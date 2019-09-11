@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">KonnectAndroid</string>
+    <string name="add">Add</string>
+    <string name="no_perm_audio">Permission for audio not granted. Visualizer can\'t run.</string>
+</resources>

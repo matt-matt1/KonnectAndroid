@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="100"
+        android:id="@+id/fv_top">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:baselineAligned="false"
+            tools:ignore="UselessParent">
+            <FrameLayout
+                android:layout_width="220dp"
+                android:layout_height="match_parent"
+                android:id="@+id/left_frame"
+                android:background="@color/White">
+<!--                <info.androidhive.fontawesome.FontTextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:text="@string/fa_calendar_check_solid"-->
+<!--                    android:textColor="@color/Green"-->
+<!--                    android:textSize="30sp"-->
+<!--                    app:solid_icon="true" />-->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/rv_left" />
+            </FrameLayout>
+            <LinearLayout
+                android:layout_width="5dp"
+                android:layout_height="match_parent"
+                android:id="@+id/lin_div_column"
+                android:background="@color/Gray"
+                android:baselineAligned="false">
+                <FrameLayout
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/Gray" />
+                <FrameLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/White"
+                    android:layout_weight="100" />
+                <FrameLayout
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/Gray" />
+            </LinearLayout>
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:id="@+id/right_frame"
+                android:layout_weight="100">
+                <ProgressBar
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:id="@+id/pb_spinner"
+                    android:layout_gravity="center"
+                    android:visibility="invisible" />
+                <androidx.recyclerview.widget.RecyclerView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/rv_right" />
+            </FrameLayout>
+        </LinearLayout>
+    </FrameLayout>
+
+<!--    <FrameLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="1dp"-->
+<!--        android:id="@+id/fv_divHorz"-->
+<!--        android:background="@color/Gray" />-->
+
+<!--    <FrameLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="80dp"-->
+<!--        android:id="@+id/base_frame"-->
+<!--        android:background="@color/White" />-->
+</LinearLayout>
