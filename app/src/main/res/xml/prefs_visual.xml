@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto">
+
+	<CheckBoxPreference
+		android:defaultValue="@bool/PREFS_show_hidden_default"
+		android:key="@string/PREFS_show_hidden"
+		android:summaryOff="@string/default_hidden"
+		app:summaryOn="@string/displayed"
+		android:title="@string/PREFS_show_hidden_title" />
+
+	<CheckBoxPreference
+		android:defaultValue="@bool/PREFS_save_pass_default"
+		android:key="@string/PREFS_save_pass"
+		android:summaryOff="@string/no"
+		app:summaryOn="@string/yes"
+		android:title="@string/PREFS_save_pass_title" />
+
+	<CheckBoxPreference
+		android:defaultValue="@bool/PREFS_rem_local_default"
+		android:key="@string/PREFS_show_hidden"
+		android:summaryOff="@string/no"
+		app:summaryOn="@string/yes"
+		android:title="@string/PREFS_rem_local_title" />
+
+	<CheckBoxPreference
+		android:defaultValue="@bool/PREFS_rem_remote_default"
+		android:key="@string/PREFS_show_hidden"
+		android:summaryOff="@string/no"
+		app:summaryOn="@string/yes"
+		android:title="@string/PREFS_rem_remote_title" />
+
+</PreferenceScreen>

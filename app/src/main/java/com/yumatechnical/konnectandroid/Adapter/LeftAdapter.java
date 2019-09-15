@@ -1,4 +1,4 @@
-package com.yumatechnical.konnectandroid;
+package com.yumatechnical.konnectandroid.Adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,27 +9,44 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.Objects;
+import com.yumatechnical.konnectandroid.R;
+
+import java.util.List;
 
 
 public class LeftAdapter extends RecyclerView.Adapter<LeftAdapter.LeftAdapterViewHolder> {
 
-    private String[] my_data;
+    private List<String> my_data;
     private static final String TAG = LeftAdapter.class.getSimpleName();
+	private int selectedPos = RecyclerView.NO_POSITION;
 
-
-    LeftAdapter() {
+	public interface OnItemClickListener {
+		void onItemClick(String item);
+	}
+	private final List<String> items;
+	private final OnItemClickListener listener;
+    public LeftAdapter(List<String> items, OnItemClickListener listener) {
+	    this.items = items;
+	    this.listener = listener;
     }
 
-    class LeftAdapterViewHolder extends RecyclerView.ViewHolder {
+	class LeftAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         final TextView tv_left_data;
 
         LeftAdapterViewHolder(@NonNull View itemView) {
             super(itemView);
             tv_left_data = itemView.findViewById(R.id.tv_left_data);
+            itemView.setOnClickListener(this);
         }
-    }
+
+		@Override
+		public void onClick(View v) {
+			notifyItemChanged(selectedPos);
+			selectedPos = getLayoutPosition();
+			listener.onItemClick(String.valueOf(tv_left_data.getText()));
+		}
+	}
 
     @NonNull
     @Override
@@ -42,19 +59,25 @@ public class LeftAdapter extends RecyclerView.Adapter<LeftAdapter.LeftAdapterVie
 
     @Override
     public void onBindViewHolder(@NonNull LeftAdapterViewHolder holder, int position) {
-        String entry = my_data[position];
+        String entry = my_data.get(position);
         holder.tv_left_data.setText(entry);
+	    holder.itemView.setSelected(selectedPos == position);
     }
 
     @Override
     public int getItemCount() {
         if (null == my_data) return 0;
-        return my_data.length;
+        return my_data.size();
     }
 
-    void setData(String[] myData) {
+    public void setData(List<String> myData) {
         my_data = myData;
         notifyDataSetChanged();
     }
+
+	@Override
+	public long getItemId(int position) {
+		return super.getItemId(position);
+	}
 
 }

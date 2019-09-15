@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+	<bool name="PREFS_show_hidden_default">false</bool>
+	<bool name="PREFS_save_pass_default">true</bool>
+	<bool name="PREFS_rem_local_default">true</bool>
+	<bool name="PREFS_rem_remote_default">true</bool>
+
+</resources>
