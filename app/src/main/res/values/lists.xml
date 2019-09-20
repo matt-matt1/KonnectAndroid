@@ -1,9 +1,2 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string-array name="first">
-        <item>@string/photos</item>
-        <item>@string/music</item>
-        <item>@string/contacts</item>
-        <item>@string/files</item>
-    </string-array>
-</resources>
+<resources></resources>

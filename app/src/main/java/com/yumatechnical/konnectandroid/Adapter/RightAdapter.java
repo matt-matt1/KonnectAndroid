@@ -4,20 +4,22 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.yumatechnical.konnectandroid.Model.FileItem;
 import com.yumatechnical.konnectandroid.R;
 
-import java.util.List;
+import java.util.ArrayList;
 
 
 public class RightAdapter extends RecyclerView.Adapter<RightAdapter.RightAdapterViewHolder> {
 
-    private List<String> my_data;
-    private static final String TAG = LeftAdapter.class.getSimpleName();
+    private ArrayList<FileItem> my_data;
+    private static final String TAG = RightAdapter.class.getSimpleName();
 	private int selectedPos = RecyclerView.NO_POSITION;
 
     public interface ListItemClickListener {
@@ -25,24 +27,27 @@ public class RightAdapter extends RecyclerView.Adapter<RightAdapter.RightAdapter
 	}
 	final private ListItemClickListener listener;
 
-    public RightAdapter(List<String> items, ListItemClickListener listener) {
+    public RightAdapter(ArrayList<FileItem> items, ListItemClickListener listener) {
     	my_data = items;
     	this.listener = listener;
     }
 
     class RightAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        final TextView tv_right_data;
+        final TextView labelView;
+        final ImageView imageView;
+
 
         RightAdapterViewHolder(@NonNull View itemView) {
             super(itemView);
-	        tv_right_data = itemView.findViewById(R.id.tv_left_data);
+	        labelView = itemView.findViewById(R.id.tv_right_label);
+	        imageView = itemView.findViewById(R.id.iv_right_image);
             itemView.setOnClickListener(this);
         }
 
 	    @Override
 	    public void onClick(View v) {
-		    listener.onListItemClick(String.valueOf(tv_right_data.getText()));
+		    listener.onListItemClick(String.valueOf(labelView.getText()));
 	    }
     }
 
@@ -51,14 +56,21 @@ public class RightAdapter extends RecyclerView.Adapter<RightAdapter.RightAdapter
     public RightAdapterViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(R.layout.inner_left, parent, false);
+        View view = inflater.inflate(R.layout.inner_right, parent, false);
         return new RightAdapterViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull RightAdapterViewHolder holder, int position) {
-        String entry = my_data.get(position);
-        holder.tv_right_data.setText(entry);
+	    FileItem entry = my_data.get(position);
+//	    if (entry.getDrawable() != null) {
+//	    	holder.imageView.setImageDrawable(entry.getDrawable());
+//	    } else if (entry.getBitmap() != null) {
+//	    	holder.imageView.setImageBitmap(entry.getBitmap());
+//	    }
+//	    if (entry.getName() != null && !entry.getName().isEmpty()) {
+//		    holder.labelView.setText(entry.getName());
+//	    }
     }
 
     @Override
@@ -67,7 +79,7 @@ public class RightAdapter extends RecyclerView.Adapter<RightAdapter.RightAdapter
         return my_data.size();
     }
 
-    public void setData(List<String> myData) {
+    public void setData(ArrayList<FileItem> myData) {
         my_data = myData;
         notifyDataSetChanged();
     }

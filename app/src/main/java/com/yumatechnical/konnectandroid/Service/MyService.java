@@ -1,4 +1,4 @@
-package com.yumatechnical.konnectandroid;
+package com.yumatechnical.konnectandroid.Service;
 
 import android.app.Service;
 import android.content.Intent;

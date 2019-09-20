@@ -29,6 +29,4 @@ public class AddConnectionActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
-
 }

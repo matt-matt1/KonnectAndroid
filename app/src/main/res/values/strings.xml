@@ -24,4 +24,13 @@
 	<!-- TODO: Remove or change this placeholder text -->
 	<string name="hello_blank_fragment">Hello blank fragment</string>
 	<string name="view_contacts">View contacts</string>
+	<string name="no_address">no address</string>
+	<string name="no_intent_found">no intent found</string>
+	<string name="contacts_list_search_results_title">contact search results %1$s</string>
+	<string name="alphabet">ABC</string>
+
+	<!--	<string name="gdrive">Google Drive</string>-->
+<!--	<string name="gdrive">Google Drive</string>-->
+<!--	<string name="gdrive">Google Drive</string>-->
+<!--	<string name="gdrive">Google Drive</string>-->
 </resources>

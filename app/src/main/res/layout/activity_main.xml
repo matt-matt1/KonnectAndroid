@@ -33,6 +33,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:id="@+id/rv_left" />
+                <ListView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/lv_left" />
             </FrameLayout>
             <LinearLayout
                 android:layout_width="5dp"
@@ -54,22 +58,21 @@
                     android:layout_height="match_parent"
                     android:background="@color/Gray" />
             </LinearLayout>
+
             <FrameLayout
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:id="@+id/right_frame"
-                android:layout_weight="100">
-                <ProgressBar
-                    android:layout_width="42dp"
-                    android:layout_height="42dp"
-                    android:id="@+id/pb_spinner"
-                    android:layout_gravity="center"
-                    android:visibility="invisible" />
-                <androidx.recyclerview.widget.RecyclerView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:id="@+id/rv_right" />
-            </FrameLayout>
+                android:id="@+id/right_frame_" />
+<!--            <fragment-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:id="@+id/right_frag" />-->
+<!--            <com.yumatechnical.konnectandroid.Contacts2013example.ContactsListFragment-->
+<!--                android:id="@+id/contact_list" />-->
+<!--            <com.yumatechnical.konnectandroid.Contacts2013example.ContactDetailFragment-->
+<!--                android:id="@+id/contact_detail" />-->
+            <!--</fragment>-->
+
         </LinearLayout>
     </FrameLayout>
 

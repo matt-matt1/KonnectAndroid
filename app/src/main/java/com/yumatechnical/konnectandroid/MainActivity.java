@@ -1,10 +1,7 @@
 package com.yumatechnical.konnectandroid;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.cursoradapter.widget.SimpleCursorAdapter;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -12,8 +9,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.ContentResolver;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -21,6 +20,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcel;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -28,45 +28,49 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
-import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.joanzapata.iconify.IconDrawable;
-import com.joanzapata.iconify.Iconify;
-import com.joanzapata.iconify.fonts.FontAwesomeIcons;
-import com.joanzapata.iconify.fonts.FontAwesomeModule;
-import com.yumatechnical.konnectandroid.Adapter.LeftAdapter;
+import com.mikepenz.iconics.IconicsColor;
+import com.mikepenz.iconics.IconicsDrawable;
+import com.mikepenz.iconics.IconicsSize;
+import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome;
+import com.yumatechnical.konnectandroid.Adapter.LeftArrayAdapter;
 import com.yumatechnical.konnectandroid.Adapter.RightAdapter;
+import com.yumatechnical.konnectandroid.Fragment.RightFragment;
+import com.yumatechnical.konnectandroid.Helper.Tools;
+import com.yumatechnical.konnectandroid.Model.FileItem;
 import com.yumatechnical.konnectandroid.Model.KeyStrValueStr;
+import com.yumatechnical.konnectandroid.Model.ListItem;
 import com.yumatechnical.konnectandroid.Settings.SettingsActivity;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements SharedPreferences.OnSharedPreferenceChangeListener,
         Preference.OnPreferenceChangeListener,
-        LeftAdapter.OnItemClickListener, RightAdapter.ListItemClickListener {
+        LeftArrayAdapter.OnClickListener {
 
-	private static String[] FROM_COLUMNS, TO_IDS;
-	ListView contactsList;
-	ListAdapter cursorAdapter;
-	FrameLayout left, right, base;
+//	private static String[] FROM_COLUMNS, TO_IDS;
+//	ListView contactsList;
+//	ListAdapter cursorAdapter;
+	FrameLayout left, right/*, base*/;
     private static final int MY_PERMISSION_RECORD_AUDIO_REQUEST_CODE = 88;
     RecyclerView recyclerViewLeft, recyclerViewRight;
-    List<String> leftList, rightlist;
-    private LeftAdapter leftAdapter;
+    ArrayList<ListItem> leftList = new ArrayList<>();
+    List<Parcel> rightList;
+    ArrayList<FileItem> rightFiles = new ArrayList<>();
+    private LeftArrayAdapter leftAdapter;
     private RightAdapter rightAdapter;
-    private ProgressBar spinner;
+//    private ProgressBar spinner;
     private static final String TAG = "KonnectAndroid";
     Boolean show_hidden, save_pass, rem_local, rem_remote;
 
     static final int PICK_CONTACT = 1;
-    String st;
+//    String st;
     final private int REQUEST_MULTIPLE_PERMISSIONS = 124;
+//    ContentResolver resolver;
 
 
     @Override
@@ -74,47 +78,94 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        SetupSharedPrefs();
+
         left = findViewById(R.id.left_frame);
         fillLeft();
         right = findViewById(R.id.right_frame);
         fillRight();
 //        base = findViewById(R.id.base_frame);
-
-        Iconify.with(new FontAwesomeModule());
-        SetupSharedPrefs();
     }
+
 
     void fillLeft() {
-        leftList = Arrays.asList(getResources().getStringArray(R.array.first));
+        Boolean fade_photos = false, fade_music = true, fade_contacts = false, fade_files = false;
+        List<KeyStrValueStr> permissions;
+        permissions = new ArrayList<>();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            permissions.add(new KeyStrValueStr(Manifest.permission.READ_EXTERNAL_STORAGE, "Read External Storage"));
+        }
+        permissions.add(new KeyStrValueStr(Manifest.permission.WRITE_EXTERNAL_STORAGE, "Write External Storage"));
+        CanAccess(permissions);
+
+        permissions = new ArrayList<>();
+        permissions.add(new KeyStrValueStr(Manifest.permission.READ_CONTACTS, "Read Contacts"));
+        permissions.add(new KeyStrValueStr(Manifest.permission.WRITE_CONTACTS, "Write Contacts"));
+        CanAccess(permissions);
+
+        leftList.add(new ListItem(0, getString(R.string.photos),null,
+                new IconicsDrawable(this, FontAwesome.Icon.faw_images)
+                        .color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE),
+                Tools.dpToPx(16, this), Tools.dpToPx(16, this),
+                Tools.dpToPx(18, this), true, Tools.dpToPx(8, this), fade_photos));
+        leftList.add(new ListItem(0, getString(R.string.music),null,
+                new IconicsDrawable(this, FontAwesome.Icon.faw_music)
+                        .color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE),
+                Tools.dpToPx(16, this), Tools.dpToPx(16, this),
+                Tools.dpToPx(18, this), true, Tools.dpToPx(8, this), fade_music));
+        leftList.add(new ListItem(0, getString(R.string.contacts),null,
+                new IconicsDrawable(this, FontAwesome.Icon.faw_address_book)
+                        .color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE),
+                Tools.dpToPx(16, this), Tools.dpToPx(16, this),
+                Tools.dpToPx(18, this), true, Tools.dpToPx(8, this), fade_contacts));
+        leftList.add(new ListItem(0, getString(R.string.files),null,
+                new IconicsDrawable(this, FontAwesome.Icon.faw_file)
+                        .color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE),
+                Tools.dpToPx(16, this), Tools.dpToPx(16, this),
+                Tools.dpToPx(18, this), true, Tools.dpToPx(8, this), fade_files));
         recyclerViewLeft = findViewById(R.id.rv_left);
-        LinearLayoutManager layoutManagerLeft =
-                new LinearLayoutManager(this);//, LinearLayoutManager.VERTICAL, false);
-        recyclerViewLeft.setLayoutManager(layoutManagerLeft);
-        leftAdapter = new LeftAdapter(leftList, this);
-        recyclerViewLeft.setAdapter(leftAdapter);
-        leftAdapter.setData(leftList);
+        ListView listView = findViewById(R.id.lv_left);
+//        LinearLayoutManager layoutManagerLeft =
+//                new LinearLayoutManager(this);//, LinearLayoutManager.VERTICAL, false);
+        leftAdapter = new LeftArrayAdapter(this, 0, leftList, this);
+        listView.setAdapter(leftAdapter);
     }
 
+
     void fillRight() {
-        spinner = findViewById(R.id.pb_spinner);
-//        rightlist = getResources().getStringArray()
         recyclerViewRight = findViewById(R.id.rv_right);
-        LinearLayoutManager layoutManagerRight =
-                new LinearLayoutManager(this);
-        recyclerViewRight.setLayoutManager(layoutManagerRight);
-        rightAdapter = new RightAdapter(null, this);
-        recyclerViewRight.setAdapter(rightAdapter);
-        rightAdapter.setData(rightlist);
+        if (recyclerViewRight != null) {
+            LinearLayoutManager layoutManagerRight =
+                    new LinearLayoutManager(this);
+            recyclerViewRight.setLayoutManager(layoutManagerRight);
+            rightAdapter = new RightAdapter(null, null);
+            recyclerViewRight.setAdapter(rightAdapter);
+            rightAdapter.setData(convertPacelToRightlist(rightList));
+        }
     }
+
+
+    public ArrayList<FileItem> convertPacelToRightlist(List<Parcel> parcelList) {
+        if (parcelList == null) {
+            return null;
+        }
+        ArrayList<FileItem> itemList = new ArrayList<>();
+        for (int i = 0; i < parcelList.size(); i++) {
+            Parcel current = parcelList.get(i);
+            itemList.add((FileItem) FileItem.CREATOR.createFromParcel(current));
+        }
+//        rightAdapter.setData(itemList));
+        return itemList;
+    }
+
+
     /**
      * Methods for setting up the menu
      **/
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        Log.d(TAG, "onCreateOptionsMenu: menu size: " + menu.size());
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.visualizer_menu, menu);
-        /* Return true so that the visualizer_menu is displayed in the Toolbar */
         return true;
     }
 
@@ -123,12 +174,12 @@ public class MainActivity extends AppCompatActivity
         MenuItem menuItem;
 
         menuItem = menu.findItem(R.id.add_connect);
-        menuItem.setIcon(new IconDrawable(this, FontAwesomeIcons.fa_plus)
-                .colorRes(R.color.White).actionBarSize());
+        menuItem.setIcon(new IconicsDrawable(this, FontAwesome.Icon.faw_plus)
+                .color(IconicsColor.colorRes(R.color.White)).size(IconicsSize.TOOLBAR_ICON_SIZE));
 
         menuItem = menu.findItem(R.id.settings);
-        menuItem.setIcon(new IconDrawable(this, FontAwesomeIcons.fa_navicon)
-                .colorRes(R.color.White).actionBarSize());
+        menuItem.setIcon(new IconicsDrawable(this, FontAwesome.Icon.faw_cog)
+                .color(IconicsColor.colorRes(R.color.White)).size(IconicsSize.TOOLBAR_ICON_SIZE));
         return true;
     }
 
@@ -148,6 +199,7 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+/*
 	public void onContactsActivityCreated() {
 		// Gets the ListView from the View list of the parent activity
 //		contactsList =
@@ -157,12 +209,13 @@ public class MainActivity extends AppCompatActivity
 				this,
 				R.layout.contact_list_item,
 				null,
-				null/*FROM_COLUMNS*/, null/*TO_IDS*/,
+				null/ *FROM_COLUMNS* /, null/ *TO_IDS* /,
 				0);
 		// Sets the adapter for the ListView
 		contactsList.setAdapter(cursorAdapter);
 //		contactsList.setOnItemClickListener(this);
 	}
+*/
 
 	void SetupSharedPrefs() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -198,6 +251,7 @@ public class MainActivity extends AppCompatActivity
 //        SetupSharedPrefs();
     }
 
+
     /**
      * onPause Cleanup audio stream
      **/
@@ -223,10 +277,11 @@ public class MainActivity extends AppCompatActivity
         super.onDestroy();
     }
 
+
     /**
      * App Permissions for Audio
      **/
-    private void setupPermissions() {
+/*    private void setupPermissions() {
         // If we don't have the record audio permission...
         if (ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
@@ -240,7 +295,7 @@ public class MainActivity extends AppCompatActivity
             // Otherwise, permissions were granted and we are ready to go!
 //            mAudioInputReader = new AudioInputReader(mVisualizerView, this);
         }
-    }
+    }*/
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
@@ -262,10 +317,13 @@ public class MainActivity extends AppCompatActivity
             }
             // Other permissions could go down here
 
+            break;
+	        default:
+		        throw new IllegalStateException("Unexpected value: " + requestCode);
         }
     }
 
-    private void AccessContact(List<KeyStrValueStr> permissions)
+    public void CanAccess(List<KeyStrValueStr> permissions)
     {
         List<String> permissionsNeeded = new ArrayList<>();
         final List<String> permissionsList = new ArrayList<>();
@@ -284,7 +342,7 @@ public class MainActivity extends AppCompatActivity
                 StringBuilder message = new StringBuilder("You need to grant access to " + permissionsNeeded.get(0));
                 for (int i = 1; i < permissionsNeeded.size(); i++)
                     message.append(", ").append(permissionsNeeded.get(i));
-                showMessageOKCancel(message.toString(),
+                Tools.showMessageOKCancel(this, message.toString(),
                         (dialog, which) -> {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                                 requestPermissions(permissionsList.toArray(new String[permissionsList.size()]),
@@ -299,6 +357,7 @@ public class MainActivity extends AppCompatActivity
             }
         }
     }
+
     private boolean addPermission(List<String> permissionsList, String permission) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
@@ -309,61 +368,12 @@ public class MainActivity extends AppCompatActivity
         }
         return true;
     }
-    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
-        new AlertDialog.Builder(this)
-                .setMessage(message)
-                .setPositiveButton("OK", okListener)
-                .setNegativeButton("Cancel", null)
-                .create()
-                .show();
-    }
 
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         return false;
     }
 
-    @Override
-    public void onItemClick(String item) {
-        /*left*/
-        if (item.equals(getString(R.string.photos))) {
-            List<KeyStrValueStr> permissions = new ArrayList<>();
-            permissions.add(new KeyStrValueStr(Manifest.permission.READ_EXTERNAL_STORAGE, "Read External Storage"));
-            permissions.add(new KeyStrValueStr(Manifest.permission.WRITE_EXTERNAL_STORAGE, "Write External Storage"));
-            AccessContact(permissions);
-            Intent service = new Intent(MainActivity.this, MyService.class);
-            startService(service);
-        } else
-        if (item.equals(getString(R.string.music))) {
-            List<KeyStrValueStr> permissions = new ArrayList<>();
-            permissions.add(new KeyStrValueStr(Manifest.permission.READ_EXTERNAL_STORAGE, "Read External Storage"));
-            permissions.add(new KeyStrValueStr(Manifest.permission.WRITE_EXTERNAL_STORAGE, "Write External Storage"));
-            AccessContact(permissions);
-            getMediaList();
-//            startActivity(new Intent(this, PlayMedia.class));
-        } else
-        if (item.equals(getString(R.string.contacts))) {
-            List<KeyStrValueStr> permissions = new ArrayList<>();
-            permissions.add(new KeyStrValueStr(Manifest.permission.READ_CONTACTS, "Read Contacts"));
-            permissions.add(new KeyStrValueStr(Manifest.permission.WRITE_CONTACTS, "Write Contacts"));
-            AccessContact(permissions);
-            startActivity(new Intent(this, PutOnRight.class));
-//            Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
-//            startActivityForResult(intent, PICK_CONTACT);
-        } else
-        if (item.equals(getString(R.string.files))) {
-            List<KeyStrValueStr> permissions = new ArrayList<>();
-            permissions.add(new KeyStrValueStr(Manifest.permission.READ_EXTERNAL_STORAGE, "Read External Storage"));
-            permissions.add(new KeyStrValueStr(Manifest.permission.WRITE_EXTERNAL_STORAGE, "Write External Storage"));
-            AccessContact(permissions);
-        }
-    }
-
-    @Override
-    public void onListItemClick(String item) {
-        /*right*/
-        Log.d(TAG, "right: " + item);
-    }
 
     public void onActivityResult(int reqCode, int resultCode, Intent data) {
         super.onActivityResult(reqCode, resultCode, data);
@@ -399,7 +409,12 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+
     void getMediaList() {
+//        List<KeyStrValueStr> permissions = new ArrayList<>();
+//        permissions.add(new KeyStrValueStr(Manifest.permission.READ_EXTERNAL_STORAGE, "Read External Storage"));
+//        permissions.add(new KeyStrValueStr(Manifest.permission.WRITE_EXTERNAL_STORAGE, "Write External Storage"));
+//        CanAccess(permissions);
         ContentResolver musicResolver = getContentResolver();
         Uri musicUri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         Cursor musicCursor = musicResolver.query(musicUri, null, null,
@@ -417,12 +432,178 @@ public class MainActivity extends AppCompatActivity
                 String thisTitle = musicCursor.getString(titleCol);
                 String thisArtist = musicCursor.getString(artistCol);
                 String thisAlbum = musicCursor.getString(albumCol);
-                rightlist.add(thisId + ":" + thisTitle + ":" + thisArtist + ":" + thisAlbum);
+                String add = thisId + ":" + thisTitle + ":" + thisArtist + ":" + thisAlbum;
+//                List<FileItem> fileItemList = new ArrayList<>();
+//                Parcel parcel;
+//                FileItem fileItem = new FileItem(add, null, Integer.parseInt(String.valueOf(thisId)),
+//                        null, "audio/mp3", false, add);
+//                parcel = FileItem.w;
+//            rightList.add(parcel);
+                Log.d(TAG, add);
             }
             while (musicCursor.moveToNext());
-            fillRight();
+//            Log.d(TAG, String.valueOf(rightlist));
+//            fillRight();
+        }
+	    if (musicCursor != null) {
+		    musicCursor.close();
+	    }
+    }
+
+
+    //from LeftArrayAdapter.OnClickListener
+    @Override
+    public void OnClickItem(String item) {
+        FragmentManager manager = getFragmentManager();
+        Fragment fragment;// = new RightFragment();
+//        Bundle bundle = new Bundle();
+        FragmentTransaction transaction = manager.beginTransaction();
+//        transaction.replace(R.id.right_frame_, fragment);
+        transaction.addToBackStack(null);
+        Log.d(TAG, "clicked: " + item);
+        if (item.equals(getString(R.string.photos))) {
+//            List<KeyStrValueStr> permissions = new ArrayList<>();
+//            permissions.add(new KeyStrValueStr(Manifest.permission.READ_EXTERNAL_STORAGE, "Read External Storage"));
+//            permissions.add(new KeyStrValueStr(Manifest.permission.WRITE_EXTERNAL_STORAGE, "Write External Storage"));
+//            AccessContact(permissions);
+//            bundle.putString("title", getString(R.string.photos));
+            fragment = RightFragment.newInstance(getString(R.string.photos), null, "");
+//            for (FileItem entry : rightFiles) {
+////            for (Parcel parcel : rightList) {
+////
+////            }
+////                create a parcel and wrap each entry
+//                Parcel parcel = new Parcel(new FileItem(entry.getName(), entry.getFullPath(), entry.getID(),
+//                        entry.getBitmap(), entry.getMIME(), entry.getHasContents(), entry.getSortKey()));
+//            }
+//            bundle.putParcelableArray("list", new Parcelable[]{rightList});
+//            bundle.putParcelableArrayList("list", new ArrayList(Collections(rightList));
+//            bundle.putString("text", "");
+//            fragment.setArguments(bundle);//.newInstance(rightlist, "");
+            transaction.replace(R.id.right_frame_, fragment);
+            transaction.commit();
+//            Intent service = new Intent(MainActivity.this, MyService.class);
+//            startService(service);
+        } else
+        if (item.equals(getString(R.string.music))) {
+//            List<KeyStrValueStr> permissions = new ArrayList<>();
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+//                permissions.add(new KeyStrValueStr(Manifest.permission.READ_EXTERNAL_STORAGE, "Read External Storage"));
+//            }
+//            permissions.add(new KeyStrValueStr(Manifest.permission.WRITE_EXTERNAL_STORAGE, "Write External Storage"));
+//            CanAccess(permissions);
+            getMediaList();
+            fragment = RightFragment.newInstance(getString(R.string.music), null, "");
+//            bundle.putString("title", getString(R.string.music));
+//            bundle.putStringArrayList("list", rightlist);
+//            bundle.putParcelableArrayList("list", new ArrayList(Collections rightList);
+//            bundle.putString("text", "");
+//            fragment.setArguments(bundle);//.newInstance(rightlist, "");
+            transaction.replace(R.id.right_frame_, fragment);
+            transaction.commit();
+//            startActivity(new Intent(this, PlayMedia.class));
+        } else
+        if (item.equals(getString(R.string.contacts))) {
+//            List<KeyStrValueStr> permissions = new ArrayList<>();
+//            permissions.add(new KeyStrValueStr(Manifest.permission.READ_CONTACTS, "Read Contacts"));
+//            permissions.add(new KeyStrValueStr(Manifest.permission.WRITE_CONTACTS, "Write Contacts"));
+//            CanAccess(permissions);
+//            fillRight();
+//            new FetchContactsTask().execute();
+            fragment = RightFragment.newInstance(getString(R.string.contacts), null, "");
+//            bundle.putString("title", getString(R.string.contacts));
+//            bundle.putStringArrayList("list", rightlist);
+//            bundle.putParcelableArrayList("list", new ArrayList(Collections rightList);
+//            bundle.putString("text", "");
+//            fragment.setArguments(bundle);//.newInstance(rightlist, "");
+            transaction.replace(R.id.right_frame_, fragment);
+            transaction.commit();
+//            startActivity(new Intent(this, PutOnRight.class));
+//            PutOnRight putOnRight = new PutOnRight.FetchContactsTask();
+//            putOnRight.FetchContactsTask().execute();
+//            Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+//            startActivityForResult(intent, PICK_CONTACT);
+        } else
+        if (item.equals(getString(R.string.files))) {
+//            List<KeyStrValueStr> permissions = new ArrayList<>();
+//            permissions.add(new KeyStrValueStr(Manifest.permission.READ_EXTERNAL_STORAGE, "Read External Storage"));
+//            permissions.add(new KeyStrValueStr(Manifest.permission.WRITE_EXTERNAL_STORAGE, "Write External Storage"));
+//            AccessContact(permissions);
+            fragment = RightFragment.newInstance(getString(R.string.files), null, "");
+//            bundle.putString("title", getString(R.string.files));
+//            bundle.putStringArrayList("list", rightlist);
+//            bundle.putParcelableArrayList("list", new ArrayList(Collections rightList);
+//            bundle.putString("text", "");
+//            fragment.setArguments(bundle);//.newInstance(rightlist, "");
+            transaction.replace(R.id.right_frame_, fragment);
+            transaction.commit();
         }
     }
 
-}
+    /*
+    public class FetchContactsTask extends AsyncTask<Void, Void, Cursor> {
 
+        int count;
+
+
+        @Override
+        protected void onPreExecute() {
+/ *            List<KeyStrValueStr> permissions = new ArrayList<>();
+            permissions.add(new KeyStrValueStr(Manifest.permission.READ_CONTACTS, "Read Contacts"));
+//			permissions.add(new KeyStrValueStr(Manifest.permission.WRITE_CONTACTS, "Write Contacts"));
+            CanAccess(permissions);* /
+        }
+
+        @Override
+        protected Cursor doInBackground(Void... params) {
+            ContentResolver resolver = getContentResolver();
+            Cursor cursor = resolver.query(ContactsContract.Contacts.CONTENT_URI,
+                    null, null, null, null);
+            if (cursor != null) {
+                count = cursor.getCount();
+            }
+            return cursor;
+        }
+
+        // Invoked on UI thread
+        @Override
+        protected void onPostExecute(Cursor cursor) {
+            super.onPostExecute(cursor);
+
+//            mData = cursor;
+
+            if (count > 0) {
+                while (cursor.moveToNext()) {
+                    String columnId = ContactsContract.Contacts._ID;
+                    int cursorIndex = cursor.getColumnIndex(columnId);
+                    String id = cursor.getString(cursorIndex);
+                    String name = cursor.getString(cursor
+                            .getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+                    boolean hasContent = (cursor.getString(cursor
+                            .getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)).equals("1"));
+                    String add = id + ":" + name + ":(" + hasContent + ")";
+                    rightFiles.add(new FileItem(name, null, Integer.parseInt(id), null,
+                            "", hasContent, name));
+                    Log.d(TAG, add);
+                }
+            }
+            cursor.close();
+//            if (spinner != null) {
+//                spinner.setVisibility(View.INVISIBLE);
+//            }
+
+            recyclerViewRight = findViewById(R.id.rv_right);
+            if (recyclerViewRight != null) {
+                LinearLayoutManager layoutManagerRight =
+                        new LinearLayoutManager(getApplicationContext());
+                recyclerViewRight.setLayoutManager(layoutManagerRight);
+//                rightAdapter = new RightAdapter(rightFiles, MainActivity.this);
+                rightAdapter = new RightAdapter(null, null);
+                recyclerViewRight.setAdapter(rightAdapter);
+                rightAdapter.setData(convertPacelToRightlist(rightList));
+            }
+            rightAdapter.notifyDataSetChanged();
+        }
+    }
+*/
+}

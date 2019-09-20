@@ -1,9 +1,8 @@
-package com.yumatechnical.konnectandroid;
+package com.yumatechnical.konnectandroid.Fragment;
 
 import android.annotation.SuppressLint;
 import android.os.Build;
 import android.provider.ContactsContract;
-import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -22,6 +21,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.yumatechnical.konnectandroid.R;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -31,7 +32,7 @@ import android.widget.ListView;
  * Use the {@link ContactsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ContactsFragment extends Fragment  implements
+public class ContactsFragment extends Fragment implements
 		LoaderManager.LoaderCallbacks<Cursor>,
 		AdapterView.OnItemClickListener {
 
@@ -169,13 +170,15 @@ public class ContactsFragment extends Fragment  implements
 				null,
 				FROM_COLUMNS, TO_IDS,
 				0);
-		// Sets the adapter for the ListView
-		contactsList.setAdapter(cursorAdapter);
-		contactsList.setOnItemClickListener(this);
+		if (contactsList != null) {
+			// Sets the adapter for the ListView
+			contactsList.setAdapter(cursorAdapter);
+			contactsList.setOnItemClickListener(this);
+		}
 		// Initializes the loader
 		getLoaderManager().initLoader(0, null, this);
 	}
-
+/*
 	// TODO: Rename method, update argument and hook method into UI event
 	public void onButtonPressed(Uri uri) {
 		if (mListener != null) {
@@ -200,7 +203,7 @@ public class ContactsFragment extends Fragment  implements
 		super.onDetach();
 		mListener = null;
 	}
-
+*/
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 /*		// Get the Cursor

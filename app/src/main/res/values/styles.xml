@@ -5,8 +5,10 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/Teal</item>
         <item name="colorPrimaryDark">@color/Maroon</item>
-        <item name="colorAccent">@color/Yellow</item>
+        <item name="colorAccent">@color/Emerald</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
     </style>
+
+	<style name="searchTextHiglight"></style>
 
 </resources>

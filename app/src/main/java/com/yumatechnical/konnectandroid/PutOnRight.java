@@ -1,23 +1,32 @@
 package com.yumatechnical.konnectandroid;
 
+import android.Manifest;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.util.Log;
+
+import com.yumatechnical.konnectandroid.Model.FileItem;
+import com.yumatechnical.konnectandroid.Model.KeyStrValueStr;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PutOnRight extends MainActivity {
 
 	private Cursor mData;
+	private static final String TAG = PutOnRight.class.getSimpleName();
 
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+//		setContentView(R.layout.activity_main);
 
 		fillRight();
-		new WordFetchTask().execute();
+		new FetchContactsTask().execute();
 	}
 
 	@Override
@@ -28,9 +37,18 @@ public class PutOnRight extends MainActivity {
 	}
 
 	// Use an async task to do the data fetch off of the main thread.
-	public class WordFetchTask extends AsyncTask<Void, Void, Cursor> {
+	public class FetchContactsTask extends AsyncTask<Void, Void, Cursor> {
 
 		int count;
+
+
+		@Override
+		protected void onPreExecute() {
+			List<KeyStrValueStr> permissions = new ArrayList<>();
+			permissions.add(new KeyStrValueStr(Manifest.permission.READ_CONTACTS, "Read Contacts"));
+//			permissions.add(new KeyStrValueStr(Manifest.permission.WRITE_CONTACTS, "Write Contacts"));
+			CanAccess(permissions);
+		}
 
 		@Override
 		protected Cursor doInBackground(Void... params) {
@@ -59,7 +77,10 @@ public class PutOnRight extends MainActivity {
 							.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
 					int numCount = Integer.parseInt(cursor.getString(cursor
 							.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)));
-					rightlist.add(id + ":" + name + ":(" + numCount + ")");
+					String add = id + ":" + name + ":(" + numCount + ")";
+					rightFiles.add(new FileItem(add, null, Integer.parseInt(id), null,
+							"", (numCount != 0), add));
+					Log.d(TAG, add);
 				}
 			}
 			cursor.close();
