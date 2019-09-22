@@ -28,6 +28,9 @@
 	<string name="no_intent_found">no intent found</string>
 	<string name="contacts_list_search_results_title">contact search results %1$s</string>
 	<string name="alphabet">ABC</string>
+	<string name="item_disabled">This item is disabled, due to permissions</string>
+	<string name="left_1">left_1</string>
+	<string name="left_2">left_2</string>
 
 	<!--	<string name="gdrive">Google Drive</string>-->
 <!--	<string name="gdrive">Google Drive</string>-->

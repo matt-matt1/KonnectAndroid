@@ -4,10 +4,12 @@ import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.content.ContentResolver;
 import android.database.Cursor;
+import android.media.browse.MediaBrowser;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,9 +23,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.yumatechnical.konnectandroid.Adapter.RightAdapter;
 import com.yumatechnical.konnectandroid.Model.FileItem;
+import com.yumatechnical.konnectandroid.Model.MyContact;
 import com.yumatechnical.konnectandroid.Model.MyPhone;
 import com.yumatechnical.konnectandroid.R;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,6 +76,9 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 		return fragment;
 	}
 
+/*
+newInstance, onCreateView, onActivityCreated
+ */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -87,11 +94,13 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 		}
 	}
 
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 	                         Bundle savedInstanceState) {
 		return inflater.inflate(R.layout.right_panel, container, false);
 	}
+
 
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
@@ -155,32 +164,36 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 		@Override
 		protected void onPreExecute() {
 			spinner.setVisibility(View.VISIBLE);
-//			recyclerView = findViewById(R.id.rv_contacts);
 			recyclerView.setVisibility(View.INVISIBLE);
 		}
 
 		@Override
 		protected Void doInBackground(Void... params) {
-			getContacts();
+			getContacts(id);
 			return null;
 		}
 
 		@Override
-		protected void onPostExecute(Void aVoid) {
-			spinner.setVisibility(View.INVISIBLE);
+		protected void onPostExecute(Void aVoid) {//done
 			rightAdapter = new RightAdapter(null, null);
-//			recyclerView.setAdapter(rightAdapter);
+			recyclerView.setAdapter(rightAdapter);
 			rightAdapter.setData(contactsList);
-//			rightAdapter.notifyDataSetChanged();
+			spinner.setVisibility(View.INVISIBLE);
 			recyclerView.setVisibility(View.VISIBLE);
 		}
 
 	}
 
 
-	void getContacts() {
+	void getContacts(int ID) {
+		if (contactsList != null) {
+			if (contactsList.size() > 0) {
+				return;
+			}
+		}
 		resolver = getActivity().getContentResolver();
 		Cursor cursor;
+		String Sel = "";
 		cursor = resolver.query(ContactsContract.Contacts.CONTENT_URI,
 				null, null, null, null);
 		if ((cursor != null ? cursor.getCount() : 0) > 0) {
@@ -190,7 +203,7 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 						cursor.getColumnIndex(ContactsContract.Contacts._ID));
 				String name = cursor.getString(cursor.getColumnIndex(
 						ContactsContract.Contacts.DISPLAY_NAME));
-				List<MyPhone> phoneList = new ArrayList<>();
+				ArrayList<MyPhone> phoneList = new ArrayList<>();
 				if (cursor.getInt(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)) > 0) {
 					Cursor pCur = resolver.query(
 							ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
@@ -237,11 +250,9 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 				}
 //				MyContact contact = new MyContact(Integer.parseInt(id), name, name, null,
 //						has, phoneList);
-//				rightList.add(new FileItem(name, null, Integer.parseInt(id), null,
-//						"mime", has, name));
-//				rightList.add(contact);
+				//				rightList.add(contact);
 				FileItem fileItem = new FileItem(name, null, Integer.parseInt(id),
-						null, "mime", has, name);
+						null, "mime", has, name, phoneList);
 				contactsList.add(fileItem);
 //				Log.d(TAG, "adding:"+ fileItem.toString());
 			}
@@ -249,6 +260,81 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 		if (cursor != null) {
 			cursor.close();
 		}
+		Log.d(TAG, "contactsList: "+ contactsList.toString());
+	}
+
+
+	@SuppressLint("StaticFieldLeak")
+	public class FetchPhotosTask extends AsyncTask<Void, Void, Void> {
+
+		int id;
+
+
+		FetchPhotosTask(int id) {
+			super();
+			this.id = id;
+		}
+
+		@Override
+		protected void onPreExecute() {
+			spinner.setVisibility(View.VISIBLE);
+			recyclerView.setVisibility(View.INVISIBLE);
+		}
+
+		@Override
+		protected Void doInBackground(Void... params) {
+			getPhotos(id);
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void aVoid) {//done
+			rightAdapter = new RightAdapter(null, null);
+			recyclerView.setAdapter(rightAdapter);
+			rightAdapter.setData(contactsList);
+			spinner.setVisibility(View.INVISIBLE);
+			recyclerView.setVisibility(View.VISIBLE);
+		}
+
+	}
+
+
+	void getPhotos(int ID) {
+		if (contactsList != null) {
+			if (contactsList.size() > 0) {
+				return;
+			}
+		}
+		String[] projection = {MediaStore.MediaColumns.DATA};
+		resolver = getActivity().getContentResolver();
+		Cursor cursor;
+		String absolutePathOfImage;
+		ArrayList<FileItem> listOfAllImages = new ArrayList<>();
+		ArrayList<MediaStore.Images.Media> list = new ArrayList<>();
+		cursor = resolver.query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+				projection, null, null, null);
+		if ((cursor != null ? cursor.getCount() : 0) > 0) {
+			while (cursor.moveToNext()) {
+				boolean has = false;
+
+				String name = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DISPLAY_NAME));
+				String id = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.BUCKET_ID));
+				absolutePathOfImage = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA));
+				Uri uri = Uri.parse(absolutePathOfImage);
+
+				FileItem fileItem = new FileItem(name, uri, Integer.parseInt(id),
+						null, "mime", has, name, null);
+				listOfAllImages.add(fileItem);
+//				Log.d(TAG, "adding:"+ fileItem.toString());
+				list.add(new MediaStore.Images.Media());
+			}
+		}
+		if (cursor != null) {
+			cursor.close();
+		}
+//		for (String path : listOfAllImages) {
+//			list.add(new MediaStore.Images.Media(new File(path)));
+//		}
 		Log.d(TAG, "contactsList: "+ contactsList.toString());
 	}
 

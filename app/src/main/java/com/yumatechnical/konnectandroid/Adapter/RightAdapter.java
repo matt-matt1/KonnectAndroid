@@ -1,6 +1,7 @@
 package com.yumatechnical.konnectandroid.Adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +20,7 @@ import java.util.ArrayList;
 public class RightAdapter extends RecyclerView.Adapter<RightAdapter.RightAdapterViewHolder> {
 
     private ArrayList<FileItem> my_data;
-    private static final String TAG = RightAdapter.class.getSimpleName();
+//    private static final String TAG = RightAdapter.class.getSimpleName();
 	private int selectedPos = RecyclerView.NO_POSITION;
 
     public interface ListItemClickListener {
@@ -28,6 +29,7 @@ public class RightAdapter extends RecyclerView.Adapter<RightAdapter.RightAdapter
 	final private ListItemClickListener listener;
 
     public RightAdapter(ArrayList<FileItem> items, ListItemClickListener listener) {
+//    	Log.d(TAG, "constructor made");
     	my_data = items;
     	this.listener = listener;
     }
@@ -45,9 +47,28 @@ public class RightAdapter extends RecyclerView.Adapter<RightAdapter.RightAdapter
             itemView.setOnClickListener(this);
         }
 
+        void bind(int position) {
+	        FileItem entry = my_data.get(position);
+	        if (entry.getBitmap() != null) {
+		        imageView.setImageBitmap(entry.getBitmap());
+	        }
+	        if (entry.getName() != null && !entry.getName().isEmpty()) {
+		        if (!entry.getHasContents()) {
+			        labelView.setTextColor(Color.LTGRAY);
+		        }
+		        labelView.setText(entry.getName());
+	        }
+        }
+
 	    @Override
 	    public void onClick(View v) {
-		    listener.onListItemClick(String.valueOf(labelView.getText()));
+		    if (getAdapterPosition() == RecyclerView.NO_POSITION) return;
+		    if (listener != null) {
+			    listener.onListItemClick(String.valueOf(labelView.getText()));
+		    }
+		    notifyItemChanged(selectedPos);
+		    selectedPos = getAdapterPosition();
+		    notifyItemChanged(selectedPos);
 	    }
     }
 
@@ -62,24 +83,27 @@ public class RightAdapter extends RecyclerView.Adapter<RightAdapter.RightAdapter
 
     @Override
     public void onBindViewHolder(@NonNull RightAdapterViewHolder holder, int position) {
-	    FileItem entry = my_data.get(position);
-//	    if (entry.getDrawable() != null) {
-//	    	holder.imageView.setImageDrawable(entry.getDrawable());
-//	    } else if (entry.getBitmap() != null) {
+    	holder.bind(position);
+	    holder.itemView.setBackgroundColor(selectedPos == position ? Color.LTGRAY : Color.TRANSPARENT);
+//	    FileItem entry = my_data.get(position);
+//	    if (entry.getBitmap() != null) {
 //	    	holder.imageView.setImageBitmap(entry.getBitmap());
 //	    }
 //	    if (entry.getName() != null && !entry.getName().isEmpty()) {
+//	    	if (!entry.getHasContents()) {
+//	    		holder.labelView.setTextColor(Color.LTGRAY);
+//		    }
 //		    holder.labelView.setText(entry.getName());
 //	    }
     }
 
     @Override
-    public int getItemCount() {
+    public int getItemCount() {//done
         if (null == my_data) return 0;
         return my_data.size();
     }
 
-    public void setData(ArrayList<FileItem> myData) {
+    public void setData(ArrayList<FileItem> myData) {//done
         my_data = myData;
         notifyDataSetChanged();
     }

@@ -10,4 +10,6 @@
 	<color name="Maroon">#FF800000</color>
 	<color name="Teal">#FF008080</color>
 
+	<drawable name="drawGray">#FF808080</drawable>
+	<drawable name="drawWhite">#FFFFFFFF</drawable>
 </resources>

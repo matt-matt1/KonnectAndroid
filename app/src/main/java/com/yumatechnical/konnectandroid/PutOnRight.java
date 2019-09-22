@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PutOnRight extends MainActivity {
-
+/*
 	private Cursor mData;
 	private static final String TAG = PutOnRight.class.getSimpleName();
 
@@ -25,7 +25,7 @@ public class PutOnRight extends MainActivity {
 		super.onCreate(savedInstanceState);
 //		setContentView(R.layout.activity_main);
 
-		fillRight();
+//		fillRight();
 		new FetchContactsTask().execute();
 	}
 

@@ -121,7 +121,10 @@ public class ListItem {
 	@NonNull
 	@Override
 	public String toString() {
-		return super.toString();
+		return "ListItem: NAME="+ getName()+ ", PRIORITY="+ getPriority()+ ", ICON_AS_STRING="+ getIconAsString()+
+				", DRAWABLE="+ getDrawable()+ ", PADDING_LEFT="+ getLeftPadding()+ ", PADDING_TOP="+ getTopPadding()+
+				", PADDING_BOTTOM="+ getBotPadding()+ ", IS_ICON_BEFORE_TEXT="+ getIconBeforeText()+
+				", PADDING_BETEEN_ICON_AND_TEXT="+ getIconTextPadding()+ ", IS_FADED="+ getFaded();
 	}
 
 	@Override

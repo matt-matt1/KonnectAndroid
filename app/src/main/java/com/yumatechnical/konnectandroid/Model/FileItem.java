@@ -3,16 +3,18 @@ package com.yumatechnical.konnectandroid.Model;
 import android.graphics.Bitmap;
 //import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
-import android.os.Parcel;
-import android.os.Parcelable;
+//import android.os.Build;
+//import android.os.Parcel;
+//import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-public class FileItem implements Parcelable {
+import java.util.ArrayList;
 
-	public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+public class FileItem /*implements Parcelable*/ {
+
+/*	public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
 		public FileItem createFromParcel(Parcel in) {
 			return new FileItem(in);
 		}
@@ -20,7 +22,7 @@ public class FileItem implements Parcelable {
 		public FileItem[] newArray(int size) {
 			return new FileItem[size];
 		}
-	};
+	};*/
 	private String name;
 	private Uri fullPath;
 	private int ID;
@@ -28,9 +30,10 @@ public class FileItem implements Parcelable {
 	private String MIME;
 	private Boolean hasContents;
 	private String sortKey;
+	private ArrayList<MyPhone> phoneArrayList;
 
 	public FileItem(String name, Uri fullPath, int ID, Bitmap bitmap, String MIME,
-	                Boolean hasContents, String sortKey) {
+	                Boolean hasContents, String sortKey, ArrayList<MyPhone> phoneArrayList) {
 		this.name = name;
 		this.fullPath = fullPath;
 		this.ID = ID;
@@ -38,9 +41,10 @@ public class FileItem implements Parcelable {
 		this.MIME = MIME;
 		this.hasContents = hasContents;
 		this.sortKey = sortKey;
+		this.phoneArrayList = phoneArrayList;
 	}
 
-	protected FileItem(Parcel in) {
+/*	protected FileItem(Parcel in) {
 		this.name = in.readString();
 		this.fullPath = in.readParcelable(Uri.class.getClassLoader());
 		this.ID = in.readInt();
@@ -51,7 +55,7 @@ public class FileItem implements Parcelable {
 		}
 		this.sortKey = in.readString();
 	}
-
+*/
 	public String getName() {
 		return name;
 	}
@@ -78,6 +82,10 @@ public class FileItem implements Parcelable {
 
 	public String getSortKey() {
 		return sortKey;
+	}
+
+	public ArrayList<MyPhone> getPhoneArrayList() {
+		return phoneArrayList;
 	}
 
 	public void setName(String name) {
@@ -109,6 +117,10 @@ public class FileItem implements Parcelable {
 		this.hasContents = hasContents;
 	}
 
+	public void setPhoneArrayList(ArrayList<MyPhone> phoneArrayList) {
+		this.phoneArrayList = phoneArrayList;
+	}
+
 	@NonNull
 	@Override
 	protected Object clone() throws CloneNotSupportedException {
@@ -129,15 +141,15 @@ public class FileItem implements Parcelable {
 	@Override
 	public String toString() {
 		return "FileItem: ID="+ getID()+ ", NAME="+ getName()+ ", BITMAP="+ getBitmap()+ ", SORT_KEY="+
-				getSortKey()+ ", PATH="+ getFullPath()+ ", HAS_CONTENTS="+ getHasContents()+ "\n";
-//		return super.toString();
+				getSortKey()+ ", PATH="+ getFullPath()+ ", HAS_CONTENTS="+ getHasContents()+
+				", PHONE_LIST="+ getPhoneArrayList().toString()+ "\n";
 	}
 
 	@Override
 	protected void finalize() throws Throwable {
 		super.finalize();
 	}
-
+/*
 	@Override
 	public int describeContents() {
 		return 0;
@@ -152,4 +164,5 @@ public class FileItem implements Parcelable {
 		dest.writeParcelable(bitmap, flags);
 		dest.writeString(MIME);
 	}
+*/
 }
