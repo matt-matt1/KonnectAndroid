@@ -1,19 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
+    <!--eg. contact person image / picture-->
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:padding="2dp"
         android:id="@+id/iv_right_image" />
 
-    <TextView
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/tv_right_label" />
+        android:layout_height="wrap_content" >
+<!--        contact label (character) / unused-->
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/fl_right_item_label"
+            android:visibility="invisible"
+            android:layout_gravity="start">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/iv_right_item_label"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/tv_right_item_label"
+                android:textColor="@color/White"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:layout_gravity="start" />
+        </FrameLayout>
+<!--        contact name / picture name-->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:id="@+id/tv_right_label" />
+    </FrameLayout>
 
+<!--    row underline-->
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"

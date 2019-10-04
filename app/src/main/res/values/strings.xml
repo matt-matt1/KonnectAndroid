@@ -20,6 +20,7 @@
 	<string name="music">My Music</string>
 	<string name="contacts">My Contacts</string>
 	<string name="files">My Files</string>
+	<string name="empty">empty</string>
 
 	<!-- TODO: Remove or change this placeholder text -->
 	<string name="hello_blank_fragment">Hello blank fragment</string>
@@ -31,9 +32,35 @@
 	<string name="item_disabled">This item is disabled, due to permissions</string>
 	<string name="left_1">left_1</string>
 	<string name="left_2">left_2</string>
+	<string name="resize">item size</string>
+	<string name="dialog_fire_missiles">Fire missiles?</string>
+	<string name="fire">fire</string>
+	<string name="cancel">cancel</string>
+	<string name="username">username</string>
+	<string name="password">password</string>
+	<string name="gdrive">Google Drive</string>
+	<string name="onedrive">Onedrive</string>
+	<string name="dropbox">Dropbox</string>
+	<string name="box">BOX</string>
+	<string name="lorem_ipsum">qwerty</string>
+	<string name="req_perm">request permission</string>
+	<string name="no_perm">Permission Not Granted</string>
+	<string name="read_contacts">Read Contacts</string>
+	<string name="ftp">FTP/SFTP/FTPS</string>
+	<string name="local_network">local network</string>
+	<string name="icon_resize">Icon Size</string>
+	<string name="ok">OK</string>
+	<string name="eg_ip_addr">eg. 192.168.1.100</string>
+	<!--	<string name="testConnect">test-connection</string>-->
+	<string name="testConnect">test</string>
+	<string name="ftpConnect">FTP connection</string>
+	<string name="server">host / server name</string>
+	<string name="rename">rename</string>
+	<string name="port">port</string>
+	<string name="failed_connect">Failed to connect</string>
 
 	<!--	<string name="gdrive">Google Drive</string>-->
-<!--	<string name="gdrive">Google Drive</string>-->
-<!--	<string name="gdrive">Google Drive</string>-->
-<!--	<string name="gdrive">Google Drive</string>-->
+	<!--	<string name="gdrive">Google Drive</string>-->
+	<!--	<string name="gdrive">Google Drive</string>-->
+	<!--	<string name="gdrive">Google Drive</string>-->
 </resources>

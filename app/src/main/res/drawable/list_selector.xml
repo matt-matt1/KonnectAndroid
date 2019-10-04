@@ -6,7 +6,8 @@
 <!--	<item android:drawable="@drawable/drawGray" android:state_pressed="true" />-->
 	<item android:drawable="@drawable/drawGray" android:state_pressed="true" />
 <!--	<item android:drawable="@drawable/drawGray" android:state_selected="true" />-->
-	<item android:drawable="@drawable/drawWhite" android:state_selected="false" />
+<!--	<item android:drawable="@drawable/drawWhite" android:state_selected="false" />-->
+	<item android:drawable="@android:color/transparent" android:state_selected="false" />
 <!--	<item android:drawable="@drawable/drawWhite" android:state_selected="false" android:state_pressed="false" />-->
 
 </selector>

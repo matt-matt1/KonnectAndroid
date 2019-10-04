@@ -31,9 +31,11 @@ public class FileItem /*implements Parcelable*/ {
 	private Boolean hasContents;
 	private String sortKey;
 	private ArrayList<MyPhone> phoneArrayList;
+	private Boolean hideName;
+	private String label;
 
-	public FileItem(String name, Uri fullPath, int ID, Bitmap bitmap, String MIME,
-	                Boolean hasContents, String sortKey, ArrayList<MyPhone> phoneArrayList) {
+	public FileItem(String name, Uri fullPath, int ID, Bitmap bitmap, String MIME, Boolean hasContents,
+	                String sortKey, ArrayList<MyPhone> phoneArrayList, Boolean hideName, String label) {
 		this.name = name;
 		this.fullPath = fullPath;
 		this.ID = ID;
@@ -42,6 +44,8 @@ public class FileItem /*implements Parcelable*/ {
 		this.hasContents = hasContents;
 		this.sortKey = sortKey;
 		this.phoneArrayList = phoneArrayList;
+		this.hideName = hideName;
+		this.label = label;
 	}
 
 /*	protected FileItem(Parcel in) {
@@ -88,6 +92,18 @@ public class FileItem /*implements Parcelable*/ {
 		return phoneArrayList;
 	}
 
+	public Boolean isHideName() {
+		return hideName;
+	}
+
+	public Boolean getHideName() {
+		return hideName;
+	}
+
+	public String getLabel() {
+		return label;
+	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
@@ -121,6 +137,14 @@ public class FileItem /*implements Parcelable*/ {
 		this.phoneArrayList = phoneArrayList;
 	}
 
+	public void setHideName(Boolean hideName) {
+		this.hideName = hideName;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
+	}
+
 	@NonNull
 	@Override
 	protected Object clone() throws CloneNotSupportedException {
@@ -140,9 +164,18 @@ public class FileItem /*implements Parcelable*/ {
 	@NonNull
 	@Override
 	public String toString() {
-		return "FileItem: ID="+ getID()+ ", NAME="+ getName()+ ", BITMAP="+ getBitmap()+ ", SORT_KEY="+
-				getSortKey()+ ", PATH="+ getFullPath()+ ", HAS_CONTENTS="+ getHasContents()+
-				", PHONE_LIST="+ getPhoneArrayList().toString()+ "\n";
+		String rtn = "ID="+ getID()+ ", ";
+		if (getName() != null) { rtn += "NAME="+ getName()+ ", "; }
+		if (getBitmap() != null) { rtn += "BITMAP="+ getBitmap()+ ", "; }
+		if (getMIME() != null) { rtn += "MIME="+ getMIME()+ ", "; }
+		if (getSortKey() != null) { rtn += "SORT_KEY="+ getSortKey()+ ", "; }
+		if (getFullPath() != null) { rtn += "PATH="+ getFullPath()+ ", "; }
+		if (getHasContents() != null) { rtn += "HAS_CONTENTS="+ getHasContents()+ ", "; }
+		if (getPhoneArrayList() != null && getPhoneArrayList().size() > 0) { rtn += "PHONE_LIST="+ getPhoneArrayList().toString()+ ", "; }
+		if (isHideName() != null) { rtn += "HIDE_AME="+ isHideName()+ ", "; }
+		if (getLabel() != null) { rtn += "LABEL="+ getLabel(); }
+		rtn += "\n";
+		return "FileItem: "+ rtn;
 	}
 
 	@Override

@@ -2,19 +2,28 @@ package com.yumatechnical.konnectandroid.Adapter;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.mikepenz.iconics.IconicsColor;
+import com.mikepenz.iconics.IconicsDrawable;
+import com.mikepenz.iconics.IconicsSize;
+import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome;
 import com.yumatechnical.konnectandroid.Model.FileItem;
 import com.yumatechnical.konnectandroid.R;
 
 import java.util.ArrayList;
+
+import static com.mikepenz.iconics.Iconics.getApplicationContext;
 
 
 public class RightAdapter extends RecyclerView.Adapter<RightAdapter.RightAdapterViewHolder> {
@@ -22,28 +31,34 @@ public class RightAdapter extends RecyclerView.Adapter<RightAdapter.RightAdapter
     private ArrayList<FileItem> my_data;
 //    private static final String TAG = RightAdapter.class.getSimpleName();
 	private int selectedPos = RecyclerView.NO_POSITION;
+	private Drawable defaultImage;
 
     public interface ListItemClickListener {
     	void onListItemClick(String item);
 	}
 	final private ListItemClickListener listener;
 
-    public RightAdapter(ArrayList<FileItem> items, ListItemClickListener listener) {
+    public RightAdapter(ArrayList<FileItem> items, Drawable defaultImage, ListItemClickListener listener) {
 //    	Log.d(TAG, "constructor made");
     	my_data = items;
     	this.listener = listener;
+    	this.defaultImage = defaultImage;
     }
 
     class RightAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        final TextView labelView;
-        final ImageView imageView;
+        final TextView labelView, labelText;
+        final ImageView imageView, labelImg;
+        final FrameLayout labelFrame;
 
 
         RightAdapterViewHolder(@NonNull View itemView) {
             super(itemView);
 	        labelView = itemView.findViewById(R.id.tv_right_label);
 	        imageView = itemView.findViewById(R.id.iv_right_image);
+	        labelFrame = itemView.findViewById(R.id.fl_right_item_label);
+	        labelText = itemView.findViewById(R.id.tv_right_item_label);
+	        labelImg = itemView.findViewById(R.id.iv_right_item_label);
             itemView.setOnClickListener(this);
         }
 
@@ -51,12 +66,23 @@ public class RightAdapter extends RecyclerView.Adapter<RightAdapter.RightAdapter
 	        FileItem entry = my_data.get(position);
 	        if (entry.getBitmap() != null) {
 		        imageView.setImageBitmap(entry.getBitmap());
+	        } else {
+	        	imageView.setImageDrawable(defaultImage);
+	        	imageView.setColorFilter(Color.GRAY);
 	        }
-	        if (entry.getName() != null && !entry.getName().isEmpty()) {
+	        if (entry.getName() != null && !entry.getName().isEmpty() && !entry.isHideName()) {
 		        if (!entry.getHasContents()) {
 			        labelView.setTextColor(Color.LTGRAY);
 		        }
 		        labelView.setText(entry.getName());
+		        labelView.setGravity(Gravity.CENTER_HORIZONTAL);
+	        }
+	        if (entry.getLabel() != null) {
+	        	labelText.setText(entry.getLabel());
+	        	labelImg.setImageDrawable(new IconicsDrawable(getApplicationContext())
+				        .icon(FontAwesome.Icon.faw_circle).color(IconicsColor.colorRes(R.color.Gray))
+				        .size(IconicsSize.TOOLBAR_ICON_SIZE));
+		        labelFrame.setVisibility(View.VISIBLE);
 	        }
         }
 
@@ -106,6 +132,11 @@ public class RightAdapter extends RecyclerView.Adapter<RightAdapter.RightAdapter
     public void setData(ArrayList<FileItem> myData) {//done
         my_data = myData;
         notifyDataSetChanged();
+    }
+
+    public void setDefaultImage(Drawable defaultImage) {
+    	this.defaultImage = defaultImage;
+	    notifyDataSetChanged();
     }
 
 }

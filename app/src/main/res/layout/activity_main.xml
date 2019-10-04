@@ -20,25 +20,18 @@
             <FrameLayout
                 android:layout_width="220dp"
                 android:layout_height="match_parent"
-                android:id="@+id/left_frame"
-                android:background="@color/White">
-<!--                <info.androidhive.fontawesome.FontTextView-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:text="@string/fa_calendar_check_solid"-->
-<!--                    android:textColor="@color/Green"-->
-<!--                    android:textSize="30sp"-->
-<!--                    app:solid_icon="true" />-->
-                <androidx.recyclerview.widget.RecyclerView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:id="@+id/rv_left" />
+                android:background="@color/White"
+                android:id="@+id/left_frame">
+<!--                <androidx.recyclerview.widget.RecyclerView-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:id="@+id/rv_left" />-->
                 <ListView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:choiceMode="singleChoice"
-	                android:smoothScrollbar="true"
-	                android:fastScrollEnabled="false"
+                    android:smoothScrollbar="true"
+                    android:fastScrollEnabled="false"
                     android:id="@+id/lv_left" />
             </FrameLayout>
             <LinearLayout
@@ -53,8 +46,8 @@
                     android:background="@color/Gray" />
                 <FrameLayout
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
                     android:background="@color/White"
+                    android:layout_height="match_parent"
                     android:layout_weight="100" />
                 <FrameLayout
                     android:layout_width="1dp"
@@ -66,15 +59,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:id="@+id/fl_right_panel" />
-<!--            <fragment-->
-<!--                android:layout_width="0dp"-->
-<!--                android:layout_height="match_parent"-->
-<!--                android:id="@+id/right_frag" />-->
-<!--            <com.yumatechnical.konnectandroid.Contacts2013example.ContactsListFragment-->
-<!--                android:id="@+id/contact_list" />-->
-<!--            <com.yumatechnical.konnectandroid.Contacts2013example.ContactDetailFragment-->
-<!--                android:id="@+id/contact_detail" />-->
-            <!--</fragment>-->
 
         </LinearLayout>
     </FrameLayout>
@@ -85,9 +69,9 @@
 <!--        android:id="@+id/fv_divHorz"-->
 <!--        android:background="@color/Gray" />-->
 
-<!--    <FrameLayout-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="80dp"-->
-<!--        android:id="@+id/base_frame"-->
-<!--        android:background="@color/White" />-->
+<!--	android:layout_height="80dp"-->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/base_frame" />
 </LinearLayout>

@@ -2,7 +2,6 @@ package com.yumatechnical.konnectandroid.Adapter;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,21 +13,21 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.yumatechnical.konnectandroid.Model.ListItem;
 import com.yumatechnical.konnectandroid.R;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
-public class LeftArrayAdapter extends ArrayAdapter<ListItem> {
+public class CustomDialogListAdapter extends ArrayAdapter<ListItem> {
 
 	private ArrayList<ListItem> my_data;
 	private int selectedPos = RecyclerView.NO_POSITION;
 	private View lastSelected = null;
-//	private static final String TAG = RightAdapter.class.getSimpleName();
-
 	static class ViewHolder {
 		TextView textView1;
 		ImageView imgView1;
@@ -36,34 +35,37 @@ public class LeftArrayAdapter extends ArrayAdapter<ListItem> {
 		ImageView imgView2;
 		LinearLayout line;
 	}
-
+	private static final String TAG = CustomDialogListAdapter.class.getSimpleName();
 
 	public interface OnClickListener {
-		void OnClickItem(String name);
-		void OnClickItemItem(ListItem item);
-		boolean onItemLongClick(int position);
+//		void OnSelecttem(int connectionID);
+//		void OnSelecttem(String name);
+		void OnSelecttem(ListItem item);
 	}
 	private final OnClickListener listener;
-	public LeftArrayAdapter(@NonNull Context context, int resource, @NonNull ArrayList<ListItem> objects, OnClickListener listener) {
-		super(context, resource, objects);
-		this.listener = listener;
-		my_data = objects;
-	}
 
+
+	public CustomDialogListAdapter(@NonNull Context context, int resource, @NonNull ArrayList<ListItem> objects,
+	                               OnClickListener listener) {
+		super(context, resource, objects);
+		this.my_data = objects;
+		this.listener = listener;
+	}
 
 	@NonNull
 	@Override
 	public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-		View view;
+		View view = null;
 		if (convertView == null) {
-			view = LayoutInflater.from(getContext()).inflate(R.layout.inner_left, parent, false);
-			final ViewHolder viewHolder = new ViewHolder();
-			viewHolder.textView1 = view.findViewById(R.id.tv_left_1);
-			viewHolder.imgView1 = view.findViewById(R.id.iv_left_1);
-			viewHolder.textView2 = view.findViewById(R.id.tv_left_2);
-			viewHolder.imgView2 = view.findViewById(R.id.iv_left_2);
-			viewHolder.line = view.findViewById(R.id.ll_left_entry);
-			view.setTag(viewHolder);
+			view = LayoutInflater.from(getContext()).inflate(R.layout.inner_left/*android.R.layout.simple_list_item_1*/,
+					parent, false);
+			final ViewHolder holder = new ViewHolder();
+			holder.textView1 = view.findViewById(R.id.tv_left_1);
+			holder.imgView1 = view.findViewById(R.id.iv_left_1);
+			holder.textView2 = view.findViewById(R.id.tv_left_2);
+			holder.imgView2 = view.findViewById(R.id.iv_left_2);
+			holder.line = view.findViewById(R.id.ll_left_entry);
+			view.setTag(holder);
 		} else {
 			view = convertView;
 		}
@@ -103,22 +105,16 @@ public class LeftArrayAdapter extends ArrayAdapter<ListItem> {
 		view.setOnClickListener(v -> {
 			selectedPos = position;
 			ListItem clickedItem = my_data.get(position);
-//			int id = clickedItem.getID();
+//			Log.d(TAG, "selected listitem="+ clickedItem.toString());
 			v.setSelected(true);
 			if (lastSelected != null) {
 				lastSelected.setSelected(false);
 			}
-			lastSelected = v;
-			listener.OnClickItem(clickedItem.getName());
-			listener.OnClickItemItem(clickedItem);
+			if (position > -1) {
+				lastSelected = v;
+			}
+			listener.OnSelecttem(clickedItem);
 		});
 		return view;
 	}
-
-
-//	public void setData(ArrayList<ListItem> myData) {
-//		my_data = myData;
-//		notifyDataSetChanged();
-//	}
-
 }

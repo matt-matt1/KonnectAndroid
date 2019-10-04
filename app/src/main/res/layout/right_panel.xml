@@ -42,10 +42,24 @@
 			android:layout_height="wrap_content"
 			android:id="@+id/tv_right" />
 
-		<androidx.recyclerview.widget.RecyclerView
+		<LinearLayout
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
-			android:id="@+id/rv_right" />
+			android:orientation="horizontal">
+			<androidx.recyclerview.widget.RecyclerView
+				android:layout_width="0dp"
+				android:layout_height="match_parent"
+				android:layout_weight="1"
+				android:fastScrollEnabled="true"
+				android:id="@+id/rv_right" />
+			<LinearLayout
+				android:layout_width="40dip"
+				android:layout_height="fill_parent"
+				android:orientation="vertical"
+				android:background="#FFF"
+				android:gravity="center_horizontal"
+				android:id="@+id/sideIndex"/>
+		</LinearLayout>
 
 	</FrameLayout>
 </LinearLayout>

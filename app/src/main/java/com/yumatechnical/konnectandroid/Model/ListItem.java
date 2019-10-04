@@ -1,7 +1,6 @@
 package com.yumatechnical.konnectandroid.Model;
 
 import android.graphics.drawable.Drawable;
-import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -9,6 +8,7 @@ import androidx.annotation.Nullable;
 public class ListItem {
 
 	private int priority;
+	private int ID;
 	private String name;
 	private String iconAsString;
 	private Drawable drawable;
@@ -19,9 +19,10 @@ public class ListItem {
 	private int iconTextPadding;
 	private Boolean faded;
 
-	public ListItem(int priority, String name, String iconAsString, Drawable drawable, int leftPadding,
+	public ListItem(int priority, int ID, String name, String iconAsString, Drawable drawable, int leftPadding,
 	                int topPadding, int botPadding, Boolean iconBeforeText, int iconTextPadding, Boolean faded) {
 		this.priority = priority;
+		this.ID = ID;
 		this.name = name;
 		this.iconAsString = iconAsString;
 		this.drawable = drawable;
@@ -35,6 +36,10 @@ public class ListItem {
 
 	public int getPriority() {
 		return priority;
+	}
+
+	public int getID() {
+		return ID;
 	}
 
 	public String getName() {
@@ -75,6 +80,10 @@ public class ListItem {
 
 	public void setPriority(int priority) {
 		this.priority = priority;
+	}
+
+	public void setID(int ID) {
+		this.ID = ID;
 	}
 
 	public void setName(String name) {
@@ -121,10 +130,10 @@ public class ListItem {
 	@NonNull
 	@Override
 	public String toString() {
-		return "ListItem: NAME="+ getName()+ ", PRIORITY="+ getPriority()+ ", ICON_AS_STRING="+ getIconAsString()+
+		return "ListItem: NAME="+ getName()+ ", PRIORITY="+ getPriority()+ ", ID="+ getID() +", ICON_AS_STRING="+ getIconAsString()+
 				", DRAWABLE="+ getDrawable()+ ", PADDING_LEFT="+ getLeftPadding()+ ", PADDING_TOP="+ getTopPadding()+
 				", PADDING_BOTTOM="+ getBotPadding()+ ", IS_ICON_BEFORE_TEXT="+ getIconBeforeText()+
-				", PADDING_BETEEN_ICON_AND_TEXT="+ getIconTextPadding()+ ", IS_FADED="+ getFaded();
+				", PADDING_BETEEN_ICON_AND_TEXT="+ getIconTextPadding()+ ", IS_FADED="+ getFaded()+ "\n";
 	}
 
 	@Override

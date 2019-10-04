@@ -13,4 +13,10 @@
         android:orderInCategory="10"
         app:showAsAction="ifRoom"
         android:title="@string/settings" />
+
+    <item
+        android:id="@+id/resize"
+        android:orderInCategory="5"
+        app:showAsAction="never"
+        android:title="@string/resize" />
 </menu>

@@ -1,13 +1,48 @@
 package com.yumatechnical.konnectandroid.Helper;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.net.Uri;
 import android.util.DisplayMetrics;
+import android.util.Log;
+import android.webkit.MimeTypeMap;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.yumatechnical.konnectandroid.Model.KeyStrValueStr;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Objects;
+
+import okhttp3.HttpUrl;
+
 public class Tools extends AppCompatActivity {
+
+	private static final String TAG = Tools.class.getSimpleName();
+
+
+	public URL makeURLfromUri(Uri uri) {
+		try {
+			return new URL(uri.toString());
+		}
+		catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public static String buildURLwithParams(String url, ArrayList<KeyStrValueStr> params) {
+		HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(url)).newBuilder();
+		for (KeyStrValueStr par : params) {
+			builder.addQueryParameter(par.getKey(), par.getValue());
+		}
+		return builder.build().toString();
+	}
+
 
 	/**
 	 * This method converts dp unit to equivalent pixels, depending on device density.
@@ -31,6 +66,31 @@ public class Tools extends AppCompatActivity {
 		return px / ((float) context.getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT);
 	}
 
+
+	public static String toTitleCase(String str) {
+		if (str == null) {
+			return null;
+		}
+		boolean space = true;
+		StringBuilder builder = new StringBuilder(str);
+		final int len = builder.length();
+		for (int i = 0; i < len; ++i) {
+			char c = builder.charAt(i);
+			if (space) {
+				if (!Character.isWhitespace(c)) {
+					builder.setCharAt(i, Character.toTitleCase(c));
+					space = false;
+				}
+			} else if (Character.isWhitespace(c)) {
+				space = true;
+			} else {
+				builder.setCharAt(i, Character.toLowerCase(c));
+			}
+		}
+		return builder.toString();
+	}
+
+
 	public static void showMessageOKCancel(Context context, String message, DialogInterface.OnClickListener okListener) {
 		new AlertDialog.Builder(context)
 				.setMessage(message)
@@ -38,6 +98,56 @@ public class Tools extends AppCompatActivity {
 				.setNegativeButton("Cancel", null)
 				.create()
 				.show();
+	}
+/*
+	// url = file path or whatever suitable URL you want.
+	public static String getMimeType(String url) {
+		String type = null;
+		String extension = MimeTypeMap.getFileExtensionFromUrl(url);
+		if (extension != null) {
+			type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+		}
+		return type;
+	}
+*/
+	public static String getMimeType(Context context, Uri uri) {
+		String mimeType = null;
+		Log.d(TAG, "uri = "+ uri);
+		if (uri == null) {
+			Log.d(TAG, "uri is null");
+		}
+		String scheme = uri.getScheme();
+		if (scheme != null && scheme.equals(ContentResolver.SCHEME_CONTENT)) {
+			ContentResolver cr = context.getContentResolver();
+			mimeType = cr.getType(uri);
+		} else {
+			String fileExtension = MimeTypeMap.getFileExtensionFromUrl(uri
+					.toString());
+			mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(
+					fileExtension.toLowerCase());
+		}
+		return mimeType;
+	}
+
+	public static String removeExtension(String s) {
+
+		String separator = System.getProperty("file.separator");
+		String filename;
+
+		// Remove the path upto the filename.
+		int lastSeparatorIndex = s.lastIndexOf(separator);
+		if (lastSeparatorIndex == -1) {
+			filename = s;
+		} else {
+			filename = s.substring(lastSeparatorIndex + 1);
+		}
+
+		// Remove the extension.
+		int extensionIndex = filename.lastIndexOf(".");
+		if (extensionIndex == -1)
+			return filename;
+
+		return filename.substring(0, extensionIndex);
 	}
 
 }
