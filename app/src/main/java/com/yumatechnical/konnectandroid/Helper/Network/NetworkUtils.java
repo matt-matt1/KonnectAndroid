@@ -1,4 +1,4 @@
-package com.yumatechnical.konnectandroid.Helper;
+package com.yumatechnical.konnectandroid.Helper.Network;
 
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -10,7 +10,6 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 final public class NetworkUtils {

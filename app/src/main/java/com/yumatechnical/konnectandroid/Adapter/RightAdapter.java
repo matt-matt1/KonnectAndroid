@@ -14,6 +14,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.github.chrisbanes.photoview.PhotoView;
 import com.mikepenz.iconics.IconicsColor;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.iconics.IconicsSize;
@@ -35,6 +36,7 @@ public class RightAdapter extends RecyclerView.Adapter<RightAdapter.RightAdapter
 
     public interface ListItemClickListener {
     	void onListItemClick(String item);
+    	void onListItemClick(FileItem item);
 	}
 	final private ListItemClickListener listener;
 
@@ -48,8 +50,9 @@ public class RightAdapter extends RecyclerView.Adapter<RightAdapter.RightAdapter
     class RightAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         final TextView labelView, labelText;
-        final ImageView imageView, labelImg;
+        final ImageView /*imageView,*/ labelImg;
         final FrameLayout labelFrame;
+        final PhotoView imageView;
 
 
         RightAdapterViewHolder(@NonNull View itemView) {
@@ -60,6 +63,7 @@ public class RightAdapter extends RecyclerView.Adapter<RightAdapter.RightAdapter
 	        labelText = itemView.findViewById(R.id.tv_right_item_label);
 	        labelImg = itemView.findViewById(R.id.iv_right_item_label);
             itemView.setOnClickListener(this);
+//            itemView.setTag(getPosition());
         }
 
         void bind(int position) {
@@ -89,8 +93,10 @@ public class RightAdapter extends RecyclerView.Adapter<RightAdapter.RightAdapter
 	    @Override
 	    public void onClick(View v) {
 		    if (getAdapterPosition() == RecyclerView.NO_POSITION) return;
+		    FileItem clickedItem = my_data.get(getAdapterPosition());
 		    if (listener != null) {
 			    listener.onListItemClick(String.valueOf(labelView.getText()));
+			    listener.onListItemClick(clickedItem);
 		    }
 		    notifyItemChanged(selectedPos);
 		    selectedPos = getAdapterPosition();
@@ -138,5 +144,15 @@ public class RightAdapter extends RecyclerView.Adapter<RightAdapter.RightAdapter
     	this.defaultImage = defaultImage;
 	    notifyDataSetChanged();
     }
+
+	public void clear() {
+		my_data.clear();
+		notifyDataSetChanged();
+	}
+
+	public void addAll(ArrayList<FileItem> list) {
+		my_data.addAll(list);
+		notifyDataSetChanged();
+	}
 
 }

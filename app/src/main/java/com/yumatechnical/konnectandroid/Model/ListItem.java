@@ -5,20 +5,27 @@ import android.graphics.drawable.Drawable;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import org.parceler.Parcel;
+import org.parceler.ParcelConstructor;
+
+//@Parcel
 public class ListItem {
 
-	private int priority;
-	private int ID;
-	private String name;
-	private String iconAsString;
-	private Drawable drawable;
-	private int leftPadding;
-	private int topPadding;
-	private int botPadding;
-	private Boolean iconBeforeText;
-	private int iconTextPadding;
-	private Boolean faded;
+	int priority;
+	int ID;
+	String name;
+	String iconAsString;
+	Drawable drawable;
+	int leftPadding;
+	int topPadding;
+	int botPadding;
+	Boolean iconBeforeText;
+	int iconTextPadding;
+	Boolean faded;
 
+
+//	public ListItem() {}
+//	@ParcelConstructor
 	public ListItem(int priority, int ID, String name, String iconAsString, Drawable drawable, int leftPadding,
 	                int topPadding, int botPadding, Boolean iconBeforeText, int iconTextPadding, Boolean faded) {
 		this.priority = priority;

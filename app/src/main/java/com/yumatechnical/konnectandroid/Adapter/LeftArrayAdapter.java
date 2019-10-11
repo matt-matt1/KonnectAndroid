@@ -1,10 +1,12 @@
 package com.yumatechnical.konnectandroid.Adapter;
-
+//inuse
 import android.content.Context;
 import android.graphics.Color;
-import android.os.Handler;
-import android.util.Log;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -22,12 +24,15 @@ import com.yumatechnical.konnectandroid.R;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class LeftArrayAdapter extends ArrayAdapter<ListItem> {
+
+public class LeftArrayAdapter extends ArrayAdapter<ListItem> implements ActionMode.Callback {
 
 	private ArrayList<ListItem> my_data;
 	private int selectedPos = RecyclerView.NO_POSITION;
 	private View lastSelected = null;
 //	private static final String TAG = RightAdapter.class.getSimpleName();
+	private Context context;
+	private Object mActionMode;
 
 	static class ViewHolder {
 		TextView textView1;
@@ -38,16 +43,17 @@ public class LeftArrayAdapter extends ArrayAdapter<ListItem> {
 	}
 
 
-	public interface OnClickListener {
-		void OnClickItem(String name);
-		void OnClickItemItem(ListItem item);
-		boolean onItemLongClick(int position);
+	public interface OnListener {
+		void SelectedLeftItemId(int id);
+		void ContextMenuLeftItemId(int id);
 	}
-	private final OnClickListener listener;
-	public LeftArrayAdapter(@NonNull Context context, int resource, @NonNull ArrayList<ListItem> objects, OnClickListener listener) {
+	private final OnListener listener;
+	public LeftArrayAdapter(@NonNull Context context, int resource, @NonNull ArrayList<ListItem> objects,
+	                        OnListener listener) {
 		super(context, resource, objects);
+		this.context = context;
 		this.listener = listener;
-		my_data = objects;
+		this.my_data = objects;
 	}
 
 
@@ -55,8 +61,9 @@ public class LeftArrayAdapter extends ArrayAdapter<ListItem> {
 	@Override
 	public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
 		View view;
+		context = getContext();
 		if (convertView == null) {
-			view = LayoutInflater.from(getContext()).inflate(R.layout.inner_left, parent, false);
+			view = LayoutInflater.from(context).inflate(R.layout.inner_left, parent, false);
 			final ViewHolder viewHolder = new ViewHolder();
 			viewHolder.textView1 = view.findViewById(R.id.tv_left_1);
 			viewHolder.imgView1 = view.findViewById(R.id.iv_left_1);
@@ -100,25 +107,113 @@ public class LeftArrayAdapter extends ArrayAdapter<ListItem> {
 			holder.imgView1.setColorFilter(Color.LTGRAY);
 			holder.imgView2.setColorFilter(Color.LTGRAY);
 		}
-		view.setOnClickListener(v -> {
+		view.setOnLongClickListener(v -> {
+			if (mActionMode != null) {
+				return false;
+			}
 			selectedPos = position;
 			ListItem clickedItem = my_data.get(position);
-//			int id = clickedItem.getID();
 			v.setSelected(true);
 			if (lastSelected != null) {
 				lastSelected.setSelected(false);
 			}
 			lastSelected = v;
-			listener.OnClickItem(clickedItem.getName());
-			listener.OnClickItemItem(clickedItem);
+			mActionMode = view.startActionMode(LeftArrayAdapter.this);
+			listener.ContextMenuLeftItemId(clickedItem.getID());
+			return true;
+		});
+/*		view.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				event.getX();
+				event.getY();
+				int action = MotionEventCompat.getActionMasked(event);
+				switch (action) {
+					case (MotionEvent.ACTION_CANCEL) :
+//						Log.d(DEBUG_TAG,"Action was CANCEL");
+						return true;
+					case (MotionEvent.ACTION_OUTSIDE) :
+//						Log.d(DEBUG_TAG,"Movement occurred outside bounds");
+						return true;
+					case (MotionEvent.ACTION_MOVE) :
+//						Log.d(DEBUG_TAG,"Action was MOVE");
+						return true;
+					case (MotionEvent.ACTION_DOWN):
+						break;
+					case (MotionEvent.ACTION_UP):
+						break;
+				}
+				return false;
+			}
+		});*/
+/*		view.setOnTouchListener(new OnSwipeTouchListener(context) {
+			@Override
+			public void onSwipeDown() {
+//				Toast.makeText(this, "Down", Toast.LENGTH_SHORT).show();
+			}
+
+			@Override
+			public void onSwipeLeft() {
+//				Toast.makeText(MainActivity.this, "Left", Toast.LENGTH_SHORT).show();
+			}
+
+			@Override
+			public void onSwipeUp() {
+//				Toast.makeText(MainActivity.this, "Up", Toast.LENGTH_SHORT).show();
+			}
+
+			@Override
+			public void onSwipeRight() {
+//				Toast.makeText(MainActivity.this, "Right", Toast.LENGTH_SHORT).show();
+			}
+		});*/
+		view.setOnClickListener(v -> {
+			selectedPos = position;
+			ListItem clickedItem = my_data.get(position);
+			v.setSelected(true);
+			if (lastSelected != null) {
+				lastSelected.setSelected(false);
+			}
+			lastSelected = v;
+			listener.SelectedLeftItemId(clickedItem.getID());
 		});
 		return view;
 	}
 
 
-//	public void setData(ArrayList<ListItem> myData) {
-//		my_data = myData;
-//		notifyDataSetChanged();
-//	}
+	private void show() {
+	}
+	//ActionMode.Callback
+	@Override
+	public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+		MenuInflater inflater = mode.getMenuInflater();
+		inflater.inflate(R.menu.left_context, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+		return false;
+	}
+
+	@Override
+	public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+		switch (item.getItemId()) {
+			case R.id.context_left_remove:
+				show();
+				mode.finish();
+				return true;
+			case R.id.context_left_move:
+				return true;
+			default:
+				return false;
+		}
+	}
+
+	@Override
+	public void onDestroyActionMode(ActionMode mode) {
+		mActionMode = null;
+		selectedPos = RecyclerView.NO_POSITION;
+	}
 
 }

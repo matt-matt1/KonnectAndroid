@@ -10,8 +10,12 @@ import android.net.Uri;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import org.parceler.Parcel;
+import org.parceler.ParcelConstructor;
+
 import java.util.ArrayList;
 
+@Parcel
 public class FileItem /*implements Parcelable*/ {
 
 /*	public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
@@ -23,17 +27,20 @@ public class FileItem /*implements Parcelable*/ {
 			return new FileItem[size];
 		}
 	};*/
-	private String name;
-	private Uri fullPath;
-	private int ID;
-	private Bitmap bitmap;
-	private String MIME;
-	private Boolean hasContents;
-	private String sortKey;
-	private ArrayList<MyPhone> phoneArrayList;
-	private Boolean hideName;
-	private String label;
+	String name;
+	Uri fullPath;
+	int ID;
+	Bitmap bitmap;
+	String MIME;
+	Boolean hasContents;
+	String sortKey;
+	ArrayList<MyPhone> phoneArrayList;
+	Boolean hideName;
+	String label;
 
+
+//	public FileItem() {}
+	@ParcelConstructor
 	public FileItem(String name, Uri fullPath, int ID, Bitmap bitmap, String MIME, Boolean hasContents,
 	                String sortKey, ArrayList<MyPhone> phoneArrayList, Boolean hideName, String label) {
 		this.name = name;

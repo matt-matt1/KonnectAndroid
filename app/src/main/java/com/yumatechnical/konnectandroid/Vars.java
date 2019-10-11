@@ -2,9 +2,15 @@ package com.yumatechnical.konnectandroid;
 
 import android.app.Application;
 
+import com.yumatechnical.konnectandroid.Adapter.LeftArrayAdapter;
 import com.yumatechnical.konnectandroid.Model.ConnectionItem;
+import com.yumatechnical.konnectandroid.Model.FileItem;
+import com.yumatechnical.konnectandroid.Model.ListItem;
+
+import org.parceler.Parcel;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 /*
  * This class holds application-wide (very global) variables
@@ -18,6 +24,64 @@ import java.util.ArrayList;
  */
 public class Vars extends Application {
 
+	public static final int MY_PHOTOS_ID = 1;
+	public static final int MY_MUSIC_ID = 2;
+	public static final int MY_CONTACTS_ID = 3;
+	public static final int MY_FILES_ID = 4;
+	public LeftArrayAdapter leftAdapter;
+
+	public ArrayList<ListItem> leftList = new ArrayList<>();
+
+	public boolean WifiConn = false;
+	public boolean MobileConn = false;
+	public boolean networkConnected = false;
+
+	public boolean isMobileConn() {
+		return MobileConn;
+	}
+
+	public void setMobileConn(boolean mobileConn) {
+		MobileConn = mobileConn;
+	}
+
+	public boolean isWifiConn() {
+		return WifiConn;
+	}
+
+	public void setWifiConn(boolean wifiConn) {
+		WifiConn = wifiConn;
+	}
+
+	public boolean isNetworkConnected() {
+		return networkConnected;
+	}
+
+	public void setNetworkConnected(boolean networkConnected) {
+		this.networkConnected = networkConnected;
+	}
+
+	//ip address
+	private int[] myIP = new int[4];
+
+	public int[] getMyIP() {
+		return myIP;
+	}
+
+	public String getMyIPString() {
+		return String.format(Locale.CANADA,"%d.%d.%d.%d", myIP[0], myIP[1], myIP[2], myIP[3]);
+	}
+	public void setMyIPString(String string) {
+		String[] parts = string.split("\\.");
+		for (int i = 0; i < 4; i++) {
+			myIP[i] = Integer.parseInt(parts[i]);
+		}
+	}
+
+	public void setMyIP(int[] myIP) {
+		this.myIP = myIP;
+	}
+
+	//iconSize
 	private int iconSize = 100;
 
 	public int getIconSize() {
@@ -29,6 +93,7 @@ public class Vars extends Application {
 	}
 
 
+	//connectionItems
 	private ArrayList<ConnectionItem> connectionItems = new ArrayList<>();
 
 	public ArrayList<ConnectionItem> getConnectionItems() {
@@ -46,6 +111,15 @@ public class Vars extends Application {
 	public void addConnectionItem(ConnectionItem item) {
 		if (item != null && connectionItems != null)
 		connectionItems.add(item);
+	}
+
+	public ConnectionItem getConnectionItemByID(int id) {
+		for (ConnectionItem item : connectionItems) {
+			if (item.getID() == id) {
+				return item;
+			}
+		}
+		return null;
 	}
 
 

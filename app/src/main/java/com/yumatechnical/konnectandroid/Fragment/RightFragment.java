@@ -1,9 +1,11 @@
 package com.yumatechnical.konnectandroid.Fragment;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
@@ -13,6 +15,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -20,31 +23,35 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ImageView;
+import android.widget.Button;
+import android.widget.HorizontalScrollView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.mikepenz.iconics.IconicsColor;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.iconics.IconicsSize;
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome;
 import com.yumatechnical.konnectandroid.Adapter.RightAdapter;
-import com.yumatechnical.konnectandroid.Helper.TestInternetLoader;
+import com.yumatechnical.konnectandroid.Helper.Network.TestInternetLoader;
 import com.yumatechnical.konnectandroid.Helper.Tools;
-import com.yumatechnical.konnectandroid.MainActivity;
 import com.yumatechnical.konnectandroid.Model.FileItem;
 import com.yumatechnical.konnectandroid.Model.MyPhone;
 import com.yumatechnical.konnectandroid.R;
 import com.yumatechnical.konnectandroid.Vars;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -64,12 +71,12 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 	private static final String RIGHT_TITLE = "title";
 	private ArrayList<FileItem> contactsList = new ArrayList<>(),
 			listOfAllImages = new ArrayList<>(),
+			listOfAllFiles = new ArrayList<>(),
 			listOfMyMusic = new ArrayList<>();
 	private String msg, title;
 	RecyclerView recyclerView;
 	TextView msgView, titleView;
 	ProgressBar spinner;
-//	AlphabetListAdapter listAdapter;
 	RightAdapter rightAdapter;
 	RightAdapter.ListItemClickListener listener;
 	ContentResolver resolver;
@@ -79,6 +86,7 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 	private static final int LOADER_GATHER_MY_MUSIC = 21;
 	private static final int LOADER_GATHER_MY_CONTACTS = 22;
 	private static final int LOADER_GATHER_MY_FILES = 23;
+	private SwipeRefreshLayout swipeContainer;
 
 	/**
 	 * default constructor
@@ -104,9 +112,7 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 		return fragment;
 	}
 
-/*
-newInstance, onCreateView, onActivityCreated
- */
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -126,6 +132,7 @@ newInstance, onCreateView, onActivityCreated
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 	                         Bundle savedInstanceState) {
+//		timelineActivity = new TimelineActivity();
 		return inflater.inflate(R.layout.right_panel, container, false);
 	}
 
@@ -191,6 +198,13 @@ newInstance, onCreateView, onActivityCreated
 		msgView = getActivity().findViewById(R.id.tv_right);
 		titleView = getActivity().findViewById(R.id.tv_right_title);
 		recyclerView = getActivity().findViewById(R.id.rv_right);
+		swipeContainer = getActivity().findViewById(R.id.sr_right);
+		swipeContainer.setOnRefreshListener(() -> functionOnTitle());
+		// Configure the refreshing colors
+		swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
+				android.R.color.holo_green_light,
+				android.R.color.holo_orange_light,
+				android.R.color.holo_red_light);
 		if (title != null && !title.isEmpty()) {
 			titleView.setText(title);
 		}
@@ -204,8 +218,21 @@ newInstance, onCreateView, onActivityCreated
 //			setupAdapter();
 //			listAdapter = new AlphabetListAdapter();
 			rightAdapter = new RightAdapter(null, null, null);
-			LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+//			LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+			GridLayoutManager layoutManager = new GridLayoutManager(getApplicationContext(),
+					Tools.calculateNoOfColumns(getApplicationContext(),
+							(1.2f * ((Vars)getApplicationContext()).getIconSize())
+									+ Tools.dpToPx(40, getApplicationContext())));
+//			ColumnQty columnQty = new ColumnQty(getApplicationContext(), R.layout.inner_right);
+//			GridLayoutManager layoutManager = new GridLayoutManager(getApplicationContext(),
+//					columnQty.calculateNoOfColumns());
+//			recyclerView.addItemDecoration(new GridSpacing() columnQty.calculateSpacing());
+//			int spanCount = 3; // 3 columns
+//			int spacing = 50; // 50px
+//			boolean includeEdge = true;
+//			recyclerView.addItemDecoration(new GridSpacingItemDecoration(spanCount, spacing, includeEdge));
 			recyclerView.setLayoutManager(layoutManager);
+			recyclerView.setHasFixedSize(true);
 			recyclerView.setAdapter(rightAdapter);
 //			recyclerView.setAdapter(listAdapter);
 			recyclerView.setOnClickListener(this);
@@ -213,6 +240,11 @@ newInstance, onCreateView, onActivityCreated
 		Bundle bundle;
 		// Initializes the loader
 //		getLoaderManager().initLoader(0, null, this);
+		functionOnTitle();
+	}
+
+	private void functionOnTitle() {
+		//		Log.d(TAG, title);
 		if (title.equals(getString(R.string.contacts))) {
 			if (uri == null) {
 //				bundle = new Bundle();
@@ -248,7 +280,9 @@ newInstance, onCreateView, onActivityCreated
 			new FetchMusicTask(-1).execute();
 			//media
 		} else {
-			Log.d(TAG, title);
+			File dir = new File(Environment.getExternalStorageDirectory().getPath());
+			Log.d(TAG, title+ ":"+ dir.getPath()+ ":");
+			new FetchFilesTask(dir).execute();
 			//files
 		}
 	}
@@ -318,12 +352,37 @@ newInstance, onCreateView, onActivityCreated
 				rightAdapter = new RightAdapter(null, null, new RightAdapter.ListItemClickListener() {
 					@Override
 					public void onListItemClick(String item) {
-						Log.d(TAG, "ListItemClickListener:"+ item);
-						Intent intent = new Intent();
-						intent.setType("image/*");
-						intent.setAction(Intent.ACTION_GET_CONTENT);
-						startActivityForResult(Intent.createChooser(intent, "Choose picture"),
-								4);
+//						Log.d(TAG, "ListItemClickListener:"+ item);
+//						Intent intent = new Intent();
+//						intent.setType("image/*");
+//						intent.setAction(Intent.ACTION_GET_CONTENT);
+//						startActivityForResult(Intent.createChooser(intent, "Choose picture"),
+//								4);
+					}
+
+					@Override
+					public void onListItemClick(FileItem item) {
+//						ArrayList<String> shares = new ArrayList<>();
+//						shares.add("Email");
+//						shares.add("SMS/MMS");
+						AlertDialog.Builder contactDialogBuilder = new AlertDialog.Builder(getActivity(), R.style.CustomDialogTheme);
+						contactDialogBuilder.setTitle(R.string.contactMethod);
+						contactDialogBuilder.setItems(R.array.contactShare, new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								Log.d(TAG, "share via: "+ which);
+							}
+						});
+						contactDialogBuilder.show();
+//						Uri uri = Uri.parse("contact:"+ item.getName());
+						Intent intent = new Intent(Intent.ACTION_EDIT);
+//						Intent intent = new Intent(Intent.ACTION_VIEW);
+//						Log.d(TAG, "viewing contact: "+ uri.toString());
+//						intent.putExtra(ContactsContract.Intents.Insert.EMAIL, item.getName());
+						intent.setData(item.getFullPath());
+						if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+							startActivity(intent);
+						}
 					}
 				});
 				recyclerView.setAdapter(rightAdapter);
@@ -349,7 +408,8 @@ newInstance, onCreateView, onActivityCreated
 				return;
 			}
 		}
-		String sortOrder = ContactsContract.Contacts.DISPLAY_NAME + " ASC";
+//		String sortOrder = ContactsContract.Contacts.DISPLAY_NAME + " ASC";
+		String sortOrder = ContactsContract.Contacts.SORT_KEY_PRIMARY+ " ASC";
 		resolver = getActivity().getContentResolver();
 		Cursor cursor;
 		cursor = resolver.query(ContactsContract.Contacts.CONTENT_URI,
@@ -495,7 +555,20 @@ newInstance, onCreateView, onActivityCreated
 						FontAwesome.Icon.faw_image)
 						.color(IconicsColor.colorRes(R.color.White)).size(IconicsSize.dp(((Vars) getApplicationContext()).getIconSize()));
 //				myList.setData(listOfAllImages, defaultImg);
-				rightAdapter = new RightAdapter(null, null, null);
+				rightAdapter = new RightAdapter(null, null, new RightAdapter.ListItemClickListener() {
+					@Override
+					public void onListItemClick(String item) {
+					}
+
+					@Override
+					public void onListItemClick(FileItem item) {
+						Intent intent = new Intent(Intent.ACTION_VIEW, item.getFullPath());
+						intent.setType("image/*");
+						if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+							startActivity(intent);
+						}
+					}
+				});
 				recyclerView.setAdapter(rightAdapter);
 				rightAdapter.setData(listOfAllImages);
 				rightAdapter.setDefaultImage(defaultImg);
@@ -531,7 +604,7 @@ newInstance, onCreateView, onActivityCreated
 
 				String path = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA));
 				if (path.startsWith("/")) {
-					path = "file:/"+ path;
+					path = "file:"+ path;
 				}
 				Uri uri = Uri.parse(path);
 				String name = Tools.removeExtension(Objects.requireNonNull(uri.getLastPathSegment()));
@@ -555,8 +628,10 @@ newInstance, onCreateView, onActivityCreated
 
 	private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 
-		ImageView bmImage;
+//		ImageView bmImage;
 		FileItem fileItem;
+//		listener;
+
 
 //		public DownloadImageTask(ImageView bmImage) {
 		public DownloadImageTask(FileItem fileItem) {
@@ -580,7 +655,9 @@ newInstance, onCreateView, onActivityCreated
 		protected void onPostExecute(Bitmap result) {
 //			bmImage.setImageBitmap(result);
 			fileItem.setBitmap(result);
-			Log.d(TAG, "adding:"+ fileItem.toString());
+//			listener.onDone();
+//			re-draw list
+			Log.d(TAG, "adding image to "+ fileItem.toString());
 
 //			rightAdapter = new RightAdapter(null, null);
 //			recyclerView.setAdapter(rightAdapter);
@@ -619,7 +696,20 @@ newInstance, onCreateView, onActivityCreated
 /*				myList.setData(listOfMyMusic, new IconicsDrawable(getApplicationContext(),
 						FontAwesome.Icon.faw_music)
 						.color(IconicsColor.colorRes(R.color.White)).size(IconicsSize.dp(100)));*/
-				rightAdapter = new RightAdapter(null, null, null);
+				rightAdapter = new RightAdapter(null, null, new RightAdapter.ListItemClickListener() {
+					@Override
+					public void onListItemClick(String item) {
+					}
+
+					@Override
+					public void onListItemClick(FileItem item) {
+						Intent intent = new Intent(Intent.ACTION_VIEW);
+						intent.setData(item.getFullPath());
+						if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+							startActivity(intent);
+						}
+					}
+				});
 				recyclerView.setAdapter(rightAdapter);
 				rightAdapter.setData(listOfMyMusic);
 				rightAdapter.setDefaultImage(new IconicsDrawable(getApplicationContext(),
@@ -686,5 +776,118 @@ newInstance, onCreateView, onActivityCreated
 		}
 	}
 
+	@SuppressLint("StaticFieldLeak")
+	public class FetchFilesTask extends AsyncTask<Void, Void, File[]> {
+
+		String directoryStr;
+		File directory;
+
+
+		FetchFilesTask(String directory) {
+			super();
+			this.directoryStr = directory;
+			this.directory = new File(directory);
+		}
+
+		FetchFilesTask(File directory) {
+			super();
+			this.directory = directory;
+			this.directoryStr = directory.getPath();
+		}
+
+		@Override
+		protected void onPreExecute() {
+			spinner.setVisibility(View.VISIBLE);
+			recyclerView.setVisibility(View.INVISIBLE);
+		}
+
+		@Override
+		protected File[] doInBackground(Void... params) {
+			File[] files = listFiles(directory);
+			return files;
+		}
+
+		@Override
+		protected void onPostExecute(File[] files) {
+			super.onPostExecute(files);
+			if (files.length > 0) {
+				Log.d(TAG, "FetchFilesTask count="+ files.length);
+				rightAdapter = new RightAdapter(null, null, new RightAdapter.ListItemClickListener() {
+					@Override
+					public void onListItemClick(String item) {
+					}
+
+					@Override
+					public void onListItemClick(FileItem item) {
+					}
+				});
+				recyclerView.setAdapter(rightAdapter);
+//				ArrayList<listOfFiles = ;
+				Drawable fileIcon = new IconicsDrawable(getApplicationContext(),
+						FontAwesome.Icon.faw_file)
+						.color(IconicsColor.colorRes(R.color.Gray)).size(IconicsSize.dp(100));
+				Drawable dirIcon = new IconicsDrawable(getApplicationContext(),
+						FontAwesome.Icon.faw_folder)
+						.color(IconicsColor.colorRes(R.color.Gray)).size(IconicsSize.dp(100));
+				for (File f : files) {
+					listOfAllFiles.add(new FileItem(f.getName(), Uri.fromFile(f), 0,
+							(f.isDirectory()) ? Tools.drawableToBitmap(dirIcon) : Tools.drawableToBitmap(fileIcon),
+							"", f.canRead(), f.getName(), null, false, f.getAbsolutePath()));
+				}
+				rightAdapter.setData(listOfAllFiles);
+				rightAdapter.setDefaultImage(new IconicsDrawable(getApplicationContext(),
+						FontAwesome.Icon.faw_file)
+						.color(IconicsColor.colorRes(R.color.White)).size(IconicsSize.dp(100)));
+				spinner.setVisibility(View.INVISIBLE);
+				recyclerView.setVisibility(View.VISIBLE);
+			} else {
+				spinner.setVisibility(View.INVISIBLE);
+				msgView.setText(R.string.empty);
+			}
+		}
+
+	}
+
+
+	public File[] listFiles(File directory) {
+		if (!directory.isDirectory()) {
+			Toast.makeText(getApplicationContext(), "ERROR", Toast.LENGTH_SHORT).show();
+			Log.d(TAG, "listFiles error for "+ directory.getPath());
+			return null;
+		}
+		File[] files = directory.listFiles();
+		Log.d(TAG, "listFiles length="+ files.length);
+		return files;
+	}
+
+
+	private LinearLayout putFilesInLayout(File[] files) {
+		LinearLayout root = new LinearLayout(getApplicationContext());
+		int i = 1;
+		for (File f : files)
+		{
+			if (f.isFile() || f.isDirectory())
+			{
+				try
+				{
+					LinearLayout layout = new LinearLayout(getApplicationContext());
+					layout.setId(i);
+					Button text = new Button(getApplicationContext());
+					text.setText(f.getName());
+					text.setMinWidth(400);
+					layout.addView(text);
+					root.addView(layout);
+					i++;
+				}
+				catch(Exception e){}
+			}
+		}
+		LinearLayout layout = new LinearLayout(getApplicationContext());
+		HorizontalScrollView scroll = new HorizontalScrollView(getApplicationContext());
+		scroll.addView(root);
+		layout.addView(scroll);
+		return layout;
+//		setContentView(layout);
+	}
 
 }

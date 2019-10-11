@@ -14,6 +14,7 @@ import com.yumatechnical.konnectandroid.R;
 
 public class SettingFragment extends PreferenceFragmentCompat
 		implements SharedPreferences.OnSharedPreferenceChangeListener, Preference.OnPreferenceChangeListener {
+
 	@Override
 	public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
 		addPreferencesFromResource(R.xml.prefs_visual);

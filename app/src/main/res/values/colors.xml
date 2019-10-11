@@ -9,6 +9,8 @@
 	<color name="Gray">#FF808080</color>
 	<color name="Maroon">#FF800000</color>
 	<color name="Teal">#FF008080</color>
+	<color name="DarkGray">#FF333333</color>
+	<color name="VeryDarkGray">#FF111111</color>
 
 	<drawable name="drawGray">#FF808080</drawable>
 	<drawable name="drawWhite">#FFFFFFFF</drawable>

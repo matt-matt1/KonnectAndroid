@@ -14,8 +14,7 @@ import androidx.fragment.app.Fragment;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 
-import com.yumatechnical.konnectandroid.Helper.TestInternetLoader;
-import com.yumatechnical.konnectandroid.Helper.TestSMBconnectionLoader;
+import com.yumatechnical.konnectandroid.Helper.Network.TestInternetLoader;
 import com.yumatechnical.konnectandroid.R;
 
 public class LoadSMBfragment extends Fragment implements LoaderManager.LoaderCallbacks {

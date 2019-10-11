@@ -9,7 +9,7 @@
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
     </style>
 
-	<style name="searchTextHiglight"></style>
+<!--	<style name="searchTextHiglight"></style>-->
 
 <!--    alert dialog theme-->
     <style name="CustomDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
@@ -26,7 +26,8 @@
 	    <!--buttons color-->
         <item name="colorAccent">@android:color/holo_orange_dark</item>
         <!--title and message color-->
-        <item name="android:textColorPrimary">@android:color/white</item>
+<!--        <item name="android:textColorPrimary">@android:color/holo_green_dark</item>-->
+        <item name="android:textColorPrimary">@color/VeryDarkGray</item>
         <!--dialog background-->
         <item name="android:windowBackground">@drawable/background_dialog</item>
     </style>

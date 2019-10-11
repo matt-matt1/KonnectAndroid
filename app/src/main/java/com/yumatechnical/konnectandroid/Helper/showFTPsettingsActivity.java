@@ -1,4 +1,4 @@
-package com.yumatechnical.konnectandroid;
+package com.yumatechnical.konnectandroid.Helper;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -12,7 +12,8 @@ import com.mikepenz.iconics.IconicsColor;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.iconics.IconicsSize;
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome;
-import com.yumatechnical.konnectandroid.Helper.Tools;
+import com.yumatechnical.konnectandroid.R;
+
 
 public class showFTPsettingsActivity extends AppCompatActivity {
 
@@ -30,23 +31,23 @@ public class showFTPsettingsActivity extends AppCompatActivity {
 	private ImageView spinner;
 
 
-	private void connectViewElements() {
-		title = findViewById(R.id.tv_ftp_title);
-		rename = findViewById(R.id.iv_ftp_rename);
-		hlabel = findViewById(R.id.tv_ftp_host);
-		ulabel = findViewById(R.id.tv_ftp_username);
-		plabel = findViewById(R.id.tv_ftp_password);
-		tlabel = findViewById(R.id.tv_ftp_port);
-		hname = findViewById(R.id.et_ftp_host);
-		uname = findViewById(R.id.et_ftp_username);
-		pword = findViewById(R.id.et_ftp_password);
-		portn = findViewById(R.id.et_ftp_port);
-		etitle = findViewById(R.id.et_ftp_rename);
-		spinner = findViewById(R.id.iv_ftp_progress);
+	public void connectViewElements(View view) {
+		title = view.findViewById(R.id.tv_ftp_title);
+		rename = view.findViewById(R.id.iv_ftp_rename);
+		hlabel = view.findViewById(R.id.tv_ftp_host);
+		ulabel = view.findViewById(R.id.tv_ftp_username);
+		plabel = view.findViewById(R.id.tv_ftp_password);
+		tlabel = view.findViewById(R.id.tv_ftp_port);
+		hname = view.findViewById(R.id.et_ftp_host);
+		uname = view.findViewById(R.id.et_ftp_username);
+		pword = view.findViewById(R.id.et_ftp_password);
+		portn = view.findViewById(R.id.et_ftp_port);
+		etitle = view.findViewById(R.id.et_ftp_rename);
+		spinner = view.findViewById(R.id.iv_ftp_progress);
 	}
 
 
-	private void setLabels() {
+	public void setLabels() {
 		title.setText(Tools.toTitleCase(getString(R.string.eg_ip_addr)));
 		hlabel.setText(Tools.toTitleCase(getString(R.string.server)));
 		ulabel.setText(Tools.toTitleCase(getString(R.string.username)));
@@ -72,8 +73,9 @@ public class showFTPsettingsActivity extends AppCompatActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+//		View view = R.layout.ftp_settings_form;
 		setContentView(R.layout.ftp_settings_form);
-		connectViewElements();
+		connectViewElements(this.findViewById(android.R.id.content).getRootView());
 		setLabels();
 	}
 }

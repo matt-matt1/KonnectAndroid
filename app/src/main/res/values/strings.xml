@@ -7,13 +7,15 @@
 	<string name="PREFS_show_hidden" translatable="false">show_dot_files</string>
 	<string name="default_hidden">default Hidden</string>
 	<string name="displayed">Displayed</string>
-	<string name="PREFS_save_pass" translatable="false">save_passs</string>
+	<string name="PREFS_save_pass" translatable="false">save_pass</string>
 	<string name="PREFS_save_pass_title">Save passwords</string>
 	<string name="PREFS_show_hidden_title">Show hidden (dot) files</string>
 	<string name="PREFS_rem_local" translatable="false">rem_local</string>
 	<string name="PREFS_rem_local_title">Remember Local Directory</string>
 	<string name="PREFS_rem_remote" translatable="false">rem_remote</string>
 	<string name="PREFS_rem_remote_title">Remember Remote Directory</string>
+	<string name="PREFS_network_transfers" translatable="false">trans_wifi_only</string>
+	<string name="PREFS_network_transfers_title">Do tranfers over WIFI networks only</string>
 	<string name="yes">Yes</string>
 	<string name="no">No</string>
 	<string name="photos">My Photos</string>
@@ -58,7 +60,25 @@
 	<string name="rename">rename</string>
 	<string name="port">port</string>
 	<string name="failed_connect">Failed to connect</string>
+	<string name="contactMethod">Share Via:</string>
+	<string name="no_app_intent">No application can handle this type</string>
+	<string name="ignore">ignore</string>
+	<string name="close">close</string>
+	<string name="warning">WARNING</string>
+	<string name="mobile_network">Connected to a mobile network.
+		Your carrier may impose extra charges by using this appliication.
+		Suggestion: disable the mobile network and restart this application
+	</string>
+	<string name="no_network">No network connection - only this device will be available</string>
+	<string name="wifi_connected">WIFI connected</string>
+	<string name="lost_connection">lost connection</string>
+	<string name="init_path">initial path</string>
+	<string name="remove">remove</string>
 
+	<string-array name="contactShare">
+		<item>Email</item>
+		<item>SMS/MMS (Text Message)</item>
+	</string-array>
 	<!--	<string name="gdrive">Google Drive</string>-->
 	<!--	<string name="gdrive">Google Drive</string>-->
 	<!--	<string name="gdrive">Google Drive</string>-->

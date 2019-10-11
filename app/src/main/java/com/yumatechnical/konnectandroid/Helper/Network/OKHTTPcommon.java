@@ -1,5 +1,5 @@
-package com.yumatechnical.konnectandroid.Helper;
-
+package com.yumatechnical.konnectandroid.Helper.Network;
+/*
 import com.yumatechnical.konnectandroid.Model.KeyStrValueStr;
 
 import java.io.IOException;
@@ -151,4 +151,4 @@ public class OKHTTPcommon {
 //		}
 	}
 
-}
+}*/

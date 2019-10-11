@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -53,6 +54,9 @@ public class Permissons {
 		ActivityCompat.requestPermissions(act, new
 				String[]{Manifest.permission.RECORD_AUDIO},code);
 	}
+	public static void Request_this(Activity activity, int code, @NonNull String manifest_permission) {
+		ActivityCompat.requestPermissions(activity, new String[]{manifest_permission}, code);
+	}
 
 	//Check Permisson
 	public static boolean Check_STORAGE(Activity act)
@@ -88,6 +92,10 @@ public class Permissons {
 	public static boolean Check_RECORD_AUDIO(Activity act)
 	{
 		int result = ContextCompat.checkSelfPermission(act, Manifest.permission.RECORD_AUDIO);
+		return result == PackageManager.PERMISSION_GRANTED;
+	}
+	public static boolean Check_this(Activity activity, @NonNull String manifest_permission) {
+		int result = ContextCompat.checkSelfPermission(activity, manifest_permission);
 		return result == PackageManager.PERMISSION_GRANTED;
 	}
 

@@ -1,134 +1,150 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--inuse-->
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:orientation="vertical"
+	android:padding="8dp"
+	android:id="@+id/ll_ftp_main"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent">
+<!--title-->
+<!--	android:layout_marginHorizontal="30sp"-->
 	<LinearLayout
-		xmlns:android="http://schemas.android.com/apk/res/android"
-		xmlns:tools="http://schemas.android.com/tools"
-		android:orientation="vertical"
-		android:padding="8dp"
-		android:id="@+id/ll_ftp_main"
 		android:layout_width="match_parent"
-		android:layout_height="match_parent">
-	<!--title-->
-	<!--	android:layout_marginHorizontal="30sp"-->
-		<LinearLayout
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_gravity="center_vertical"
-			android:orientation="horizontal"
-			tools:ignore="UseCompoundDrawables">
-			<TextView
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:paddingLeft="30sp"
-				android:paddingRight="30sp"
-				android:paddingStart="30sp"
-				android:paddingEnd="30sp"
-				android:id="@+id/tv_ftp_title" />
-			<ImageView
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:contentDescription="@string/rename"
-				android:id="@+id/iv_ftp_rename"/>
-		</LinearLayout>
-
-		<EditText
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			style="@style/FormFieldEntry"
-			android:autofillHints="server_address"
-			tools:ignore="LabelFor,UnusedAttribute"
-			android:visibility="gone"
-			android:inputType="text"
-			android:hint=""
-			android:id="@+id/et_ftp_rename"	/>
-		<LinearLayout
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:baselineAligned="false"
-			android:orientation="horizontal">
-			<!-- host -->
-			<LinearLayout
-				android:layout_width="0dp"
-				android:layout_height="wrap_content"
-				android:layout_weight="1"
-				android:orientation="vertical">
-				<TextView
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					style="@style/FormFieldLabel"
-					android:id="@+id/tv_ftp_host" />
-
-<!--				android:layout_marginEnd="0dp"-->
-				<EditText
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					style="@style/FormFieldEntry"
-					android:layout_marginRight="0dp"
-					android:autofillHints="server_address"
-					tools:ignore="LabelFor,UnusedAttribute"
-					android:inputType="text"
-					android:hint=""
-					android:id="@+id/et_ftp_host" />
-			</LinearLayout>
-			<!-- port -->
-			<LinearLayout
-				android:layout_width="100sp"
-				android:layout_height="wrap_content"
-				android:orientation="vertical">
-				<TextView
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					style="@style/FormFieldLabel"
-					android:id="@+id/tv_ftp_port" />
-
-<!--				android:layout_marginStart="0dp"-->
-				<EditText
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:autofillHints="server_address"
-					style="@style/FormFieldEntry"
-					android:layout_marginLeft="0dp"
-					tools:ignore="LabelFor,UnusedAttribute"
-					android:inputType="number"
-					android:hint=""
-					android:id="@+id/et_ftp_port" />
-			</LinearLayout>
-		</LinearLayout>
-	<!--	username-->
+		android:layout_height="wrap_content"
+		android:layout_gravity="center_vertical"
+		android:orientation="horizontal"
+		tools:ignore="UseCompoundDrawables">
 		<TextView
-			android:layout_width="match_parent"
+			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			style="@style/FormFieldLabel"
-			android:id="@+id/tv_ftp_username" />
-		<EditText
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			style="@style/FormFieldEntry"
-			android:autofillHints="@string/username"
-			tools:ignore="LabelFor,UnusedAttribute"
-			android:inputType="text"
-			android:hint=""
-			android:id="@+id/et_ftp_username" />
-	<!--password-->
-		<TextView
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			style="@style/FormFieldLabel"
-			android:id="@+id/tv_ftp_password" />
-		<EditText
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			style="@style/FormFieldEntry"
-			android:autofillHints="@string/password"
-			tools:ignore="LabelFor,UnusedAttribute"
-			android:inputType="textPassword"
-			android:hint=""
-			android:id="@+id/et_ftp_password" />
-
+			android:paddingLeft="30sp"
+			android:paddingRight="30sp"
+			android:paddingStart="30sp"
+			android:paddingEnd="30sp"
+			android:id="@+id/tv_ftp_title" />
 		<ImageView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:id="@+id/iv_ftp_progress"
-			android:visibility="invisible"
-			android:contentDescription="@string/testConnect" />
-
+			android:contentDescription="@string/rename"
+			android:id="@+id/iv_ftp_rename"/>
 	</LinearLayout>
+
+	<EditText
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		style="@style/FormFieldEntry"
+		android:autofillHints="server_address"
+		tools:ignore="LabelFor,UnusedAttribute"
+		android:visibility="gone"
+		android:inputType="text"
+		android:hint=""
+		android:id="@+id/et_ftp_rename"	/>
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:baselineAligned="false"
+		android:orientation="horizontal">
+		<!-- host -->
+		<LinearLayout
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:orientation="vertical">
+			<TextView
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				style="@style/FormFieldLabel"
+				android:id="@+id/tv_ftp_host" />
+
+<!--				android:layout_marginEnd="0dp"-->
+			<EditText
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				style="@style/FormFieldEntry"
+				android:layout_marginRight="0dp"
+				android:autofillHints="server_address"
+				tools:ignore="LabelFor,UnusedAttribute"
+				android:inputType="text"
+				android:hint=""
+				android:id="@+id/et_ftp_host" />
+		</LinearLayout>
+		<!-- port -->
+		<LinearLayout
+			android:layout_width="100sp"
+			android:layout_height="wrap_content"
+			android:orientation="vertical">
+			<TextView
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				style="@style/FormFieldLabel"
+				android:id="@+id/tv_ftp_port" />
+
+<!--				android:layout_marginStart="0dp"-->
+			<EditText
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:autofillHints="server_address"
+				style="@style/FormFieldEntry"
+				android:layout_marginLeft="0dp"
+				tools:ignore="LabelFor,UnusedAttribute"
+				android:inputType="number"
+				android:hint=""
+				android:id="@+id/et_ftp_port" />
+		</LinearLayout>
+	</LinearLayout>
+<!--	username-->
+	<TextView
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		style="@style/FormFieldLabel"
+		android:id="@+id/tv_ftp_username" />
+	<EditText
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		style="@style/FormFieldEntry"
+		android:autofillHints="@string/username"
+		tools:ignore="LabelFor,UnusedAttribute"
+		android:inputType="text"
+		android:hint=""
+		android:id="@+id/et_ftp_username" />
+<!--password-->
+	<TextView
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		style="@style/FormFieldLabel"
+		android:id="@+id/tv_ftp_password" />
+	<EditText
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		style="@style/FormFieldEntry"
+		android:autofillHints="@string/password"
+		tools:ignore="LabelFor,UnusedAttribute"
+		android:inputType="textPassword"
+		android:hint=""
+		android:id="@+id/et_ftp_password" />
+<!--	init_path-->
+	<TextView
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		style="@style/FormFieldLabel"
+		android:id="@+id/tv_ftp_init_path" />
+	<EditText
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		style="@style/FormFieldEntry"
+		android:autofillHints="@string/username"
+		tools:ignore="LabelFor,UnusedAttribute"
+		android:inputType="text"
+		android:hint=""
+		android:id="@+id/et_ftp_init_path" />
+
+	<ImageView
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:id="@+id/iv_ftp_progress"
+		android:visibility="invisible"
+		android:contentDescription="@string/testConnect" />
+
+</LinearLayout>

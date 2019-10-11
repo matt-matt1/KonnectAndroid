@@ -1,4 +1,4 @@
-package com.yumatechnical.konnectandroid.Helper;
+package com.yumatechnical.konnectandroid.Helper.Network;
 
 import android.content.Context;
 

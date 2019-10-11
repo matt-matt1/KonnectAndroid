@@ -6,11 +6,16 @@
     android:layout_height="wrap_content">
 
     <!--eg. contact person image / picture-->
-    <ImageView
+    <com.github.chrisbanes.photoview.PhotoView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="2dp"
         android:id="@+id/iv_right_image" />
+<!--    <ImageView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:padding="2dp"-->
+<!--        android:id="@+id/iv_right_image" />-->
 
     <FrameLayout
         android:layout_width="match_parent"
