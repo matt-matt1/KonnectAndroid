@@ -155,7 +155,7 @@ public class LocalNetwork {
 						connectionInfo = wm.getConnectionInfo();
 						int ipInt = connectionInfo.getIpAddress();
 						if (ipInt == 0) {
-							Log.d(TAG, "cannot work on emulator");
+							Log.d(TAG, "cannot get IP on emulator");
 							return null;
 						}
 //						Log.d(TAG, "ip as int: "+ ipInt);

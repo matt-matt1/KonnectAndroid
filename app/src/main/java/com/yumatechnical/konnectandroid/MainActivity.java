@@ -14,6 +14,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -25,10 +28,13 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,6 +44,7 @@ import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.DbxWebAuth;
 import com.dropbox.core.android.Auth;
 import com.dropbox.core.v1.DbxEntry;
+import com.hierynomus.smbj.session.Session;
 import com.mikepenz.iconics.IconicsColor;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.iconics.IconicsSize;
@@ -49,8 +56,11 @@ import com.yumatechnical.konnectandroid.Fragment.MyDialogFragment;
 import com.yumatechnical.konnectandroid.Fragment.RightFragment;
 import com.yumatechnical.konnectandroid.Helper.Dropbox.DropboxInstance;
 import com.yumatechnical.konnectandroid.Helper.Dropbox.UploadTask;
+import com.yumatechnical.konnectandroid.Helper.Network.FTPoperation;
 import com.yumatechnical.konnectandroid.Helper.Network.LoaderFTP;
+//import com.yumatechnical.konnectandroid.Helper.Network.LoaderSMB;
 import com.yumatechnical.konnectandroid.Helper.Network.LocalNetwork;
+import com.yumatechnical.konnectandroid.Helper.Network.SMBoperation;
 import com.yumatechnical.konnectandroid.Helper.Tools;
 import com.yumatechnical.konnectandroid.Helper.URI_to_Path;
 import com.yumatechnical.konnectandroid.Model.ConnectionItem;
@@ -59,7 +69,6 @@ import com.yumatechnical.konnectandroid.Settings.SettingsActivity;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Locale;
 import java.util.Objects;
 
 
@@ -80,6 +89,8 @@ public class MainActivity extends AppCompatActivity
 	private static final int MY_PERMISSION_RECORD_READ_EXTERNAL_STORAGE_REQUEST_CODE = 8;
 	private static final int MY_PERMISSION_PHOTOS_READ_EXTERNAL_STORAGE_REQUEST_CODE = 7;
 	private static final int MY_PERMISSION_MUSIC_READ_EXTERNAL_STORAGE_REQUEST_CODE = 6;
+//	private static final int CONNECTION_ID = 108;
+//	private static final int CONNECTION_TYPE = 109;
 	private static final int CONNECTION_TYPE_GDRIVE = 10;
 	private static final int CONNECTION_TYPE_ONEDRIVE = 11;
 	private static final int CONNECTION_TYPE_DROPBOX = 12;
@@ -98,6 +109,8 @@ int minIconSize = 50;
 	private static final int IMAGE_REQUEST_CODE = 13;
 //	MySharedPreferencesActivity mySharedPreferencesActivity = new MySharedPreferencesActivity();
 //	MyOptionsMenu myOptionsMenu = new MyOptionsMenu();
+//	private AlertDialog alertDialog;
+	private View alertViewFTP;
 
 
 	@Override
@@ -115,7 +128,23 @@ int minIconSize = 50;
 		SetupSharedPrefs();
 
 		new LocalNetwork.ConnectionInfoTask(getApplicationContext(), this).execute();
+/*		CustomDialogUI customDialogUI = new CustomDialogUI();
+		customDialogUI.dialog(this, "Title",
+				"Message1 message2 message3 message4 message5 message6 message7 message8 message9",
+				"", "", null, new CustomDialogUI.OnDialogInteraction() {
+					@Override
+					public void PressedNeutralButton() {
+					}
 
+					@Override
+					public void PressedNegativeButton() {
+					}
+
+					@Override
+					public void PressedPositiveButton() {
+					}
+				});*/
+//				new LocalNetwork.ConnectionInfoTask(getApplicationContext(), this));
 		setLeftList();
 		right = findViewById(R.id.right_frame);
 		base = findViewById(R.id.base_frame);
@@ -168,7 +197,7 @@ int minIconSize = 50;
 					.color(IconicsColor.colorRes(R.color.White)).size(IconicsSize.TOOLBAR_ICON_SIZE));
 		}
 		menuItem = menu.findItem(R.id.settings);
-		menuItem.setIcon(new IconicsDrawable(this, FontAwesome.Icon.faw_cog)
+		menuItem.setIcon(new IconicsDrawable(this, FontAwesome.Icon.faw_sliders_h)
 				.color(IconicsColor.colorRes(R.color.White)).size(IconicsSize.TOOLBAR_ICON_SIZE));
 
 		menuItem = menu.findItem(R.id.resize);
@@ -293,52 +322,23 @@ int minIconSize = 50;
 		customView.setPadding(Tools.dpToPx(8, this), Tools.dpToPx(24, this),
 				Tools.dpToPx(8, this), Tools.dpToPx(24, this));
 		addConnectBuilder.setView(customView);
-//				addConnectBuilder.setNegativeButton(R.string.cancel, null);
-//				builder.setCancelable(false);
 
 		final AlertDialog addConnectionDialog = addConnectBuilder.create();
-/*				androidx.fragment.app.FragmentManager fm = getSupportFragmentManager();
-				AlertDialogFragment alertDialogFragment = AlertDialogFragment.newInstance(
-						R.style.CustomDialogTheme,
-						Html.fromHtml("<font color='#111111'>"+ getString(R.string.addConnection)+ "</font>").toString()/ *,
-						"",
-						"",
-						getString(R.string.cancel)* /
-				);
-//				alertDialogFragment.setTitle(Html.fromHtml("<font color='#111111'>"+ getString(R.string.addConnection)+ "</font>"));
-/ *				alertDialogFragment.setButton(AlertDialog.BUTTON_NEGATIVE, getResources().getString(R.string.cancel),
-						new DialogListAdapter.OnClickListener() {
-							@Override
-							public void OnClickItem(String name) {
-							}
-//						}
-//				(dialog1, which) -> {
-//							return dialog1.cancel();
-						});* /
-				alertDialogFragment.show(fm, "alertDialogFragment");
-/**/
 		addConnectionDialog.setTitle(Html.fromHtml("<font color='#111111'>"+ getString(R.string.addConnection)+ "</font>"));
 		addConnectionDialog.setButton(AlertDialog.BUTTON_NEGATIVE, getResources().getString(R.string.cancel),
 				(dialog1, which) -> dialog1.cancel());
-//				addConnectionDialog.setButton(AlertDialog.BUTTON_NEGATIVE, getResources().getString(R.string.cancel), (DialogInterface.OnClickListener) null);
 		addConnectionDialog.setCanceledOnTouchOutside(false);
 		addConnectionDialog.show();
-		/**/
 		CustomDialogListAdapter adapter = new CustomDialogListAdapter(this,
-				R.layout.dialog_list, items, new CustomDialogListAdapter.OnClickListener() {
-			@Override
-			public void OnSelecttem(ListItem item1) {
-//						addConnectionDialog.dismiss();
-				addConnectionDialog.cancel();
-				String name = item1.getName();
-				int id = ((Vars) MainActivity.this.getApplication()).getConnectionItems().size();
-				item1.setID(((Vars) MainActivity.this.getApplication()).leftList.size() + 1);
-				((Vars) MainActivity.this.getApplication()).leftList.add(item1);
-				((Vars) MainActivity.this.getApplication()).leftAdapter.notifyDataSetChanged();
-//						MainActivity.this.selectionAddConnection(name, id);
-				MainActivity.this.selectionAddConnection(name, id);
-			}
-		});
+				R.layout.dialog_list, items, item1 -> {
+					addConnectionDialog.cancel();
+					String name = item1.getName();
+					int id = ((Vars) MainActivity.this.getApplication()).getConnectionItems().size();
+					item1.setID(((Vars) MainActivity.this.getApplication()).leftList.size() + 1);
+					((Vars) MainActivity.this.getApplication()).leftList.add(item1);
+					((Vars) MainActivity.this.getApplication()).leftAdapter.notifyDataSetChanged();
+					MainActivity.this.selectionAddConnection(name, item1.getID());
+				});
 		ListView listView = customView.findViewById(R.id.lv_dialog_list);
 		listView.setAdapter(adapter);
 		listView.setOnItemClickListener((parent, view, position, id) -> addConnectionDialog.dismiss());
@@ -346,33 +346,36 @@ int minIconSize = 50;
 
 	private void selectionAddConnection(String name, int id) {
 		if (name.equals(MainActivity.this.getString(R.string.gdrive))) {
-			Log.d(TAG, "adding a new GDrive connection:" + id);
-			((Vars)getApplication()).addConnectionItem(new ConnectionItem(
+			ConnectionItem item = new ConnectionItem(
 					id,
 					CONNECTION_TYPE_GDRIVE,
 					"",
 					"",
 					"",
 					"",
+					"",
 					"drive.google.com",
 					80,
-					"/"));
+					"/");
 //							ShareCompat.IntentBuilder.from(this)
 //									.setChooserTitle("title")
 //									.setType("mimiType")
 //									.setText("textToShare");
+			((Vars)getApplication()).addConnectionItem(item);
 		} else if (name.equals(MainActivity.this.getString(R.string.onedrive))) {
 //							Log.d(TAG, "adding a new Onedrive connection:" + id);
-			((Vars)getApplication()).addConnectionItem(new ConnectionItem(
+			ConnectionItem item = new ConnectionItem(
 					id,
 					CONNECTION_TYPE_ONEDRIVE,
 					"",
 					"",
 					"",
 					"",
+					"",
 					"onedrive.apple.com",
 					80,
-					"/"));
+					"/");
+			((Vars)getApplication()).addConnectionItem(item);
 		} else if (name.equals(getString(R.string.dropbox))) {
 //							DropboxInstance dropboxInstance = new DropboxInstance();
 //							dropboxInstance.authorise(DropboxInstance.appInfo());
@@ -393,16 +396,18 @@ int minIconSize = 50;
 			if (intent.resolveActivity(getPackageManager()) != null) {
 				startActivity(intent);
 			}/**/
-			((Vars)getApplication()).addConnectionItem(new ConnectionItem(
+			ConnectionItem item = new ConnectionItem(
 					id,
 					CONNECTION_TYPE_DROPBOX,
 					"",
 					"",
 					"",
 					"",
-					"onedrive.apple.com",
+					"",
+					"dropbox.com",
 					80,
-					"/"));
+					"/");
+			((Vars)getApplication()).addConnectionItem(item);
 		} else if (name.equals(getString(R.string.box))) {
 			Uri.Builder builder = new Uri.Builder();
 			builder.scheme("smb").encodedAuthority("yumausa:yuma@192.168.1.222").path("/");
@@ -421,22 +426,52 @@ int minIconSize = 50;
 			}
 			*/
 //							new NetworkUtils.AsyncGetNetworkResponce().execute();
-			((Vars)getApplication()).addConnectionItem(new ConnectionItem(
+			ConnectionItem item = new ConnectionItem(
 					id,
 					CONNECTION_TYPE_BOX,
 					"",
 					"",
 					"",
 					"",
-					"onedrive.apple.com",
+					"",
+					"box.microsoft.com",
 					80,
-					"/"));
+					"/");
+			((Vars)getApplication()).addConnectionItem(item);
 		} else if (name.equals(MainActivity.this.getString(R.string.ftp))) {
 //							MainActivity.this.showFTPsettings("ftp", id);
-			showFTPsettings(CONNECTION_TYPE_FTP);
+/*			ConnectionItem item = new ConnectionItem(
+					id,
+					CONNECTION_TYPE_FTP,
+					"",
+					"",
+					"",
+					"",
+					"",
+					"",
+					21,
+					"/");
+			((Vars)getApplication()).addConnectionItem(item);*/
+//			showFTPsettings(CONNECTION_TYPE_FTP, item);
+//			showFTPsettings(item.getID());
+			showFTPsettings(-1, CONNECTION_TYPE_FTP);
 		} else if (name.equals(MainActivity.this.getString(R.string.local_network))) {
 //							MainActivity.this.showFTPsettings("smb", id);
-			showFTPsettings(CONNECTION_TYPE_SMB);
+/*			ConnectionItem item = new ConnectionItem(
+					id,
+					CONNECTION_TYPE_SMB,
+					"",
+					"",
+					"",
+					"",
+					"",
+					"",
+					0,
+					"/");
+			((Vars)getApplication()).addConnectionItem(item);*/
+//			showFTPsettings(CONNECTION_TYPE_SMB, item);
+//			showFTPsettings(item.getID());
+			showFTPsettings(-1, CONNECTION_TYPE_SMB);
 		}
 	}
 
@@ -451,10 +486,17 @@ int minIconSize = 50;
 				Tools.dpToPx(16, this), Tools.dpToPx(16, this),
 				Tools.dpToPx(18, this), true, Tools.dpToPx(8, this),
 				false));
+//		items.add(new ListItem(0, items.size(), getString(R.string.onedrive),null,
+//				new IconicsDrawable(this, FontAwesome.Icon.faw_cloud)
+//						.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE),
+//				Tools.dpToPx(16, this), Tools.dpToPx(16, this),
+//				Tools.dpToPx(18, this), true, Tools.dpToPx(8, this),
+//				false));
+		Drawable oneDrive_d = getResources().getDrawable(R.drawable.ms_onedrive);
+		Bitmap oneDrive_b = ((BitmapDrawable)oneDrive_d).getBitmap();
+		Drawable oneDrive = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(oneDrive_b, 64, 64, true));
 		items.add(new ListItem(0, items.size(), getString(R.string.onedrive),null,
-				new IconicsDrawable(this, FontAwesome.Icon.faw_cloud)
-						.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE),
-				Tools.dpToPx(16, this), Tools.dpToPx(16, this),
+				oneDrive, Tools.dpToPx(16, this), Tools.dpToPx(16, this),
 				Tools.dpToPx(18, this), true, Tools.dpToPx(8, this),
 				false));
 		items.add(new ListItem(0, items.size(), getString(R.string.dropbox),null,
@@ -463,16 +505,30 @@ int minIconSize = 50;
 				Tools.dpToPx(16, this), Tools.dpToPx(16, this),
 				Tools.dpToPx(18, this), true, Tools.dpToPx(8, this),
 				false));
+//		items.add(new ListItem(0, items.size(), getString(R.string.box),null,
+//				new IconicsDrawable(this, FontAwesome.Icon.faw_box)
+//						.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE),
+//				Tools.dpToPx(16, this), Tools.dpToPx(16, this),
+//				Tools.dpToPx(18, this), true, Tools.dpToPx(8, this),
+//				false));
+		Drawable box_d = getResources().getDrawable(R.drawable.box_icon);
+		Bitmap box_b = ((BitmapDrawable)box_d).getBitmap();
+		Drawable box = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(box_b, 64, 64, true));
 		items.add(new ListItem(0, items.size(), getString(R.string.box),null,
-				new IconicsDrawable(this, FontAwesome.Icon.faw_box)
-						.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE),
-				Tools.dpToPx(16, this), Tools.dpToPx(16, this),
+				box, Tools.dpToPx(16, this), Tools.dpToPx(16, this),
 				Tools.dpToPx(18, this), true, Tools.dpToPx(8, this),
 				false));
+//		items.add(new ListItem(0, items.size(), getString(R.string.ftp),null,
+//				new IconicsDrawable(this, FontAwesome.Icon.faw_server)
+//						.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE),
+//				Tools.dpToPx(16, this), Tools.dpToPx(16, this),
+//				Tools.dpToPx(18, this), true, Tools.dpToPx(8, this),
+//				false));
+		Drawable ftp_d = getResources().getDrawable(R.drawable.ftp_connection);
+		Bitmap ftp_b = ((BitmapDrawable)ftp_d).getBitmap();
+		Drawable ftp = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(ftp_b, 64, 64, true));
 		items.add(new ListItem(0, items.size(), getString(R.string.ftp),null,
-				new IconicsDrawable(this, FontAwesome.Icon.faw_server)
-						.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE),
-				Tools.dpToPx(16, this), Tools.dpToPx(16, this),
+				ftp, Tools.dpToPx(16, this), Tools.dpToPx(16, this),
 				Tools.dpToPx(18, this), true, Tools.dpToPx(8, this),
 				false));
 		items.add(new ListItem(0, items.size(), getString(R.string.local_network),null,
@@ -485,83 +541,221 @@ int minIconSize = 50;
 	}
 
 
-	private void showFTPsettings(int type) {
+	private void showFTPsettings(int id, int myType) {
+		ConnectionItem item = new ConnectionItem();
+		int type = myType;
+		if (id > -1) {
+			item = ((Vars) this.getApplication()).getConnectionItemByID(id);
+			type = item.getType();
+			Log.d(TAG, "showFTPsettings opening with item:"+ item.toString());
+		}
+//		Log.d(TAG, "showFTPsettings opening with item:"+ item.toString()+ ", type="+ type);
+//		ArrayList<String> methods = new ArrayList<>();
+//		String scheme = "";
 		androidx.fragment.app.FragmentManager fm = getSupportFragmentManager();
-		MyDialogFragment myDialogFragment = MyDialogFragment.newInstance(R.layout.ftp_settings_form,
-				R.style.CustomDialogTheme, "Some Title", "",
-				getString(R.string.testConnect), getString(android.R.string.ok), getString(android.R.string.cancel));
-		myDialogFragment.show(fm, "fragment_edit_name");
-/*
-		AlertDialog.Builder showFTPbuilder;
-		showFTPbuilder = new AlertDialog.Builder(this, R.style.CustomDialogTheme);
-		final View formFTP = View.inflate(this, R.layout.ftp_settings_form, null);
-		formFTP.setPadding(Tools.dpToPx(8, this), Tools.dpToPx(24, this),
-				Tools.dpToPx(8, this), Tools.dpToPx(24, this));
-		showFTPbuilder.setView(formFTP);
-//				builder.setCancelable(false);
-		final AlertDialog formDialog = showFTPbuilder.create();
-//		AlertDialogFragment formDialog = showFTPbuilder.create();
-		formDialog.setTitle(Html.fromHtml("<font color='#111111'>"+ getString(R.string.ftpConnect)+ "</font>"));
-//	get view elements
-		TextView title = formFTP.findViewById(R.id.tv_ftp_title);
-		ImageView rename = formFTP.findViewById(R.id.iv_ftp_rename);
-		TextView hlabel = formFTP.findViewById(R.id.tv_ftp_host);
-		TextView ulabel = formFTP.findViewById(R.id.tv_ftp_username);
-		TextView plabel = formFTP.findViewById(R.id.tv_ftp_password);
-		TextView tlabel = formFTP.findViewById(R.id.tv_ftp_port);
-		TextView iplabel = formFTP.findViewById(R.id.tv_ftp_init_path);
-		EditText ipath = formFTP.findViewById(R.id.et_ftp_init_path);
-		EditText hname = formFTP.findViewById(R.id.et_ftp_host);
-		EditText uname = formFTP.findViewById(R.id.et_ftp_username);
-		EditText pword = formFTP.findViewById(R.id.et_ftp_password);
-		EditText portn = formFTP.findViewById(R.id.et_ftp_port);
-		EditText etitle = formFTP.findViewById(R.id.et_ftp_rename);
-		ImageView spinner = formFTP.findViewById(R.id.iv_ftp_progress);
-//	toggle rename button
-		final boolean[] openedRename = {false};
-		rename.setOnClickListener(v -> {
-			if (openedRename[0]) {
-				openedRename[0] = false;
-				etitle.setVisibility(View.GONE);
+		MyDialogFragment myDialogFragment = MyDialogFragment.newInstance();
+		Bundle bundle = new Bundle();
+		bundle.putInt("id", id);
+//		bundle.putInt("width", 123);
+//		bundle.putInt("height", 234);
+//		bundle.putFloat("percent", 34.5f);
+		bundle.putInt("style", R.style.CustomDialogTheme);
+//		View view = View.inflate(this, R.layout.ftp_settings_form, null);
+//		bundle.putInt("layout", R.layout.ftp_settings_form);
+		bundle.putBoolean("cancelable", false);
+		if (type == CONNECTION_TYPE_SMB) {
+			bundle.putString("title", getString(R.string.local_network));
+		} else {
+			bundle.putString("title", getString(R.string.ftpConnect));
+		}
+//		bundle.putString("message", "My Message");
+		bundle.putString("neutralButtonLabel", getString(R.string.testConnect));
+		bundle.putString("positiveButtonLabel", getString(android.R.string.ok));
+		bundle.putString("negativeButtonLabel", getString(android.R.string.cancel));
+
+		alertViewFTP = View.inflate(this, R.layout.ftp_settings_form, null);
+		if (alertViewFTP != null) {
+			TextView title = alertViewFTP.findViewById(R.id.tv_ftp_title);
+			TextView hlabel = alertViewFTP.findViewById(R.id.tv_ftp_host);
+			TextView ulabel = alertViewFTP.findViewById(R.id.tv_ftp_username);
+			TextView plabel = alertViewFTP.findViewById(R.id.tv_ftp_password);
+			TextView tlabel = alertViewFTP.findViewById(R.id.tv_ftp_port);
+			TextView iplabel = alertViewFTP.findViewById(R.id.tv_ftp_init_path);
+			EditText ipath = alertViewFTP.findViewById(R.id.et_ftp_init_path);
+			EditText hname = alertViewFTP.findViewById(R.id.et_ftp_host);
+			EditText uname = alertViewFTP.findViewById(R.id.et_ftp_username);
+			EditText pword = alertViewFTP.findViewById(R.id.et_ftp_password);
+			EditText portn = alertViewFTP.findViewById(R.id.et_ftp_port);
+			EditText etitle = alertViewFTP.findViewById(R.id.et_ftp_rename);
+			ImageView spinner = alertViewFTP.findViewById(R.id.iv_ftp_progress);
+			RadioGroup radios = alertViewFTP.findViewById(R.id.rg_ftp_auth);
+			TextView domlabel = alertViewFTP.findViewById(R.id.tv_ftp_domain);
+			EditText domain = alertViewFTP.findViewById(R.id.et_ftp_domain);
+			View method = alertViewFTP.findViewById(R.id.connType);
+
+			method.setTag(type);
+			title.setText(Tools.toTitleCase(getString(R.string.title)));
+			hlabel.setText(Tools.toTitleCase(getString(R.string.server)));
+			domlabel.setText(Tools.toTitleCase(getString(R.string.domain)));
+			ulabel.setText(Tools.toTitleCase(getString(R.string.username)));
+			plabel.setText(Tools.toTitleCase(getString(R.string.password)));
+			tlabel.setText(Tools.toTitleCase(getString(R.string.port)));
+			iplabel.setText(Tools.toTitleCase(getString(R.string.init_path)));
+			spinner.setImageDrawable(new IconicsDrawable(this, FontAwesome.Icon.faw_spinner)
+					.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE));
+			if (type == CONNECTION_TYPE_SMB) {
+				radios.setVisibility(View.GONE);
+				tlabel.setVisibility(View.GONE);
+				portn.setVisibility(View.GONE);
+				tlabel.setVisibility(View.GONE);
+				domlabel.setVisibility(View.VISIBLE);
+				domain.setVisibility(View.VISIBLE);
 			} else {
-				openedRename[0] = true;
-				etitle.setVisibility(View.VISIBLE);
+				RadioButton authFTP = alertViewFTP.findViewById(R.id.rb_ftp_plain);
+				RadioButton authFTPS = alertViewFTP.findViewById(R.id.rb_ftps);
+				RadioButton authSFTP = alertViewFTP.findViewById(R.id.rb_sftp);
+				authSFTP.setOnClickListener(v -> {
+					portn.setHint("22");
+				});
+				authFTPS.setOnClickListener(v -> {
+					portn.setHint("21");
+				});
+				authFTP.setOnClickListener(v -> {
+					portn.setHint("21");
+				});
 			}
-		});
-		rename.setImageDrawable(new IconicsDrawable(this, FontAwesome.Icon.faw_edit)
-				.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE));
-//	set field labels
-		title.setText(Tools.toTitleCase(getString(R.string.eg_ip_addr)));
-		hlabel.setText(Tools.toTitleCase(getString(R.string.server)));
-		ulabel.setText(Tools.toTitleCase(getString(R.string.username)));
-		plabel.setText(Tools.toTitleCase(getString(R.string.password)));
-		tlabel.setText(Tools.toTitleCase(getString(R.string.port)));
-		iplabel.setText(Tools.toTitleCase(getString(R.string.init_path)));
-		spinner.setImageDrawable(new IconicsDrawable(this, FontAwesome.Icon.faw_spinner)
-				.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE));
-//  button actions
-		formDialog.setButton(AlertDialog.BUTTON_NEUTRAL, getResources().getString(R.string.testConnect), null);
-		formDialog.setButton(AlertDialog.BUTTON_POSITIVE, getResources().getString(android.R.string.ok), null);
-		formDialog.setButton(AlertDialog.BUTTON_NEGATIVE, getResources().getString(android.R.string.cancel), null);
-//		formDialog.setButton(AlertDialog.BUTTON_NEGATIVE, getResources().getString(android.R.string.cancel),
-//				(dialog1, which) -> dialog1.cancel());
-//		formDialog.setCanceledOnTouchOutside(false);
-		formDialog.show();*/
+			if (item != null) {
+				alertViewFTP.setTag(item.getID());
+				if (item.getConnectionName() != null && !item.getConnectionName().equals("")) {
+//					title.setText(item.getConnectionName());
+					etitle.setText(item.getConnectionName());
+				} else {
+					etitle.setHint(Tools.toTitleCase(getString(R.string.eg_conn)));
+				}
+//				Log.d(TAG, "showFTPsettings item is "+ item.toString());////////////error below
+				if (item.getPort() > 0) {// && portn != null) {
+					try {
+						portn.setText(String.valueOf(item.getPort()));
+					} catch (NumberFormatException e) {
+					}
+				} else {
+					portn.setText("21");
+				}
+				if (item.getPath() != null && !item.getPath().equals("")) {
+					ipath.setText(item.getPath());
+				} else {
+					ipath.setHint("/");
+				}
+				if (item.getHost() != null && !item.getHost().equals("")) {
+					hname.setText(item.getHost());
+				}
+				if (item.getUsername() != null && !item.getUsername().equals("")) {
+					uname.setText(item.getUsername());
+				}
+				if (item.getPassword() != null && !item.getPassword().equals("")) {
+					pword.setText(item.getPassword());
+				}
+				if (item.getAccessToken() != null && !item.getAccessToken().equals("")) {
+					domain.setText(item.getAccessToken());
+				}
+			} else {
+				alertViewFTP.setTag(0);
+				etitle.setHint(Tools.toTitleCase(getString(R.string.eg_conn)));
+				portn.setHint("21");
+				ipath.setHint("/");
+			}
+			myDialogFragment.setArguments(bundle);
+			myDialogFragment.show(fm, "fragment_edit_ftp");
+		}
 	}
 
 
+	//from MyDialogFragment
 	@Override
-	public void neutralButtonPressed() {
-		Log.d(TAG, "neutralButtonPressed");
-		/*
-//						LinearLayout layout = formFTP.findViewById(R.id.ll_ftp_main);
-//						layout.setBackgroundColor(Color.GRAY);
-		spinner.setVisibility(View.VISIBLE);
-		Log.d(TAG, "why this dialog closes?");
-//					formDialog.getButton(which).setText(FontAwesome.Icon.faw_spinner);
-//						formDialog.getButton(which).setText("...");
-		String string = method + "://" + uname.getText() + ":" + pword.getText() + "@" +
-				hname.getText() + ":" + portn.getText() + "/";
+	public void AlertDialogNeutralButtonPressed(Button button, AlertDialog dialog, int id) {
+		ConnectionItem item = new ConnectionItem();
+		View view = (View) button.getParent().getParent().getParent();
+		EditText ipath = view.findViewById(R.id.et_ftp_init_path);
+		EditText hname = view.findViewById(R.id.et_ftp_host);
+		EditText uname = view.findViewById(R.id.et_ftp_username);
+		EditText pword = view.findViewById(R.id.et_ftp_password);
+		EditText portn = view.findViewById(R.id.et_ftp_port);
+		if (id > 0) {
+			item = ((Vars) this.getApplication()).getConnectionItemByID(id);
+			View method = view.findViewById(R.id.connType);
+//			int type = (int)method.getTag();
+		}
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+			button.setBackgroundDrawable(
+					new IconicsDrawable(this, FontAwesome.Icon.faw_spinner)
+							.color(IconicsColor.colorRes(R.color.Teal))
+							.size(IconicsSize.TOOLBAR_ICON_SIZE));
+		}
+//		RadioButton authFTP = alertViewFTP.findViewById(R.id.rb_ftp_plain);
+		RadioButton authFTPS = alertViewFTP.findViewById(R.id.rb_ftps);
+		RadioButton authSFTP = alertViewFTP.findViewById(R.id.rb_sftp);
+//		TextView domlabel = alertViewFTP.findViewById(R.id.tv_ftp_domain);
+		EditText domain = alertViewFTP.findViewById(R.id.et_ftp_domain);
+		String connStr = "";
+		connStr = (item.getType() == CONNECTION_TYPE_SMB)
+				? "smb://"
+				: (authSFTP.isChecked())
+					? "sftp://"
+					: (authFTPS.isChecked())
+						? "ftps://"
+						: "ftp://";
+		connStr += hname.getText();
+		int port;
+		try {
+			port = Integer.parseInt(portn.getText().toString());
+			connStr += ":" + port;
+		} catch (NumberFormatException e) {
+		}
+		if (!ipath.getText().toString().startsWith("/")) {
+			connStr += "/";
+		}
+		connStr += ipath.getText();
+
+		Log.d(TAG, "testing connection:"+ connStr);
+		if (item.getType() == CONNECTION_TYPE_SMB) {
+//			LoaderSMB client = new LoaderSMB(this, result -> {
+//				Log.d(TAG, "tested connection:");
+//				Log.d(TAG, "response=" + result.getSessionId()+ ":" + result.getConnection().toString());
+//				dialog.dismiss();
+//			});
+//			client.connect(connStr, uname.getText().toString(), pword.getText().toString(), .getText().toString());
+			final String connString = connStr;
+			SMBoperation client = new SMBoperation(new SMBoperation.OnSMBinteraction() {
+				@Override
+				public void OnResult(Session result) {
+					Log.d(TAG, "tested smb connection:"+ connString);
+					Log.d(TAG, "smb response=" + result.getSessionId()+ ":" + result.getConnection().toString());
+				}
+			});
+			client.connect(connStr, uname.getText().toString(), pword.getText().toString(), domain.getText().toString());
+		} else {
+//			LoaderFTP ftp = new LoaderFTP(result -> {
+//				Log.d(TAG, "tested connection:");
+//				try {
+//					Log.d(TAG, "response=" + result.getStatus() + ":" + result.getReplyString());
+//				} catch (IOException e) {
+//					e.printStackTrace();
+//				}
+//				dialog.dismiss();
+//			});
+//			ftp.connectFTP(this, connStr, uname.getText().toString(), pword.getText().toString(),
+//					ipath.getText().toString());
+			FTPoperation client = new FTPoperation(result -> {
+				Log.d(TAG, "tested ftp connection:");
+				try {
+					Log.d(TAG, "ftp response=" + result.getStatus()+ ":" + result.getReplyString());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			});
+			client.connectFTP(connStr, uname.getText().toString(), pword.getText().toString(), ipath.getText().toString());
+		}
+/*
 		AlertDialog.Builder testBuilder = new AlertDialog.Builder(MainActivity.this);
 		testBuilder.setTitle("testing...");
 		testBuilder.setMessage(string);
@@ -591,56 +785,19 @@ int minIconSize = 50;
 	}
 
 	@Override
-	public void negativeButtonPressed() {
-		Log.d(TAG, "negativeButtonPressed");
+	public void AlertDialogNegativeButtonPressed(Button button, AlertDialog dialog, int id) {
+		dialog.dismiss();
 	}
 
 	@Override
-	public void positiveButtonPressed() {
-		Log.d(TAG, "positiveButtonPressed");
-		/*
-		String string = "";
-		if (type == CONNECTION_TYPE_SMB) {
-			string += "smb:";
+	public void AlertDialogPositiveButtonPressed(Button button, AlertDialog dialog, int id) {
+		ConnectionItem item = new ConnectionItem();
+		if (id > 0) {
+			item = ((Vars) this.getApplication()).getConnectionItemByID(id);
 		} else {
-			string += "ftp:";
+			item.setID(((Vars)this.getApplication()).getConnectionItems().size());
 		}
-		string += "//"+ uname.getText()+ ":"+ pword.getText()+ "@"+
-				hname.getText()+ ":"+ portn.getText()+ "/";
-//					Uri uri = Uri.parse(string);
-//					String name = etitle.getText().toString().isEmpty() ? title.getText().toString() : etitle.getText().toString();
-		Log.d(TAG, "button OK string="+ string);
-//					((Vars)this.getApplication()).addConnectionItem(new ConnectionItem(id, string));
-		int connectId = ((Vars)getApplication()).getConnectionItems().size();
-		((Vars)this.getApplication()).addConnectionItem(new ConnectionItem(
-				connectId,
-				type,
-				"",
-				(type == CONNECTION_TYPE_SMB) ? "smb:" : "ftp:",
-				uname.getText().toString(),
-				pword.getText().toString(),
-				hname.getText().toString(),
-				Integer.parseInt(portn.getText().toString()),
-				ipath.getText().toString()));
-//					leftList.add(new ListItem(0, id, name, "",null,
-//							leftListDefaultLeftPadding, leftListDefaultTopPadding, leftListDefaultBottomPadding,
-//							leftListDefaultIconBeforeText, leftListDefaultBetweenPadding, false));
-		dialog1.cancel();*/
-	}
-
-	@Override
-	public void putInOnViewCreated(View view, Bundle bundle) {
-/*		showFTPsettingsActivity ftPsettingsActivity = new showFTPsettingsActivity();*/
-
-/*		ftPsettingsActivity.connectViewElements(view);*/
-/**/
-		TextView title = view.findViewById(R.id.tv_ftp_title);
-		ImageView rename = view.findViewById(R.id.iv_ftp_rename);
-		TextView hlabel = view.findViewById(R.id.tv_ftp_host);
-		TextView ulabel = view.findViewById(R.id.tv_ftp_username);
-		TextView plabel = view.findViewById(R.id.tv_ftp_password);
-		TextView tlabel = view.findViewById(R.id.tv_ftp_port);
-		TextView iplabel = view.findViewById(R.id.tv_ftp_init_path);
+		View view = (View) button.getParent().getParent().getParent();
 		EditText ipath = view.findViewById(R.id.et_ftp_init_path);
 		EditText hname = view.findViewById(R.id.et_ftp_host);
 		EditText uname = view.findViewById(R.id.et_ftp_username);
@@ -648,41 +805,68 @@ int minIconSize = 50;
 		EditText portn = view.findViewById(R.id.et_ftp_port);
 		EditText etitle = view.findViewById(R.id.et_ftp_rename);
 		ImageView spinner = view.findViewById(R.id.iv_ftp_progress);
-/**/
-/*		ftPsettingsActivity.setLabels();*/
-/**/
-		title.setText(Tools.toTitleCase(getString(R.string.eg_ip_addr)));
-		hlabel.setText(Tools.toTitleCase(getString(R.string.server)));
-		ulabel.setText(Tools.toTitleCase(getString(R.string.username)));
-		plabel.setText(Tools.toTitleCase(getString(R.string.password)));
-		tlabel.setText(Tools.toTitleCase(getString(R.string.port)));
-		iplabel.setText(Tools.toTitleCase(getString(R.string.init_path)));
-		spinner.setImageDrawable(new IconicsDrawable(this, FontAwesome.Icon.faw_spinner)
-				.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE));
-		final boolean[] openedRename = {false};
-		rename.setOnClickListener(v -> {
-			if (openedRename[0]) {
-				openedRename[0] = false;
-				etitle.setVisibility(View.GONE);
-			} else {
-				openedRename[0] = true;
-				etitle.setVisibility(View.VISIBLE);
+		RadioButton authFTPS = alertViewFTP.findViewById(R.id.rb_ftps);
+		RadioButton authSFTP = alertViewFTP.findViewById(R.id.rb_sftp);
+		EditText domain = alertViewFTP.findViewById(R.id.et_ftp_domain);
+		View method = alertViewFTP.findViewById(R.id.connType);
+		spinner.setVisibility(View.VISIBLE);
+		int port = 21;
+		try {
+			port = Integer.parseInt(portn.getText().toString());
+			if (port < 1) {
+				port = 21;
 			}
-		});
-		rename.setImageDrawable(new IconicsDrawable(this, FontAwesome.Icon.faw_edit)
-				.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE));
-/**/
-//		int port;
-//		try {
-//			port = Integer.getInteger(portn.toString());
-//		}
-		String connStr = String.format(Locale.CANADA, "%s://%s:%s@%s:%d/%s",
-				"", uname, pword, hname, Integer.parseInt(portn.getText().toString()), ipath);
+			item.setPort(port);
+		} catch (NumberFormatException e) {
+		}
+		if (item.getType() < 1) {
+			item.setType((int)method.getTag());
+		}
+		if (etitle.getText() != null) {
+			item.setConnectionName(etitle.getText().toString());
+		}
+		if (hname.getText() != null) {
+			item.setHost(hname.getText().toString());
+		}
+		if (uname.getText() != null) {
+			item.setUsername(uname.getText().toString());
+		}
+		if (pword.getText() != null) {
+			item.setPassword(pword.getText().toString());
+		}
+		if (ipath.getText() != null) {
+			item.setPath(ipath.getText().toString());
+		} else {
+			item.setPath(ipath.getHint().toString());
+		}
+		if (item.getType() > 0) {
+			String scheme = (item.getType() == CONNECTION_TYPE_SMB) ? "smb:"
+					: (authSFTP.isChecked()) ? "sftp:"
+						: (authFTPS.isChecked()) ? "ftps:"
+							: "ftp:";
+			item.setScheme(scheme);
+		}
+		if (domain.getText() != null) {
+			item.setAccessToken(domain.getText().toString());
+		}
+		((Vars)this.getApplication()).leftList.get(item.getID()+4).setName(item.getConnectionName());
+		Log.d(TAG, "saving connection: "+ item.toString());
+		((Vars)this.getApplication()).addConnectionItem(item);
+		spinner.setVisibility(View.INVISIBLE);
+		dialog.dismiss();
 	}
 
 	@Override
-	public void onBeforeCreate(AlertDialog.Builder alertDialogBuilder) {
-		alertDialogBuilder.setTitle(Html.fromHtml("<font color='#111111'>"+ getString(R.string.ftpConnect)+ "</font>"));
+	public void AlertDialogPutInOnViewCreated(View view, Bundle bundle, int id) {
+	}
+
+	@Override
+	public void AlertDialogOnBeforeCreate(AlertDialog.Builder alertDialogBuilder) {
+		if (alertViewFTP != null) {
+			alertDialogBuilder.setView(alertViewFTP);
+//			Log.d("onBeforeCreate", "alertViewFTP="+ alertViewFTP.toString());
+		}
+//		alertDialogBuilder.setTitle(Html.fromHtml("<font color='#111111'>"+ getString(R.string.ftpConnect)+ "</font>"));
 	}
 
 /**/
@@ -760,78 +944,6 @@ int minIconSize = 50;
 		if (accessToken != null) {
 			Vars.setDropboxAccessToken(accessToken);
 		}
-//		setLeftList();
-/*
-		AlertDialog formDialog = (AlertDialog)getDialog();
-		if () {
-			formDialog.setButton(AlertDialog.BUTTON_NEUTRAL, getResources().getString(R.string.testConnect),
-					(dialog1, which) -> {
-//						LinearLayout layout = formFTP.findViewById(R.id.ll_ftp_main);
-//						layout.setBackgroundColor(Color.GRAY);
-						spinner.setVisibility(View.VISIBLE);
-						Log.d(TAG, "why this dialog closes?");
-//					formDialog.getButton(which).setText(FontAwesome.Icon.faw_spinner);
-//						formDialog.getButton(which).setText("...");
-/ *						String string = method + "://" + uname.getText() + ":" + pword.getText() + "@" +
-							hname.getText() + ":" + portn.getText() + "/";* /
-/ *						AlertDialog.Builder testBuilder = new AlertDialog.Builder(MainActivity.this);
-					testBuilder.setTitle("testing...");
-					testBuilder.setMessage(string);
-					testBuilder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							dialog.dismiss();
-						}
-					});
-					testBuilder.show();* /
-/ *						Log.d(TAG, "button TEST string=" + string);
-					Bundle bundle = new Bundle();
-					bundle.putString("string", string);
-					bundle.putInt("which", which);
-					bundle.putString("dialog", dialog1.toString());
-					Uri uri = Uri.parse(string);* /
-//
-//					new connectTask(string, which, dialog1).execute();
-//
-//					LoaderManager loaderManager = getSupportLoaderManager();
-//					Loader<String> loader = loaderManager.getLoader(TEST_CONNECT_LOADER);
-//					if (loader == null) {
-//						loaderManager.initLoader(TEST_CONNECT_LOADER, bundle, this);
-//					} else {
-//						loaderManager.restartLoader(TEST_CONNECT_LOADER, bundle, this);
-//					}
-					});
-			formDialog.setButton(AlertDialog.BUTTON_POSITIVE, getResources().getString(android.R.string.ok),
-					(dialog1, which) -> {
-						String string = "";
-						if (type == CONNECTION_TYPE_SMB) {
-							string += "smb:";
-						} else {
-							string += "ftp:";
-						}
-						string += "//"+ uname.getText()+ ":"+ pword.getText()+ "@"+
-								hname.getText()+ ":"+ portn.getText()+ "/";
-//					Uri uri = Uri.parse(string);
-//					String name = etitle.getText().toString().isEmpty() ? title.getText().toString() : etitle.getText().toString();
-						Log.d(TAG, "button OK string="+ string);
-//					((Vars)this.getApplication()).addConnectionItem(new ConnectionItem(id, string));
-						int connectId = ((Vars)getApplication()).getConnectionItems().size();
-						((Vars)this.getApplication()).addConnectionItem(new ConnectionItem(
-								connectId,
-								type,
-								"",
-								(type == CONNECTION_TYPE_SMB) ? "smb:" : "ftp:",
-								uname.getText().toString(),
-								pword.getText().toString(),
-								hname.getText().toString(),
-								Integer.parseInt(portn.getText().toString()),
-								ipath.getText().toString()));
-//					leftList.add(new ListItem(0, id, name, "",null,
-//							leftListDefaultLeftPadding, leftListDefaultTopPadding, leftListDefaultBottomPadding,
-//							leftListDefaultIconBeforeText, leftListDefaultBetweenPadding, false));
-						dialog1.cancel();
-					});
-		}*/
 	}
 
 	@Override
@@ -1036,9 +1148,126 @@ int minIconSize = 50;
 		Log.d(TAG, "left interaction with "+ item.toString());
 	}
 
-
+	//from LeftArrayAdapter
 	@Override
-	public void ContextMenuLeftItemId(int id) {
+	public void LongPressedLeftItemId(final int id) {
+		boolean editFaded = id < 5;
+		Log.d(TAG, "items="+ ((Vars)this.getApplication()).getConnectionItems().toString());
+		if (id > 4) {
+//			Log.d(TAG, "looking for "+ id);
+			final ConnectionItem item = ((Vars)this.getApplication()).getConnectionItemByID(id);
+			if (item != null) {
+				Log.d(TAG, "item=" + item.toString());
+				if (!editFaded) {
+					final int type = item.getType();
+					editFaded = type != CONNECTION_TYPE_FTP && type != CONNECTION_TYPE_SMB;
+				}
+			}
+		}
+		AlertDialog.Builder contextmenuBuilder = new AlertDialog.Builder(this, R.style.CustomDialogTheme);
+		String itemName = ((Vars)MainActivity.this.getApplication()).leftList.get(id-1).getName();
+		contextmenuBuilder.setTitle(itemName);
+		ArrayList<ListItem> items = new ArrayList<>();//fillAddConnections();
+		items.add(new ListItem(0, items.size(), Tools.toTitleCase(getString(R.string.connto)), null,
+				new IconicsDrawable(this, FontAwesome.Icon.faw_ellipsis_h)
+						.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE),
+				Tools.dpToPx(16, this), Tools.dpToPx(16, this),
+				Tools.dpToPx(18, this), true, Tools.dpToPx(8, this),
+				id < 5));
+		items.add(new ListItem(0, items.size(), Tools.toTitleCase(getString(R.string.rename, "")),null,
+				new IconicsDrawable(this, FontAwesome.Icon.faw_newspaper1)
+						.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE),
+				Tools.dpToPx(16, this), Tools.dpToPx(16, this),
+				Tools.dpToPx(18, this), true, Tools.dpToPx(8, this),
+				id < 5));
+		items.add(new ListItem(0, items.size(), Tools.toTitleCase(getString(R.string.edit_conn)),null,
+				new IconicsDrawable(this, FontAwesome.Icon.faw_edit1)
+						.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE),
+				Tools.dpToPx(16, this), Tools.dpToPx(16, this),
+				Tools.dpToPx(18, this), true, Tools.dpToPx(8, this),
+				/*id < 5*/editFaded));
+		items.add(new ListItem(0, items.size(), Tools.toTitleCase(getString(R.string.remove)),null,
+				new IconicsDrawable(this, FontAwesome.Icon.faw_eraser)
+						.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE),
+				Tools.dpToPx(16, this), Tools.dpToPx(16, this),
+				Tools.dpToPx(18, this), true, Tools.dpToPx(8, this),
+				id < 5));
+		items.add(new ListItem(0, items.size(), Tools.toTitleCase(getString(R.string.move)),null,
+				new IconicsDrawable(this, FontAwesome.Icon.faw_arrows_alt)
+						.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE),
+				Tools.dpToPx(16, this), Tools.dpToPx(16, this),
+				Tools.dpToPx(18, this), true, Tools.dpToPx(8, this),
+				id < 5));
+
+		final View customView = View.inflate(this, R.layout.dialog_list, null);
+		customView.setPadding(Tools.dpToPx(8, this), Tools.dpToPx(10, this),
+				Tools.dpToPx(8, this), Tools.dpToPx(10, this));
+		contextmenuBuilder.setView(customView);
+
+		final AlertDialog contextmenuDialog = contextmenuBuilder.create();
+		contextmenuDialog.setButton(AlertDialog.BUTTON_NEGATIVE, getResources().getString(R.string.cancel),
+				(dialog1, which) -> dialog1.cancel());
+//				addConnectionDialog.setButton(AlertDialog.BUTTON_NEGATIVE, getResources().getString(R.string.cancel), (DialogInterface.OnClickListener) null);
+		contextmenuDialog.setCanceledOnTouchOutside(false);
+		contextmenuDialog.show();
+		CustomDialogListAdapter adapter = new CustomDialogListAdapter(this,
+				R.layout.dialog_list, items, item1 -> {
+					if (id > 4) {
+						//						addConnectionDialog.dismiss();
+						contextmenuDialog.cancel();
+						String name = item1.getName();
+						//				int id = ((Vars) MainActivity.this.getApplication()).getConnectionItems().size();
+						//				item1.setID(((Vars) MainActivity.this.getApplication()).leftList.size() + 1);
+						MainActivity.this.contextmenuSelection(name, id);
+					}
+				});
+		ListView listView = customView.findViewById(R.id.lv_dialog_list);
+		listView.setAdapter(adapter);
+		listView.setOnItemClickListener((parent, view, position, itemId) -> contextmenuDialog.dismiss());
+	}
+
+	void contextmenuSelection(String name, int id) {
+//		Log.d(TAG, "contextmenuSelection: name="+ name+ ", id="+ id);
+		if (name.toUpperCase().equals(getString(R.string.remove).toUpperCase())) {
+			AlertDialog.Builder rusureDialog = new AlertDialog.Builder(this, R.style.CustomDialogTheme);
+			rusureDialog.setTitle(getString(R.string.rusure));
+			String itemName = ((Vars)MainActivity.this.getApplication()).leftList.get(id-1).getName();
+			rusureDialog.setMessage(getString(R.string.delete_conn_x, itemName));
+			rusureDialog.setNegativeButton(getString(android.R.string.cancel), null);
+			rusureDialog.setPositiveButton(getString(android.R.string.ok), (dialog, which) -> {
+				((Vars) MainActivity.this.getApplication()).leftList.remove(id-1);
+				((Vars) MainActivity.this.getApplication()).leftAdapter.notifyDataSetChanged();
+			});
+			rusureDialog.show();
+		} else if (name.toUpperCase().equals(getString(R.string.rename, "").toUpperCase())) {
+			String itemName = ((Vars)MainActivity.this.getApplication()).leftList.get(id-1).getName();
+			AlertDialog.Builder renameDialogBuilder = new AlertDialog.Builder(this, R.style.CustomDialogTheme);
+			renameDialogBuilder.setTitle(getString(R.string.rename, itemName));
+			final View customView = View.inflate(this, R.layout.edit_one_field, null);
+			customView.setPadding(Tools.dpToPx(8, this), Tools.dpToPx(24, this),
+					Tools.dpToPx(8, this), Tools.dpToPx(24, this));
+			final TextView label = customView.findViewById(R.id.tv_edit_label);
+			final EditText value = customView.findViewById(R.id.et_edit_field);
+			label.setText(Tools.toTitleCase(getString(R.string.name)));
+			value.setHint(itemName);
+			renameDialogBuilder.setView(customView);
+
+			final AlertDialog renameDialog = renameDialogBuilder.create();
+			renameDialog.setButton(AlertDialog.BUTTON_NEGATIVE, getResources().getString(android.R.string.cancel),
+					(dialog1, which) -> dialog1.cancel());
+			renameDialog.setButton(AlertDialog.BUTTON_POSITIVE, getResources().getString(android.R.string.ok),
+					(dialog1, which) -> {
+						((Vars) MainActivity.this.getApplication()).leftList.get(id-1).setName(value.getText().toString());
+						((Vars) MainActivity.this.getApplication()).leftAdapter.notifyDataSetChanged();
+					});
+			renameDialog.show();
+		} else if (name.toUpperCase().equals(getString(R.string.move).toUpperCase())) {
+		} else if (name.toUpperCase().equals(getString(R.string.edit_conn).toUpperCase())) {
+			ConnectionItem item = ((Vars) MainActivity.this.getApplication()).getConnectionItemByID(id-5);
+			Log.d(TAG, "editing:"+ item.toString());
+//			showFTPsettings(item.getType(), item);
+			showFTPsettings(item.getID(), 0);
+		}
 	}
 
 

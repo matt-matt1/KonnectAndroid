@@ -4,13 +4,17 @@
 <!--    <color name="colorPrimaryDark">#00574B</color>-->
 <!--    <color name="colorAccent">#D81B60</color>-->
 
-    <color name="Emerald">#008577</color>
+    <color name="Emerald">#FF008577</color>
 	<color name="White">#FFFFFFFF</color>
 	<color name="Gray">#FF808080</color>
 	<color name="Maroon">#FF800000</color>
 	<color name="Teal">#FF008080</color>
 	<color name="DarkGray">#FF333333</color>
 	<color name="VeryDarkGray">#FF111111</color>
+	<color name="SkyBlue">#FF569CE3</color>
+	<color name="lightGray">#FFB1BCBE</color>
+	<color name="black">#FF000000</color>
+	<color name="paleYellow">#FFf5f5dd</color>
 
 	<drawable name="drawGray">#FF808080</drawable>
 	<drawable name="drawWhite">#FFFFFFFF</drawable>

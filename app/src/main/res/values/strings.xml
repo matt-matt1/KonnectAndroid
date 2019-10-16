@@ -57,7 +57,7 @@
 	<string name="testConnect">test</string>
 	<string name="ftpConnect">FTP connection</string>
 	<string name="server">host / server name</string>
-	<string name="rename">rename</string>
+	<string name="rename">rename %1$s</string>
 	<string name="port">port</string>
 	<string name="failed_connect">Failed to connect</string>
 	<string name="contactMethod">Share Via:</string>
@@ -74,6 +74,16 @@
 	<string name="lost_connection">lost connection</string>
 	<string name="init_path">initial path</string>
 	<string name="remove">remove</string>
+	<string name="move">move</string>
+	<string name="rusure">Are you sure?</string>
+	<string name="delete_conn_x">Delete connection to %1$s?</string>
+	<string name="name">name</string>
+	<string name="neutral">neutral</string>
+	<string name="edit_conn">edit connection</string>
+	<string name="eg_conn">Eg. My Connection</string>
+	<string name="domain">domain</string>
+	<string name="connto">connect to ...</string>
+	<string name="title">title</string>
 
 	<string-array name="contactShare">
 		<item>Email</item>

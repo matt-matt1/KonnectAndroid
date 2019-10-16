@@ -26,7 +26,7 @@ public class LoaderFTP implements LoaderManager.LoaderCallbacks<FTPClient> {
 	private static final String TAG = FTPoperation.class.getSimpleName();
 
 	public interface OnFTPinteraction {
-		void OnResult(FTPClient result);
+		void OnResult(FTPClient result);// throws IOException;
 	}
 	private final OnFTPinteraction listener;
 
@@ -169,6 +169,7 @@ REPLACED WITH LOADER
 						ConnectionItem connectionItem = new ConnectionItem(
 								args.getInt("id"),
 								args.getInt("type"),
+								args.getString("name"),
 								args.getString("token"),
 								args.getString("scheme"),
 								args.getString("user"),

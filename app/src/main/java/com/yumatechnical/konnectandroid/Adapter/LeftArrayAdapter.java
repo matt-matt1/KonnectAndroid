@@ -2,11 +2,11 @@ package com.yumatechnical.konnectandroid.Adapter;
 //inuse
 import android.content.Context;
 import android.graphics.Color;
-import android.view.ActionMode;
+//import android.view.ActionMode;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
+//import android.view.Menu;
+//import android.view.MenuInflater;
+//import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -25,14 +25,14 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 
-public class LeftArrayAdapter extends ArrayAdapter<ListItem> implements ActionMode.Callback {
+public class LeftArrayAdapter extends ArrayAdapter<ListItem> /*implements ActionMode.Callback*/ {
 
 	private ArrayList<ListItem> my_data;
 	private int selectedPos = RecyclerView.NO_POSITION;
 	private View lastSelected = null;
 //	private static final String TAG = RightAdapter.class.getSimpleName();
 	private Context context;
-	private Object mActionMode;
+//	private Object mActionMode;
 
 	static class ViewHolder {
 		TextView textView1;
@@ -45,7 +45,7 @@ public class LeftArrayAdapter extends ArrayAdapter<ListItem> implements ActionMo
 
 	public interface OnListener {
 		void SelectedLeftItemId(int id);
-		void ContextMenuLeftItemId(int id);
+		void LongPressedLeftItemId(int id);
 	}
 	private final OnListener listener;
 	public LeftArrayAdapter(@NonNull Context context, int resource, @NonNull ArrayList<ListItem> objects,
@@ -108,9 +108,9 @@ public class LeftArrayAdapter extends ArrayAdapter<ListItem> implements ActionMo
 			holder.imgView2.setColorFilter(Color.LTGRAY);
 		}
 		view.setOnLongClickListener(v -> {
-			if (mActionMode != null) {
-				return false;
-			}
+//			if (mActionMode != null) {
+//				return false;
+//			}
 			selectedPos = position;
 			ListItem clickedItem = my_data.get(position);
 			v.setSelected(true);
@@ -118,8 +118,8 @@ public class LeftArrayAdapter extends ArrayAdapter<ListItem> implements ActionMo
 				lastSelected.setSelected(false);
 			}
 			lastSelected = v;
-			mActionMode = view.startActionMode(LeftArrayAdapter.this);
-			listener.ContextMenuLeftItemId(clickedItem.getID());
+//			mActionMode = view.startActionMode(LeftArrayAdapter.this);
+			listener.LongPressedLeftItemId(clickedItem.getID());
 			return true;
 		});
 /*		view.setOnTouchListener(new View.OnTouchListener() {
@@ -180,7 +180,7 @@ public class LeftArrayAdapter extends ArrayAdapter<ListItem> implements ActionMo
 		return view;
 	}
 
-
+/*
 	private void show() {
 	}
 	//ActionMode.Callback
@@ -215,5 +215,5 @@ public class LeftArrayAdapter extends ArrayAdapter<ListItem> implements ActionMo
 		mActionMode = null;
 		selectedPos = RecyclerView.NO_POSITION;
 	}
-
+*/
 }

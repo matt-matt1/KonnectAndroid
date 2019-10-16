@@ -1,6 +1,7 @@
 package com.yumatechnical.konnectandroid.Fragment;
 
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.view.Display;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager.LayoutParams;
+import android.widget.Button;
 
 import androidx.annotation.LayoutRes;
 import androidx.annotation.Nullable;
@@ -33,203 +35,30 @@ public class MyDialogFragment extends DialogFragment {
 	private float percent;
 	private boolean useCustomWidth = false, useCustomHeight = false, useCustomPercent = false,
 			useCustomWidthPercent = false, useCustomHeightPercent = false, useFullScreen = false;
-	private String title, message, neutralButtonLabel, positiveButtonLabel, negativeButtonLabel;
-	private @StyleRes int style;
-//	private EditText mEditText;
+//	private String title, message, neutralButtonLabel, positiveButtonLabel, negativeButtonLabel;
+//	private @StyleRes int style;
 	public interface OnMyDialogInteraction {
-//		void AddToView();
-//		void setButton(int which, String label);
-		void neutralButtonPressed();
-		void negativeButtonPressed();
-		void positiveButtonPressed();
-		void putInOnViewCreated(View view, Bundle bundle);
+		void AlertDialogNeutralButtonPressed(Button view, AlertDialog dialog, int id);
+		void AlertDialogNegativeButtonPressed(Button view, AlertDialog dialog, int id);
+		void AlertDialogPositiveButtonPressed(Button view, AlertDialog dialog, int id);
+		void AlertDialogPutInOnViewCreated(View view, Bundle bundle, int id);
 		// ^Get field from view - eg:
 //		mEditText = view.findViewById(R.id.txt_your_name);
 	// Show soft keyboard automatically and request focus to field
 //		mEditText.requestFocus();
 //		Objects.requireNonNull(getDialog().getWindow()).setSoftInputMode(
 //				LayoutParams.SOFT_INPUT_STATE_VISIBLE);
-		void onBeforeCreate(AlertDialog.Builder alertDialogBuilder);
+		void AlertDialogOnBeforeCreate(AlertDialog.Builder alertDialogBuilder);
 	}
-//	private OnMyDialogInteraction listener;
+//	private View view;
+	private int id;
 
 
 	public MyDialogFragment() {}
 
 
-	public static MyDialogFragment newInstance(String title) {
+	public static MyDialogFragment newInstance() {
 		MyDialogFragment frag = new MyDialogFragment();
-		Bundle args = new Bundle();
-		args.putString("title", title);
-		frag.setArguments(args);
-		return frag;
-	}
-
-	public static MyDialogFragment newInstance(String title,
-	                                                 int width, int height) {
-		MyDialogFragment frag = new MyDialogFragment();
-		Bundle args = new Bundle();
-		args.putInt("width", width);
-		args.putInt("height", height);
-		args.putString("title", title);
-		frag.setArguments(args);
-		return frag;
-	}
-
-	public static MyDialogFragment newInstance(String title,
-	                                                 boolean fullScreen) {
-		MyDialogFragment frag = new MyDialogFragment();
-		Bundle args = new Bundle();
-		args.putBoolean("fullScreen", fullScreen);
-		args.putString("title", title);
-		frag.setArguments(args);
-		return frag;
-	}
-
-	public static MyDialogFragment newInstance(String title, float percent) {
-		MyDialogFragment frag = new MyDialogFragment();
-		Bundle args = new Bundle();
-		args.putFloat("percent", percent);
-		args.putString("title", title);
-		frag.setArguments(args);
-		return frag;
-	}
-
-	public static MyDialogFragment newInstance(@LayoutRes int layout, String title) {
-		MyDialogFragment frag = new MyDialogFragment();
-		Bundle args = new Bundle();
-		args.putInt("layout", layout);
-		args.putString("title", title);
-		frag.setArguments(args);
-		return frag;
-	}
-
-	public static MyDialogFragment newInstance(@LayoutRes int layout, String title,
-	                                                 int width, int height) {
-		MyDialogFragment frag = new MyDialogFragment();
-		Bundle args = new Bundle();
-		args.putInt("width", width);
-		args.putInt("height", height);
-		args.putInt("layout", layout);
-		args.putString("title", title);
-		frag.setArguments(args);
-		return frag;
-	}
-
-	public static MyDialogFragment newInstance(@LayoutRes int layout, String title,
-	                                                 boolean fullScreen) {
-		MyDialogFragment frag = new MyDialogFragment();
-		Bundle args = new Bundle();
-		args.putBoolean("fullScreen", false);
-		args.putInt("layout", layout);
-		args.putString("title", title);
-		frag.setArguments(args);
-		return frag;
-	}
-
-	public static MyDialogFragment newInstance(@LayoutRes int layout, String title, float percent) {
-		MyDialogFragment frag = new MyDialogFragment();
-		Bundle args = new Bundle();
-		args.putFloat("percent", percent);
-		args.putInt("layout", layout);
-		args.putString("title", title);
-		frag.setArguments(args);
-		return frag;
-	}
-
-	public static MyDialogFragment newInstance(String title, String message,
-	                                                 String neutralButtonLabel,
-	                                                 String positiveButtonLabel,
-	                                                 String negativeButtonLabel,
-	                                           OnMyDialogInteraction listener) {
-		MyDialogFragment frag = new MyDialogFragment();
-		Bundle args = new Bundle();
-		args.putString("title", title);
-		args.putString("message", message);
-		args.putString("neutralButtonLabel", neutralButtonLabel);
-		args.putString("positiveButtonLabel", positiveButtonLabel);
-		args.putString("negativeButtonLabel", negativeButtonLabel);
-		frag.setArguments(args);
-		return frag;
-	}
-
-	public static MyDialogFragment newInstance(String title, String message,
-	                                                 int width, int height) {
-		MyDialogFragment frag = new MyDialogFragment();
-		Bundle args = new Bundle();
-		args.putInt("width", width);
-		args.putInt("height", height);
-		args.putString("title", title);
-		args.putString("message", message);
-		frag.setArguments(args);
-		return frag;
-	}
-
-	public static MyDialogFragment newInstance(String title, String message,
-	                                                 boolean fullScreen) {
-		MyDialogFragment frag = new MyDialogFragment();
-		Bundle args = new Bundle();
-		args.putBoolean("fullScreen", false);
-		args.putString("title", title);
-		args.putString("message", message);
-		frag.setArguments(args);
-		return frag;
-	}
-
-	public static MyDialogFragment newInstance(String title, String message, float percent) {
-		MyDialogFragment frag = new MyDialogFragment();
-		Bundle args = new Bundle();
-		args.putFloat("percent", percent);
-		args.putString("title", title);
-		args.putString("message", message);
-		frag.setArguments(args);
-		return frag;
-	}
-
-	public static MyDialogFragment newInstance(@LayoutRes int layout, String title, String message) {
-		MyDialogFragment frag = new MyDialogFragment();
-		Bundle args = new Bundle();
-		args.putInt("layout", layout);
-		args.putString("title", title);
-		args.putString("message", message);
-		frag.setArguments(args);
-		return frag;
-	}
-
-	public static MyDialogFragment newInstance(@LayoutRes int layout, String title, String message,
-	                                                 int width, int height) {
-		MyDialogFragment frag = new MyDialogFragment();
-		Bundle args = new Bundle();
-		args.putInt("width", width);
-		args.putInt("height", height);
-		args.putInt("layout", layout);
-		args.putString("title", title);
-		args.putString("message", message);
-		frag.setArguments(args);
-		return frag;
-	}
-
-	public static MyDialogFragment newInstance(@LayoutRes int layout, String title, String message,
-	                                                 boolean fullScreen) {
-		MyDialogFragment frag = new MyDialogFragment();
-		Bundle args = new Bundle();
-		args.putBoolean("fullScreen", fullScreen);
-		args.putInt("layout", layout);
-		args.putString("message", message);
-		args.putString("title", title);
-		frag.setArguments(args);
-		return frag;
-	}
-
-	public static MyDialogFragment newInstance(@LayoutRes int layout, String title, String message,
-	                                                 float percent) {
-		MyDialogFragment frag = new MyDialogFragment();
-		Bundle args = new Bundle();
-		args.putFloat("percent", percent);
-		args.putInt("layout", layout);
-		args.putString("message", message);
-		args.putString("title", title);
-		frag.setArguments(args);
 		return frag;
 	}
 
@@ -251,114 +80,96 @@ public class MyDialogFragment extends DialogFragment {
 		return frag;
 	}
 
+
 	@Override
 	public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
 	                         Bundle savedInstanceState) {
 		@LayoutRes int layout = Objects.requireNonNull(getArguments()).getInt("layout",
 				R.layout.ftp_settings_form);
-//		return inflater.inflate(layout, container);
-//		^Note: There is currently a bug in the support library that causes styles not to show up properly. Thus:
 		return Objects.requireNonNull(getActivity()).getLayoutInflater().inflate(layout, container);
 	}
+
 
 	@Override
 	public void onViewCreated(@NotNull View view, @Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		if (getArguments().getInt("width", 0) > 0) {
-			this.width = getArguments().getInt("width");
-			useCustomWidth = true;
+		if (getArguments() != null) {
+			this.width = getArguments().getInt("width", 0);
+			if (this.width > 0) {
+				useCustomWidth = true;
+			}
+			this.height = getArguments().getInt("height", 0);
+			if (this.height > 0) {
+				useCustomHeight = true;
+			}
+			this.percent = getArguments().getFloat("percent", 0);
+			if (this.percent > 0) {
+				useCustomPercent = true;
+			}
+			if (getArguments().getBoolean("fullScreen", false)) {
+				useFullScreen = true;
+			}
 		}
-		if (getArguments().getInt("height", 0) > 0) {
-			this.height = getArguments().getInt("height");
-			useCustomHeight = true;
-		}
-		if (getArguments().getFloat("percent", 0) > 0) {
-			this.percent = getArguments().getFloat("percent");
-			useCustomPercent = true;
-		}
-		if (getArguments().getBoolean("fullScreen", false)) {
-			useFullScreen = true;
-		}
-		message = Objects.requireNonNull(getArguments()).getString("message", "");
-		Objects.requireNonNull(getDialog()).setTitle(message);
-		title = Objects.requireNonNull(getArguments()).getString("title", "");
-		Objects.requireNonNull(getDialog()).setTitle(title);
+//		this.view = view;
 		OnMyDialogInteraction listener = (OnMyDialogInteraction) getActivity();
-		listener.putInOnViewCreated(view, savedInstanceState);
+		Objects.requireNonNull(listener).AlertDialogPutInOnViewCreated(view, savedInstanceState, id);
 	}
+
 
 	@NotNull
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
-		AlertDialog.Builder alertDialogBuilder;
-		title = Objects.requireNonNull(getArguments()).getString("title");
-		message = Objects.requireNonNull(getArguments()).getString("message");
-		style = Objects.requireNonNull(getArguments()).getInt("style", 0);
-		neutralButtonLabel = Objects.requireNonNull(getArguments()).getString("neutralButtonLabel");
-		negativeButtonLabel = Objects.requireNonNull(getArguments()).getString("negativeButtonLabel");
-		positiveButtonLabel = Objects.requireNonNull(getArguments()).getString("positiveButtonLabel");
-		if (title == null || title.equals("")) {
-			Dialog dialog = super.onCreateDialog(savedInstanceState);
-			// request a window without the title
-			Objects.requireNonNull(dialog.getWindow()).requestFeature(Window.FEATURE_NO_TITLE);
-//			alertDialogBuilder = dialog.create();//dialog without titlebar
-			return dialog;
-		} else {
-			if (style != 0) {
+		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Objects.requireNonNull(getContext()));
+		if (getArguments() != null) {
+			if (getArguments().containsKey("id")) {
+				this.id = getArguments().getInt("id");
+			}
+			if (getArguments().containsKey("style")) {
+				@StyleRes int style = Objects.requireNonNull(getArguments()).getInt("style", 0);
 				alertDialogBuilder = new AlertDialog.Builder(Objects.requireNonNull(getActivity()), style);
 			} else {
 				alertDialogBuilder = new AlertDialog.Builder(Objects.requireNonNull(getActivity()));
 			}
-			alertDialogBuilder.setTitle(title);
-//			alertDialogBuilder.setMessage("Are you sure?");
-//			alertDialogBuilder.setPositiveButton("OK",  new DialogInterface.OnClickListener() {
-//				@Override
-//				public void onClick(DialogInterface dialog, int which) {
-//					// on success
-//				}
-//			});
-//			alertDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-//				@Override
-//				public void onClick(DialogInterface dialog, int which) {
-//					if (dialog != null /*&& dialog.isShowing()*/) {
-//						dialog.dismiss();
-//					}
-//				}
-//			});
-//			return alertDialogBuilder.create();
+			if (getArguments().containsKey("title")) {
+				String title = Objects.requireNonNull(getArguments()).getString("title");
+				alertDialogBuilder.setTitle(title);
+			}
+			if (getArguments().containsKey("message")) {
+				String message = Objects.requireNonNull(getArguments()).getString("message");
+				alertDialogBuilder.setMessage(message);
+			}
+			if (getArguments().containsKey("layout")) {
+				@LayoutRes int layout = Objects.requireNonNull(getArguments()).getInt("layout");
+				alertDialogBuilder.setView(layout);
+			}
+			if (getArguments().containsKey("cancelable")) {
+				if (getArguments().getBoolean("cancelable")) {
+					alertDialogBuilder.setCancelable(true);
+				} else {
+					alertDialogBuilder.setCancelable(false);
+				}
+			}
 		}
-		if (message != null && !message.equals("")) {
-			message = Objects.requireNonNull(getArguments()).getString("message");
-//			alertDialogBuilder.setMessage("Are you sure?");
-			alertDialogBuilder.setMessage(message);
-		}
-		if (neutralButtonLabel != null && !neutralButtonLabel.equals("")) {
-			alertDialogBuilder.setNeutralButton(negativeButtonLabel, null);
-		}
-		if (negativeButtonLabel != null && !negativeButtonLabel.equals("")) {
-			alertDialogBuilder.setNeutralButton(negativeButtonLabel, null);
-		}
-		if (positiveButtonLabel != null && !positiveButtonLabel.equals("")) {
-			alertDialogBuilder.setNeutralButton(positiveButtonLabel, null);
-		}
-//		alertDialogBuilder.setPositiveButton("OK",  new DialogInterface.OnClickListener() {
-//			@Override
-//			public void onClick(DialogInterface dialog, int which) {
-//				// on success
-//			}
-//		});
-//		alertDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-//			@Override
-//			public void onClick(DialogInterface dialog, int which) {
-//				if (dialog != null /*&& dialog.isShowing()*/) {
-//					dialog.dismiss();
-//				}
-//			}
-//		});
 		OnMyDialogInteraction listener = (OnMyDialogInteraction) getActivity();
-		listener.onBeforeCreate(alertDialogBuilder);
-		return alertDialogBuilder.create();
+		if (listener != null) {
+			listener.AlertDialogOnBeforeCreate(alertDialogBuilder);
+		}
+		AlertDialog dialog = alertDialogBuilder.create();
+		if (getArguments().containsKey("neutralButtonLabel")) {
+			String neutralButtonLabel = Objects.requireNonNull(getArguments()).getString("neutralButtonLabel");
+			dialog.setButton(AlertDialog.BUTTON_NEUTRAL, neutralButtonLabel, (DialogInterface.OnClickListener) null);
+		}
+		if (getArguments().containsKey("negativeButtonLabel")) {
+			String negativeButtonLabel = Objects.requireNonNull(getArguments()).getString("negativeButtonLabel");
+			dialog.setButton(AlertDialog.BUTTON_NEGATIVE, negativeButtonLabel, (DialogInterface.OnClickListener) null);
+		}
+		if (getArguments().containsKey("positiveButtonLabel")) {
+			String positiveButtonLabel = Objects.requireNonNull(getArguments()).getString("positiveButtonLabel");
+			dialog.setButton(AlertDialog.BUTTON_POSITIVE, positiveButtonLabel, (DialogInterface.OnClickListener) null);
+		}
+		return dialog;
 	}
+
 
 	public void setHeight(int height) {
 		this.height = height;
@@ -375,44 +186,48 @@ public class MyDialogFragment extends DialogFragment {
 		useCustomPercent = true;
 	}
 
+
 	@Override
 	public void onResume() {
-//		int width = getResources().getDimensionPixelSize(R.dimen.popup_width);
-//		int height = getResources().getDimensionPixelSize(R.dimen.popup_height);
 		if (useCustomWidth && useCustomHeight) {
 			Objects.requireNonNull(Objects.requireNonNull(getDialog()).getWindow()).setLayout(width, height);
-			// Call super onResume after sizing
 		} else if (useCustomHeightPercent || useCustomWidthPercent) {
-			// Store access variables for window and blank point
 			Window window = Objects.requireNonNull(getDialog()).getWindow();
 			Point size = new Point();
-			// Store dimensions of the screen in `size`
 			Display display = Objects.requireNonNull(window).getWindowManager().getDefaultDisplay();
 			display.getSize(size);
-			// Set the width of the dialog proportional to 75% of the screen width
 			if (useCustomWidthPercent) {
 				window.setLayout((int) (size.x * percent), LayoutParams.WRAP_CONTENT);
 			}
 			window.setGravity(Gravity.CENTER);
-			// Call super onResume after sizing
 		} else if (useFullScreen) {
-			// Get existing layout params for the window
 			LayoutParams params = Objects.requireNonNull(Objects.requireNonNull(getDialog()).getWindow()).getAttributes();
-			// Assign window properties to fill the parent
 			params.width = LayoutParams.MATCH_PARENT;
 			params.height = LayoutParams.MATCH_PARENT;
 			Objects.requireNonNull(getDialog().getWindow()).setAttributes(params);
-			// Call super onResume after sizing
 		}
 		OnMyDialogInteraction listener = (OnMyDialogInteraction) getActivity();
-		if (neutralButtonLabel != null && !neutralButtonLabel.equals("")) {
-			listener.neutralButtonPressed();
+		AlertDialog dialog = (AlertDialog) getDialog();
+		if (dialog != null && getArguments() != null && getArguments().containsKey("neutralButtonLabel")) {
+			dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(v -> {
+				if (listener != null) {
+					listener.AlertDialogNeutralButtonPressed((Button)v, dialog, id);
+				}
+			});
 		}
-		if (negativeButtonLabel != null && !negativeButtonLabel.equals("")) {
-			listener.negativeButtonPressed();
+		if (dialog != null && getArguments() != null && getArguments().containsKey("negativeButtonLabel")) {
+			dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(v -> {
+				if (listener != null) {
+					listener.AlertDialogNegativeButtonPressed((Button)v, dialog, id);
+				}
+			});
 		}
-		if (positiveButtonLabel != null && !positiveButtonLabel.equals("")) {
-			listener.positiveButtonPressed();
+		if (dialog != null && getArguments() != null && getArguments().containsKey("positiveButtonLabel")) {
+			dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+				if (listener != null) {
+					listener.AlertDialogPositiveButtonPressed((Button)v, dialog, id);
+				}
+			});
 		}
 		super.onResume();
 	}

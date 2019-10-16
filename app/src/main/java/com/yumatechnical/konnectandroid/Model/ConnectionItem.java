@@ -10,6 +10,7 @@ public class ConnectionItem {
 
 	int ID;
 	int type;
+	String connectionName;
 	String accessToken;
 	String scheme;
 	String username;
@@ -19,12 +20,13 @@ public class ConnectionItem {
 	String path;
 
 
-//	public ConnectionItem() {}
-	@ParcelConstructor
-	public ConnectionItem (int ID, int type, String accessToken, String scheme, String username,
-	                       String password, String host, int port, String path) {
+	public ConnectionItem() {}
+//	@ParcelConstructor
+	public ConnectionItem (int ID, int type, String connectionName, String accessToken, String scheme,
+	                       String username, String password, String host, int port, String path) {
 		this.ID = ID;
 		this.type = type;
+		this.connectionName = connectionName;
 		this.accessToken = accessToken;
 		this.scheme = scheme;
 		this.username = username;
@@ -49,6 +51,14 @@ public class ConnectionItem {
 
 	public void setType(int type) {
 		this.type = type;
+	}
+
+	public String getConnectionName() {
+		return connectionName;
+	}
+
+	public void setConnectionName(String connectionName) {
+		this.connectionName = connectionName;
 	}
 
 	public String getAccessToken() {
@@ -110,6 +120,9 @@ public class ConnectionItem {
 	@NonNull
 	@Override
 	public String toString() {
-		return super.toString();
+//		return super.toString();
+		return "ConnectionItem("+ getID()+ ", type="+ getType()+ ", name="+ getConnectionName()+
+				", token="+ getAccessToken()+ ", scheme="+ getScheme()+ ", user="+ getUsername()+
+				", pass="+ getPassword()+ ", host="+ getHost()+ ", port="+ getPort()+ ", path="+ getPath()+ ")";
 	}
 }
