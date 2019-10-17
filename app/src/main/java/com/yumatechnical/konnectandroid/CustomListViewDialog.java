@@ -55,8 +55,6 @@ public class CustomListViewDialog extends Dialog implements View.OnClickListener
 		recyclerView = findViewById(R.id.recycler_view);
 		mLayoutManager = new LinearLayoutManager(activity);
 		recyclerView.setLayoutManager(mLayoutManager);
-
-
 		recyclerView.setAdapter(adapter);
 		yes.setOnClickListener(this);
 		no.setOnClickListener(this);

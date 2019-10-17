@@ -28,7 +28,28 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:targetApi="n">
+<!--	    android:label="MainActivity"-->
+<!--	    android:theme="@style/Theme.AppCompat"-->
+	    <activity
+		    android:name=".MainActivity"
+		    android:launchMode="singleTop">
+		    <intent-filter>
+			    <action android:name="android.intent.action.MAIN" />
+			    <category android:name="android.intent.category.LAUNCHER" />
+		    </intent-filter>
+	    </activity>
+
+	    <activity
+		    android:name=".PlayMedia"
+		    android:parentActivityName=".MainActivity"
+		    tools:targetApi="jelly_bean">
+		    <meta-data
+			    android:name="android.support.PARENT_ACTIVITY"
+			    android:value=".MainActivity" />
+	    </activity>
+
         <activity android:name=".Helper.showFTPsettingsActivity"></activity>
+
         <activity
             android:name=".Settings.SettingsActivity"
             android:label="@string/settings"
@@ -43,14 +64,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-        <activity
-            android:name=".MainActivity"
-            android:launchMode="singleTop">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+
         <activity android:name="com.dropbox.core.android.AuthActivity"
             android:configChanges="orientation|keyboard"
             android:launchMode="singleTask">
@@ -61,14 +75,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".PlayMedia"
-            android:parentActivityName=".MainActivity"
-            tools:targetApi="jelly_bean">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
-        </activity>
+
 	    <activity android:name=".Adapter.LeftArrayAdapter" />
 
 	    <service

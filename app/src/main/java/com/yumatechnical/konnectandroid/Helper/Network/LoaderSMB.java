@@ -15,6 +15,10 @@ import com.hierynomus.smbj.auth.AuthenticationContext;
 import com.hierynomus.smbj.connection.Connection;
 import com.hierynomus.smbj.session.Session;
 import com.hierynomus.smbj.share.DiskShare;
+import com.yumatechnical.konnectandroid.MainActivity;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -29,6 +33,7 @@ public class LoaderSMB implements LoaderManager.LoaderCallbacks<Session> {
 	private Timeout units;
 	private static final String TAG = LoaderSMB.class.getSimpleName();
 	private static final int SMB_LOADER_ID = 24;
+	private static final Logger logger = LoggerFactory.getLogger(MainActivity.class);
 
 
 	@NonNull
@@ -105,6 +110,7 @@ public class LoaderSMB implements LoaderManager.LoaderCallbacks<Session> {
 //		} else {
 //			loaderManager.restartLoader(SMB_LOADER_ID, bundle, this);
 //		}
+		logger.debug("Starting connect. Bundle: {}", bundle.toString());
 	}
 
 /*

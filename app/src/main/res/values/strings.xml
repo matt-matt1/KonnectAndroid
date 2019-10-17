@@ -84,6 +84,10 @@
 	<string name="domain">domain</string>
 	<string name="connto">connect to ...</string>
 	<string name="title">title</string>
+	<string name="conn_good">Connection is good</string>
+	<string name="save_OK">Press OK to save</string>
+	<string name="conn_bad">Connection is bad</string>
+	<string name="adjust_sett">Adjust the settings</string>
 
 	<string-array name="contactShare">
 		<item>Email</item>

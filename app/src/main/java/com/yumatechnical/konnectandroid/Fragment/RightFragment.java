@@ -35,6 +35,7 @@ import androidx.annotation.Nullable;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
@@ -45,6 +46,7 @@ import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome;
 import com.yumatechnical.konnectandroid.Adapter.RightAdapter;
 import com.yumatechnical.konnectandroid.Helper.Network.TestInternetLoader;
 import com.yumatechnical.konnectandroid.Helper.Tools;
+import com.yumatechnical.konnectandroid.MainActivity;
 import com.yumatechnical.konnectandroid.Model.FileItem;
 import com.yumatechnical.konnectandroid.Model.MyPhone;
 import com.yumatechnical.konnectandroid.R;
@@ -74,10 +76,8 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 			listOfAllFiles = new ArrayList<>(),
 			listOfMyMusic = new ArrayList<>();
 	private String msg, title;
-	RecyclerView recyclerView;
 	TextView msgView, titleView;
 	ProgressBar spinner;
-	RightAdapter rightAdapter;
 	RightAdapter.ListItemClickListener listener;
 	ContentResolver resolver;
 	Uri uri;
@@ -194,10 +194,13 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
+		if (savedInstanceState != null) {
+			Log.d(TAG, "RightFragment-onActivityCreated:" + savedInstanceState.toString());
+		}
 		spinner = getActivity().findViewById(R.id.pb_right);
 		msgView = getActivity().findViewById(R.id.tv_right);
 		titleView = getActivity().findViewById(R.id.tv_right_title);
-		recyclerView = getActivity().findViewById(R.id.rv_right);
+		((Vars)getActivity().getApplication()).recyclerView = getActivity().findViewById(R.id.rv_right);
 		swipeContainer = getActivity().findViewById(R.id.sr_right);
 		swipeContainer.setOnRefreshListener(() -> functionOnTitle());
 		// Configure the refreshing colors
@@ -212,12 +215,13 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 			msgView.setText(msg);
 		} else {
 			spinner.setVisibility(View.VISIBLE);
-			recyclerView.setVisibility(View.INVISIBLE);
+			((Vars)getActivity().getApplication()).recyclerView.setVisibility(View.INVISIBLE);
 //			myList = new MyList();
 //			myList.onCreate();
 //			setupAdapter();
 //			listAdapter = new AlphabetListAdapter();
-			rightAdapter = new RightAdapter(null, null, null);
+//			rightAdapter = new RightAdapter(null, null, null);
+			((Vars)getActivity().getApplication()).rightAdapter = new RightAdapter(null, null, null);
 //			LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
 			GridLayoutManager layoutManager = new GridLayoutManager(getApplicationContext(),
 					Tools.calculateNoOfColumns(getApplicationContext(),
@@ -231,11 +235,12 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 //			int spacing = 50; // 50px
 //			boolean includeEdge = true;
 //			recyclerView.addItemDecoration(new GridSpacingItemDecoration(spanCount, spacing, includeEdge));
-			recyclerView.setLayoutManager(layoutManager);
-			recyclerView.setHasFixedSize(true);
-			recyclerView.setAdapter(rightAdapter);
+			((Vars)getActivity().getApplication()).recyclerView.setLayoutManager(layoutManager);
+			((Vars)getActivity().getApplication()).recyclerView.setHasFixedSize(true);
+//			recyclerView.setAdapter(rightAdapter);
+			((Vars)getActivity().getApplication()).recyclerView.setAdapter(((Vars)getActivity().getApplication()).rightAdapter);
 //			recyclerView.setAdapter(listAdapter);
-			recyclerView.setOnClickListener(this);
+			((Vars)getActivity().getApplication()).recyclerView.setOnClickListener(this);
 		}
 		Bundle bundle;
 		// Initializes the loader
@@ -244,7 +249,7 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 	}
 
 	private void functionOnTitle() {
-		//		Log.d(TAG, title);
+				Log.d(TAG, "functionOnTitle:"+ title);
 		if (title.equals(getString(R.string.contacts))) {
 			if (uri == null) {
 //				bundle = new Bundle();
@@ -273,12 +278,18 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 					MediaStore.Audio.Media.DISPLAY_NAME,
 					MediaStore.Audio.Media.DURATION
 			};
-			new FetchPhotosTask(-1).execute();
-			//photos
+//			if (!Permissons.Check_STORAGE(this.getActivity())) {
+//				Permissons.Request_STORAGE(this, this.MainActivity.MY_PERMISSION_);
+//			} else {
+				new FetchPhotosTask(-1).execute();
+//			}
 		} else if (title.equals(getString(R.string.music))) {
 //			Log.d(TAG, title);
-			new FetchMusicTask(-1).execute();
-			//media
+//			if (!Permissons.Check_STORAGE(this.getActivity())) {
+//				Permissons.Request_STORAGE(this, MY_PERMISSION_MUSIC_READ_EXTERNAL_STORAGE_REQUEST_CODE);
+//			} else {
+				new FetchMusicTask(-1).execute();
+//			}
 		} else {
 			File dir = new File(Environment.getExternalStorageDirectory().getPath());
 			Log.d(TAG, title+ ":"+ dir.getPath()+ ":");
@@ -334,7 +345,7 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 		@Override
 		protected void onPreExecute() {
 			spinner.setVisibility(View.VISIBLE);
-			recyclerView.setVisibility(View.INVISIBLE);
+			((Vars)getActivity().getApplication()).recyclerView.setVisibility(View.INVISIBLE);
 		}
 
 		@Override
@@ -349,7 +360,8 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 /*				myList.setData(contactsList, new IconicsDrawable(getApplicationContext(),
 						FontAwesome.Icon.faw_user_circle1)
 						.color(IconicsColor.colorRes(R.color.White)).size(IconicsSize.dp(100)));*/
-				rightAdapter = new RightAdapter(null, null, new RightAdapter.ListItemClickListener() {
+//				rightAdapter = new RightAdapter(null, null, new RightAdapter.ListItemClickListener() {
+				((Vars)getActivity().getApplication()).rightAdapter = new RightAdapter(null, null, new RightAdapter.ListItemClickListener() {
 					@Override
 					public void onListItemClick(String item) {
 //						Log.d(TAG, "ListItemClickListener:"+ item);
@@ -385,14 +397,22 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 						}
 					}
 				});
-				recyclerView.setAdapter(rightAdapter);
-				rightAdapter.setDefaultImage(new IconicsDrawable(getApplicationContext(),
+//				recyclerView.setAdapter(rightAAdapter);
+//				((Vars)getActivity().getApplication()).recyclerView.setLayoutManager(new LinearLayoutManager());
+				((Vars)getActivity().getApplication()).recyclerView.setAdapter(((Vars)getActivity().getApplication()).rightAdapter);
+				((Vars)getActivity().getApplication()).rightAdapter.setDefaultImage(new IconicsDrawable(getApplicationContext(),
 						FontAwesome.Icon.faw_user_circle1)
 						.color(IconicsColor.colorRes(R.color.White))
 						.size(IconicsSize.dp(((Vars) getApplicationContext()).getIconSize())));
-				rightAdapter.setData(contactsList);
+				((Vars)getActivity().getApplication()).rightAdapter.setData(contactsList);
+//				rightAdapter.setDefaultImage(new IconicsDrawable(getApplicationContext(),
+//						FontAwesome.Icon.faw_user_circle1)
+//						.color(IconicsColor.colorRes(R.color.White))
+//						.size(IconicsSize.dp(((Vars) getApplicationContext()).getIconSize())));
+//				rightAdapter.setData(contactsList);
+				((Vars)getActivity().getApplication()).rightAdapter.notifyDataSetChanged();
 				spinner.setVisibility(View.INVISIBLE);
-				recyclerView.setVisibility(View.VISIBLE);
+				((Vars)getActivity().getApplication()).recyclerView.setVisibility(View.VISIBLE);
 			} else {
 				spinner.setVisibility(View.INVISIBLE);
 				msgView.setText(R.string.empty);
@@ -539,7 +559,7 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 		@Override
 		protected void onPreExecute() {
 			spinner.setVisibility(View.VISIBLE);
-			recyclerView.setVisibility(View.INVISIBLE);
+			((Vars)getActivity().getApplication()).recyclerView.setVisibility(View.INVISIBLE);
 		}
 
 		@Override
@@ -555,7 +575,8 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 						FontAwesome.Icon.faw_image)
 						.color(IconicsColor.colorRes(R.color.White)).size(IconicsSize.dp(((Vars) getApplicationContext()).getIconSize()));
 //				myList.setData(listOfAllImages, defaultImg);
-				rightAdapter = new RightAdapter(null, null, new RightAdapter.ListItemClickListener() {
+//				rightAdapter = new RightAdapter(null, null, new RightAdapter.ListItemClickListener() {
+				((Vars)getActivity().getApplication()).rightAdapter = new RightAdapter(null, null, new RightAdapter.ListItemClickListener() {
 					@Override
 					public void onListItemClick(String item) {
 					}
@@ -569,11 +590,15 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 						}
 					}
 				});
-				recyclerView.setAdapter(rightAdapter);
-				rightAdapter.setData(listOfAllImages);
-				rightAdapter.setDefaultImage(defaultImg);
+//				recyclerView.setAdapter(rightAdapter);
+				((Vars)getActivity().getApplication()).recyclerView.setAdapter(((Vars)getActivity().getApplication()).rightAdapter);
+//				rightAdapter.setData(listOfAllImages);
+				((Vars)getActivity().getApplication()).rightAdapter.setData(listOfAllImages);
+				((Vars)getActivity().getApplication()).rightAdapter.notifyDataSetChanged();
+//				rightAdapter.setDefaultImage(defaultImg);
+				((Vars)getActivity().getApplication()).rightAdapter.setDefaultImage(defaultImg);
 				spinner.setVisibility(View.INVISIBLE);
-				recyclerView.setVisibility(View.VISIBLE);
+				((Vars)getActivity().getApplication()).recyclerView.setVisibility(View.VISIBLE);
 			} else {
 				spinner.setVisibility(View.INVISIBLE);
 				msgView.setText(R.string.empty);
@@ -681,7 +706,7 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 		@Override
 		protected void onPreExecute() {
 			spinner.setVisibility(View.VISIBLE);
-			recyclerView.setVisibility(View.INVISIBLE);
+			((Vars)getActivity().getApplication()).recyclerView.setVisibility(View.INVISIBLE);
 		}
 
 		@Override
@@ -696,7 +721,8 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 /*				myList.setData(listOfMyMusic, new IconicsDrawable(getApplicationContext(),
 						FontAwesome.Icon.faw_music)
 						.color(IconicsColor.colorRes(R.color.White)).size(IconicsSize.dp(100)));*/
-				rightAdapter = new RightAdapter(null, null, new RightAdapter.ListItemClickListener() {
+//				rightAdapter = new RightAdapter(null, null, new RightAdapter.ListItemClickListener() {
+				((Vars)getActivity().getApplication()).rightAdapter = new RightAdapter(null, null, new RightAdapter.ListItemClickListener() {
 					@Override
 					public void onListItemClick(String item) {
 					}
@@ -710,13 +736,16 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 						}
 					}
 				});
-				recyclerView.setAdapter(rightAdapter);
-				rightAdapter.setData(listOfMyMusic);
-				rightAdapter.setDefaultImage(new IconicsDrawable(getApplicationContext(),
+//				recyclerView.setAdapter(rightAdapter);
+				((Vars)getActivity().getApplication()).recyclerView.setAdapter(((Vars)getActivity().getApplication()).rightAdapter);
+//				rightAdapter.setData(listOfMyMusic);
+				((Vars)getActivity().getApplication()).rightAdapter.setData(listOfMyMusic);
+//				rightAdapter.setDefaultImage(new IconicsDrawable(getApplicationContext(),
+				((Vars)getActivity().getApplication()).rightAdapter.setDefaultImage(new IconicsDrawable(getApplicationContext(),
 						FontAwesome.Icon.faw_music)
 						.color(IconicsColor.colorRes(R.color.White)).size(IconicsSize.dp(100)));
 				spinner.setVisibility(View.INVISIBLE);
-				recyclerView.setVisibility(View.VISIBLE);
+				((Vars)getActivity().getApplication()).recyclerView.setVisibility(View.VISIBLE);
 			} else {
 				spinner.setVisibility(View.INVISIBLE);
 				msgView.setText(R.string.empty);
@@ -798,7 +827,7 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 		@Override
 		protected void onPreExecute() {
 			spinner.setVisibility(View.VISIBLE);
-			recyclerView.setVisibility(View.INVISIBLE);
+			((Vars)getActivity().getApplication()).recyclerView.setVisibility(View.INVISIBLE);
 		}
 
 		@Override
@@ -812,7 +841,8 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 			super.onPostExecute(files);
 			if (files.length > 0) {
 				Log.d(TAG, "FetchFilesTask count="+ files.length);
-				rightAdapter = new RightAdapter(null, null, new RightAdapter.ListItemClickListener() {
+//				rightAdapter = new RightAdapter(null, null, new RightAdapter.ListItemClickListener() {
+				((Vars)getActivity().getApplication()).rightAdapter = new RightAdapter(null, null, new RightAdapter.ListItemClickListener() {
 					@Override
 					public void onListItemClick(String item) {
 					}
@@ -821,7 +851,8 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 					public void onListItemClick(FileItem item) {
 					}
 				});
-				recyclerView.setAdapter(rightAdapter);
+//				recyclerView.setAdapter(rightAdapter);
+				((Vars)getActivity().getApplication()).recyclerView.setAdapter(((Vars)getActivity().getApplication()).rightAdapter);
 //				ArrayList<listOfFiles = ;
 				Drawable fileIcon = new IconicsDrawable(getApplicationContext(),
 						FontAwesome.Icon.faw_file)
@@ -834,12 +865,14 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 							(f.isDirectory()) ? Tools.drawableToBitmap(dirIcon) : Tools.drawableToBitmap(fileIcon),
 							"", f.canRead(), f.getName(), null, false, f.getAbsolutePath()));
 				}
-				rightAdapter.setData(listOfAllFiles);
-				rightAdapter.setDefaultImage(new IconicsDrawable(getApplicationContext(),
+//				rightAdapter.setData(listOfAllFiles);
+				((Vars)getActivity().getApplication()).rightAdapter.setData(listOfAllFiles);
+//				rightAdapter.setDefaultImage(new IconicsDrawable(getApplicationContext(),
+				((Vars)getActivity().getApplication()).rightAdapter.setDefaultImage(new IconicsDrawable(getApplicationContext(),
 						FontAwesome.Icon.faw_file)
 						.color(IconicsColor.colorRes(R.color.White)).size(IconicsSize.dp(100)));
 				spinner.setVisibility(View.INVISIBLE);
-				recyclerView.setVisibility(View.VISIBLE);
+				((Vars)getActivity().getApplication()).recyclerView.setVisibility(View.VISIBLE);
 			} else {
 				spinner.setVisibility(View.INVISIBLE);
 				msgView.setText(R.string.empty);

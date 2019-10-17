@@ -15,6 +15,11 @@
 	<color name="lightGray">#FFB1BCBE</color>
 	<color name="black">#FF000000</color>
 	<color name="paleYellow">#FFf5f5dd</color>
+	<color name="paleRed">#FFFFCCCB</color>
+	<color name="lightRed">#FFFF3232</color>
+	<color name="lighterRed">#FFFF4C4C</color>
+	<color name="lightGreen">#FF90EE90</color>
+	<color name="springGreen">#FF00FF7F</color>
 
 	<drawable name="drawGray">#FF808080</drawable>
 	<drawable name="drawWhite">#FFFFFFFF</drawable>

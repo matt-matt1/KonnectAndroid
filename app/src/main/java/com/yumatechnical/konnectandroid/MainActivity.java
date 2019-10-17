@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceManager;
 
+import android.Manifest;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -32,9 +33,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -58,7 +62,6 @@ import com.yumatechnical.konnectandroid.Helper.Dropbox.DropboxInstance;
 import com.yumatechnical.konnectandroid.Helper.Dropbox.UploadTask;
 import com.yumatechnical.konnectandroid.Helper.Network.FTPoperation;
 import com.yumatechnical.konnectandroid.Helper.Network.LoaderFTP;
-//import com.yumatechnical.konnectandroid.Helper.Network.LoaderSMB;
 import com.yumatechnical.konnectandroid.Helper.Network.LocalNetwork;
 import com.yumatechnical.konnectandroid.Helper.Network.SMBoperation;
 import com.yumatechnical.konnectandroid.Helper.Tools;
@@ -151,18 +154,21 @@ int minIconSize = 50;
 		// Get current account info
 //		FullAccount account = DropboxInstance.main().users().getCurrentAccount();
 //		System.out.println(account.getName().getDisplayName());
-/*
-		SMBoperation smb = new SMBoperation(new SMBoperation.OnSMBinteraction() {
+/**/
+/*		LoaderSMB smb = new LoaderSMB(this, new LoaderSMB.OnSMBinteraction() {
 			@Override
 			public void OnResult(Session result) {
-				if (result != null) {
-					Log.d(TAG, "result=");
+				Log.d(TAG, "result="+ result.getSessionId()+ ":"+ result.getConnection().getRemoteHostname());
+			}
+		});*/
+/*		SMBoperation smb = new SMBoperation(result -> {
+			if (result != null) {
+				Log.d(TAG, "result="+ result.getSessionId()+ ":"+ result.getConnection().getRemoteHostname());
 //					Log.d(TAG, "sessionID="+ session.getSessionId());
-				}
 			}
 		});
-		smb.connect("192.168.1.222", "yumausa", "yuma", "");
-*/
+		smb.connect("192.168.1.222", "yumausa", "yuma", "");*/
+/**/
 	}
 
 	private void setLeftList() {
@@ -244,9 +250,12 @@ int minIconSize = 50;
 			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 				seekBar.setProgress(progress);
 				((Vars) getApplicationContext()).setIconSize((progress / factorPercent) + minIconSize);
-//						if (((Fragment)RightFragment()).rightAdapter != null) {
-//							((Fragment)RightFragment()).rightAdapter.notifyDataSetChanged();
-//						}
+				if (((Vars)getApplication()).rightAdapter != null) {
+					((Vars)getApplication()).rightAdapter.notifyDataSetChanged();
+					((Vars)getApplication()).recyclerView.invalidate();
+					((Vars)getApplication()).recyclerView.scrollBy(0, 0);
+//					((Vars)getApplication()).rightAdapter.
+				}
 			}
 			@Override
 			public void onStartTrackingTouch(SeekBar seekBar) {
@@ -257,7 +266,6 @@ int minIconSize = 50;
 		});
 		AlertDialog.Builder resizeBuilder = new AlertDialog.Builder(this);
 		resizeBuilder.setView(sliderView);
-//				builder.setItems(colors, (dialog12, which) -> Log.d(TAG, "the user selected:"+ which));
 		final AlertDialog resizeDialog = resizeBuilder.create();
 		resizeDialog.setTitle(getResources().getString(R.string.icon_resize));
 		resizeDialog.setButton(AlertDialog.BUTTON_POSITIVE, getResources().getString(android.R.string.ok),
@@ -518,19 +526,19 @@ int minIconSize = 50;
 				box, Tools.dpToPx(16, this), Tools.dpToPx(16, this),
 				Tools.dpToPx(18, this), true, Tools.dpToPx(8, this),
 				false));
-//		items.add(new ListItem(0, items.size(), getString(R.string.ftp),null,
-//				new IconicsDrawable(this, FontAwesome.Icon.faw_server)
-//						.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE),
-//				Tools.dpToPx(16, this), Tools.dpToPx(16, this),
-//				Tools.dpToPx(18, this), true, Tools.dpToPx(8, this),
-//				false));
-		Drawable ftp_d = getResources().getDrawable(R.drawable.ftp_connection);
-		Bitmap ftp_b = ((BitmapDrawable)ftp_d).getBitmap();
-		Drawable ftp = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(ftp_b, 64, 64, true));
 		items.add(new ListItem(0, items.size(), getString(R.string.ftp),null,
-				ftp, Tools.dpToPx(16, this), Tools.dpToPx(16, this),
+				new IconicsDrawable(this, FontAwesome.Icon.faw_server)
+						.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE),
+				Tools.dpToPx(16, this), Tools.dpToPx(16, this),
 				Tools.dpToPx(18, this), true, Tools.dpToPx(8, this),
 				false));
+//		Drawable ftp_d = getResources().getDrawable(R.drawable.ftp_connection);
+//		Bitmap ftp_b = ((BitmapDrawable)ftp_d).getBitmap();
+//		Drawable ftp = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(ftp_b, 64, 64, true));
+//		items.add(new ListItem(0, items.size(), getString(R.string.ftp),null,
+//				ftp, Tools.dpToPx(16, this), Tools.dpToPx(16, this),
+//				Tools.dpToPx(18, this), true, Tools.dpToPx(8, this),
+//				false));
 		items.add(new ListItem(0, items.size(), getString(R.string.local_network),null,
 				new IconicsDrawable(this, FontAwesome.Icon.faw_network_wired)
 						.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE),
@@ -673,17 +681,28 @@ int minIconSize = 50;
 	//from MyDialogFragment
 	@Override
 	public void AlertDialogNeutralButtonPressed(Button button, AlertDialog dialog, int id) {
-		ConnectionItem item = new ConnectionItem();
+		ConnectionItem item;
 		View view = (View) button.getParent().getParent().getParent();
 		EditText ipath = view.findViewById(R.id.et_ftp_init_path);
 		EditText hname = view.findViewById(R.id.et_ftp_host);
 		EditText uname = view.findViewById(R.id.et_ftp_username);
 		EditText pword = view.findViewById(R.id.et_ftp_password);
 		EditText portn = view.findViewById(R.id.et_ftp_port);
-		if (id > 0) {
+		ProgressBar spinner = view.findViewById(R.id.pb_ftp_spinner);
+		LinearLayout layout = view.findViewById(R.id.ll_ftp_response);
+		TextView response = view.findViewById(R.id.tv_ftp_response);
+		ImageView rimage = view.findViewById(R.id.iv_ftp_response);
+		ScrollView main = view.findViewById(R.id.sv_ftp);
+
+		main.setVisibility(View.INVISIBLE);
+		spinner.setVisibility(View.VISIBLE);
+		int type;
+		if (id > -1) {
 			item = ((Vars) this.getApplication()).getConnectionItemByID(id);
+			type = item.getType();
+		} else {
 			View method = view.findViewById(R.id.connType);
-//			int type = (int)method.getTag();
+			type = (int)method.getTag();
 		}
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
 			button.setBackgroundDrawable(
@@ -692,32 +711,34 @@ int minIconSize = 50;
 							.size(IconicsSize.TOOLBAR_ICON_SIZE));
 		}
 //		RadioButton authFTP = alertViewFTP.findViewById(R.id.rb_ftp_plain);
-		RadioButton authFTPS = alertViewFTP.findViewById(R.id.rb_ftps);
-		RadioButton authSFTP = alertViewFTP.findViewById(R.id.rb_sftp);
+//		RadioButton authFTPS = alertViewFTP.findViewById(R.id.rb_ftps);
+//		RadioButton authSFTP = alertViewFTP.findViewById(R.id.rb_sftp);
 //		TextView domlabel = alertViewFTP.findViewById(R.id.tv_ftp_domain);
 		EditText domain = alertViewFTP.findViewById(R.id.et_ftp_domain);
 		String connStr = "";
-		connStr = (item.getType() == CONNECTION_TYPE_SMB)
-				? "smb://"
-				: (authSFTP.isChecked())
-					? "sftp://"
-					: (authFTPS.isChecked())
-						? "ftps://"
-						: "ftp://";
+//		connStr = (type == CONNECTION_TYPE_SMB)
+//				? ""
+//				: (authSFTP.isChecked())
+//					? "sftp://"
+//					: (authFTPS.isChecked())
+//						? "ftps://"
+//						: "ftp://";
 		connStr += hname.getText();
 		int port;
-		try {
-			port = Integer.parseInt(portn.getText().toString());
-			connStr += ":" + port;
-		} catch (NumberFormatException e) {
+		if (type != CONNECTION_TYPE_SMB) {
+			try {
+				port = Integer.parseInt(portn.getText().toString());
+				connStr += ":" + port;
+			} catch (NumberFormatException e) {
+			}
+			if (!ipath.getText().toString().startsWith("/")) {
+				connStr += "/";
+			}
+			connStr += ipath.getText();
 		}
-		if (!ipath.getText().toString().startsWith("/")) {
-			connStr += "/";
-		}
-		connStr += ipath.getText();
 
 		Log.d(TAG, "testing connection:"+ connStr);
-		if (item.getType() == CONNECTION_TYPE_SMB) {
+		if (type == CONNECTION_TYPE_SMB) {
 //			LoaderSMB client = new LoaderSMB(this, result -> {
 //				Log.d(TAG, "tested connection:");
 //				Log.d(TAG, "response=" + result.getSessionId()+ ":" + result.getConnection().toString());
@@ -728,8 +749,22 @@ int minIconSize = 50;
 			SMBoperation client = new SMBoperation(new SMBoperation.OnSMBinteraction() {
 				@Override
 				public void OnResult(Session result) {
-					Log.d(TAG, "tested smb connection:"+ connString);
-					Log.d(TAG, "smb response=" + result.getSessionId()+ ":" + result.getConnection().toString());
+//					Log.d(TAG, "tested smb connection:" + connString);
+					button.setVisibility(View.GONE);
+					spinner.setVisibility(View.GONE);
+					if (result != null) {
+//						Log.d(TAG, "smb response=" + result.getSessionId() + ":" + result.getConnection().toString());
+						response.setText(getString(R.string.conn_good)+ ".\n"+ getString(R.string.save_OK));
+						rimage.setImageDrawable(new IconicsDrawable(MainActivity.this, FontAwesome.Icon.faw_check)
+								.color(IconicsColor.colorRes(R.color.springGreen)).size(IconicsSize.TOOLBAR_ICON_SIZE));
+						response.setVisibility(View.VISIBLE);
+						rimage.setVisibility(View.VISIBLE);
+						layout.setVisibility(View.VISIBLE);
+					} else {
+						Toast.makeText(MainActivity.this,
+								getString(R.string.conn_bad)+ "."+ getString(R.string.adjust_sett),
+								Toast.LENGTH_SHORT).show();
+					}
 				}
 			});
 			client.connect(connStr, uname.getText().toString(), pword.getText().toString(), domain.getText().toString());
@@ -746,42 +781,25 @@ int minIconSize = 50;
 //			ftp.connectFTP(this, connStr, uname.getText().toString(), pword.getText().toString(),
 //					ipath.getText().toString());
 			FTPoperation client = new FTPoperation(result -> {
-				Log.d(TAG, "tested ftp connection:");
+				button.setVisibility(View.GONE);
+				spinner.setVisibility(View.GONE);
 				try {
 					Log.d(TAG, "ftp response=" + result.getStatus()+ ":" + result.getReplyString());
+					response.setText(getString(R.string.conn_good)+ ".\n"+ getString(R.string.save_OK));
+					rimage.setImageDrawable(new IconicsDrawable(MainActivity.this, FontAwesome.Icon.faw_check)
+							.color(IconicsColor.colorRes(R.color.springGreen)).size(IconicsSize.TOOLBAR_ICON_SIZE));
+					response.setVisibility(View.VISIBLE);
+					rimage.setVisibility(View.VISIBLE);
+					layout.setVisibility(View.VISIBLE);
 				} catch (IOException e) {
 					e.printStackTrace();
+					Toast.makeText(MainActivity.this,
+							getString(R.string.conn_bad)+ "."+ getString(R.string.adjust_sett),
+							Toast.LENGTH_SHORT).show();
 				}
 			});
 			client.connectFTP(connStr, uname.getText().toString(), pword.getText().toString(), ipath.getText().toString());
 		}
-/*
-		AlertDialog.Builder testBuilder = new AlertDialog.Builder(MainActivity.this);
-		testBuilder.setTitle("testing...");
-		testBuilder.setMessage(string);
-		testBuilder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-			}
-		});
-		testBuilder.show();
-		Log.d(TAG, "button TEST string=" + string);
-		Bundle bundle = new Bundle();
-		bundle.putString("string", string);
-		bundle.putInt("which", which);
-		bundle.putString("dialog", dialog1.toString());
-		Uri uri = Uri.parse(string);*/
-//
-//					new connectTask(string, which, dialog1).execute();
-//
-//					LoaderManager loaderManager = getSupportLoaderManager();
-//					Loader<String> loader = loaderManager.getLoader(TEST_CONNECT_LOADER);
-//					if (loader == null) {
-//						loaderManager.initLoader(TEST_CONNECT_LOADER, bundle, this);
-//					} else {
-//						loaderManager.restartLoader(TEST_CONNECT_LOADER, bundle, this);
-//					}
 	}
 
 	@Override
@@ -792,7 +810,7 @@ int minIconSize = 50;
 	@Override
 	public void AlertDialogPositiveButtonPressed(Button button, AlertDialog dialog, int id) {
 		ConnectionItem item = new ConnectionItem();
-		if (id > 0) {
+		if (id > -1) {
 			item = ((Vars) this.getApplication()).getConnectionItemByID(id);
 		} else {
 			item.setID(((Vars)this.getApplication()).getConnectionItems().size());
@@ -805,10 +823,14 @@ int minIconSize = 50;
 		EditText portn = view.findViewById(R.id.et_ftp_port);
 		EditText etitle = view.findViewById(R.id.et_ftp_rename);
 		ImageView spinner = view.findViewById(R.id.iv_ftp_progress);
-		RadioButton authFTPS = alertViewFTP.findViewById(R.id.rb_ftps);
-		RadioButton authSFTP = alertViewFTP.findViewById(R.id.rb_sftp);
-		EditText domain = alertViewFTP.findViewById(R.id.et_ftp_domain);
-		View method = alertViewFTP.findViewById(R.id.connType);
+		RadioButton authFTPS = view.findViewById(R.id.rb_ftps);
+		RadioButton authSFTP = view.findViewById(R.id.rb_sftp);
+		EditText domain = view.findViewById(R.id.et_ftp_domain);
+		View method = view.findViewById(R.id.connType);
+//		RadioButton authFTPS = alertViewFTP.findViewById(R.id.rb_ftps);
+//		RadioButton authSFTP = alertViewFTP.findViewById(R.id.rb_sftp);
+//		EditText domain = alertViewFTP.findViewById(R.id.et_ftp_domain);
+//		View method = alertViewFTP.findViewById(R.id.connType);
 		spinner.setVisibility(View.VISIBLE);
 		int port = 21;
 		try {
@@ -849,7 +871,9 @@ int minIconSize = 50;
 		if (domain.getText() != null) {
 			item.setAccessToken(domain.getText().toString());
 		}
-		((Vars)this.getApplication()).leftList.get(item.getID()+4).setName(item.getConnectionName());
+		if (item.getConnectionName() != null && !item.getConnectionName().equals("")) {
+			((Vars) this.getApplication()).leftList.get(item.getID()).setName(item.getConnectionName());
+		}
 		Log.d(TAG, "saving connection: "+ item.toString());
 		((Vars)this.getApplication()).addConnectionItem(item);
 		spinner.setVisibility(View.INVISIBLE);
@@ -1173,7 +1197,7 @@ int minIconSize = 50;
 						.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE),
 				Tools.dpToPx(16, this), Tools.dpToPx(16, this),
 				Tools.dpToPx(18, this), true, Tools.dpToPx(8, this),
-				id < 5));
+				false));
 		items.add(new ListItem(0, items.size(), Tools.toTitleCase(getString(R.string.rename, "")),null,
 				new IconicsDrawable(this, FontAwesome.Icon.faw_newspaper1)
 						.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE),
@@ -1197,7 +1221,7 @@ int minIconSize = 50;
 						.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE),
 				Tools.dpToPx(16, this), Tools.dpToPx(16, this),
 				Tools.dpToPx(18, this), true, Tools.dpToPx(8, this),
-				id < 5));
+				id < 6));
 
 		final View customView = View.inflate(this, R.layout.dialog_list, null);
 		customView.setPadding(Tools.dpToPx(8, this), Tools.dpToPx(10, this),
@@ -1262,6 +1286,8 @@ int minIconSize = 50;
 					});
 			renameDialog.show();
 		} else if (name.toUpperCase().equals(getString(R.string.move).toUpperCase())) {
+		} else if (name.toUpperCase().equals(getString(R.string.connto).toUpperCase())) {
+			SelectedLeftItemId(id);
 		} else if (name.toUpperCase().equals(getString(R.string.edit_conn).toUpperCase())) {
 			ConnectionItem item = ((Vars) MainActivity.this.getApplication()).getConnectionItemByID(id-5);
 			Log.d(TAG, "editing:"+ item.toString());
@@ -1277,21 +1303,30 @@ int minIconSize = 50;
 		switch (id) {
 			case Vars.MY_PHOTOS_ID:
 				if (!Permissons.Check_STORAGE(this)) {
-					Permissons.Request_STORAGE(this, MY_PERMISSION_PHOTOS_READ_EXTERNAL_STORAGE_REQUEST_CODE);
+//					Permissons.Request_STORAGE(this, MY_PERMISSION_PHOTOS_READ_EXTERNAL_STORAGE_REQUEST_CODE);
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+						requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, MY_PERMISSION_PHOTOS_READ_EXTERNAL_STORAGE_REQUEST_CODE);
+					}
 				} else {
 					doListPhotos();
 				}
 				break;
 			case Vars.MY_MUSIC_ID:
 				if (!Permissons.Check_STORAGE(this)) {
-					Permissons.Request_STORAGE(this, MY_PERMISSION_MUSIC_READ_EXTERNAL_STORAGE_REQUEST_CODE);
+//					Permissons.Request_STORAGE(this, MY_PERMISSION_MUSIC_READ_EXTERNAL_STORAGE_REQUEST_CODE);
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+						requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, MY_PERMISSION_MUSIC_READ_EXTERNAL_STORAGE_REQUEST_CODE);
+					}
 				} else {
 					doListMusic();
 				}
 				break;
 			case Vars.MY_CONTACTS_ID:
 				if (!Permissons.Check_READ_CONTACTS(this)) {
-					Permissons.Request_READ_CONTACTS(this, MY_PERMISSION_RECORD_READ_CONTACTS_REQUEST_CODE);
+//					Permissons.Request_READ_CONTACTS(this, MY_PERMISSION_RECORD_READ_CONTACTS_REQUEST_CODE);
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+						requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, MY_PERMISSION_RECORD_READ_CONTACTS_REQUEST_CODE);
+					}
 				} else {
 					doListContacts();
 				}

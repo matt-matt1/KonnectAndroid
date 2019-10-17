@@ -2,7 +2,10 @@ package com.yumatechnical.konnectandroid;
 
 import android.app.Application;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.yumatechnical.konnectandroid.Adapter.LeftArrayAdapter;
+import com.yumatechnical.konnectandroid.Adapter.RightAdapter;
 import com.yumatechnical.konnectandroid.Model.ConnectionItem;
 import com.yumatechnical.konnectandroid.Model.FileItem;
 import com.yumatechnical.konnectandroid.Model.ListItem;
@@ -29,8 +32,10 @@ public class Vars extends Application {
 	public static final int MY_CONTACTS_ID = 3;
 	public static final int MY_FILES_ID = 4;
 	public LeftArrayAdapter leftAdapter;
-
 	public ArrayList<ListItem> leftList = new ArrayList<>();
+	public RightAdapter rightAdapter;
+//	public ArrayList<FileItem> rightList = new ArrayList<>();
+	public RecyclerView recyclerView;
 
 	public boolean WifiConn = false;
 	public boolean MobileConn = false;

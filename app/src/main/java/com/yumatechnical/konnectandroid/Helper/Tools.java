@@ -5,13 +5,16 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.text.TextPaint;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.webkit.MimeTypeMap;
+import android.widget.Button;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,6 +34,27 @@ import java.util.Objects;
 public class Tools extends AppCompatActivity {
 
 	private static final String TAG = Tools.class.getSimpleName();
+
+
+	//https://stackoverflow.com/questions/3679432/images-for-alertdialog-buttons
+	public static void centerImageAndTextInButton(Button button) {
+		Rect textBounds = new Rect();
+		//Get text bounds
+		CharSequence text = button.getText();
+		if (text != null && text.length() > 0) {
+			TextPaint textPaint = button.getPaint();
+			textPaint.getTextBounds(text.toString(), 0, text.length(), textBounds);
+		}
+		//Set left drawable bounds
+		Drawable leftDrawable = button.getCompoundDrawables()[0];
+		if (leftDrawable != null) {
+			Rect leftBounds = leftDrawable.copyBounds();
+			int width = button.getWidth() - (button.getPaddingLeft() + button.getPaddingRight());
+			int leftOffset = (width - (textBounds.width() + leftBounds.width()) - button.getCompoundDrawablePadding()) / 2 - button.getCompoundDrawablePadding();
+			leftBounds.offset(leftOffset, 0);
+			leftDrawable.setBounds(leftBounds);
+		}
+	}
 
 
 	public URL makeURLfromUri(Uri uri) {

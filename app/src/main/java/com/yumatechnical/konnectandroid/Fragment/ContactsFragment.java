@@ -172,6 +172,7 @@ public class ContactsFragment extends Fragment implements
 				0);
 		if (contactsList != null) {
 			// Sets the adapter for the ListView
+//			contactsList.setLayoutParams(new ViewGroup.LayoutParams());
 			contactsList.setAdapter(cursorAdapter);
 			contactsList.setOnItemClickListener(this);
 		}

@@ -95,4 +95,10 @@ dependencies {
 	//^ swipe-down to refresh
 	implementation 'com.github.chrisbanes:PhotoView:2.3.0'
 	//^ zoom images
+	implementation 'org.slf4j:slf4j-api:1.7.28'
+//	runtimeOnly('com.github.tony19:logback-android-classic:1.1.1-6') {
+//		// workaround issue #73
+//		exclude group: 'com.google.android', module: 'android'
+//	}
+	implementation 'uk.uuid.slf4j:slf4j-android:1.7.28-0'
 }

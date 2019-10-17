@@ -16,7 +16,7 @@ import java.util.Locale;
  * PLEASE NOTE: This class is super-seeded by "LoaderFTP"
  * since AsyncTaskLoader is more efficient than AsyncTask
  */
-@Deprecated
+//@Deprecated
 public class FTPoperation {
 
 //	private String server = "www.yourserver.net", path = "/";

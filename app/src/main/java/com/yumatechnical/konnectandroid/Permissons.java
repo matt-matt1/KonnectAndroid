@@ -54,7 +54,7 @@ public class Permissons {
 		ActivityCompat.requestPermissions(act, new
 				String[]{Manifest.permission.RECORD_AUDIO},code);
 	}
-	public static void Request_this(Activity activity, int code, @NonNull String manifest_permission) {
+	public static void Request(Activity activity, int code, @NonNull String manifest_permission) {
 		ActivityCompat.requestPermissions(activity, new String[]{manifest_permission}, code);
 	}
 
@@ -94,7 +94,7 @@ public class Permissons {
 		int result = ContextCompat.checkSelfPermission(act, Manifest.permission.RECORD_AUDIO);
 		return result == PackageManager.PERMISSION_GRANTED;
 	}
-	public static boolean Check_this(Activity activity, @NonNull String manifest_permission) {
+	public static boolean Check(Activity activity, @NonNull String manifest_permission) {
 		int result = ContextCompat.checkSelfPermission(activity, manifest_permission);
 		return result == PackageManager.PERMISSION_GRANTED;
 	}

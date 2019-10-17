@@ -1,189 +1,240 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--inuse-->
-<ScrollView
-	xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent">
-	<LinearLayout
-		android:orientation="vertical"
-		android:padding="8dp"
-		android:id="@+id/ll_ftp_main"
+
+	<ScrollView
 		android:layout_width="match_parent"
-		android:layout_height="wrap_content">
-		<View
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:visibility="gone"
-			android:id="@+id/connType" />
-		<!--title-->
-		<TextView
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			style="@style/FormFieldLabel"
-			android:id="@+id/tv_ftp_title" />
-		<EditText
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			style="@style/FormFieldEntry"
-			android:autofillHints="server_address"
-			tools:ignore="LabelFor,UnusedAttribute"
-			android:inputType="text"
-			android:hint=""
-			android:id="@+id/et_ftp_rename"	/>
+		android:layout_height="match_parent"
+		android:id="@+id/sv_ftp">
 
 		<LinearLayout
+			android:orientation="vertical"
+			android:padding="8dp"
+			android:id="@+id/ll_ftp_main"
 			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:baselineAligned="false"
-			android:orientation="horizontal">
-			<!-- host -->
-			<LinearLayout
-				android:layout_width="0dp"
-				android:layout_height="wrap_content"
-				android:layout_weight="1"
-				android:orientation="vertical">
-				<TextView
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					style="@style/FormFieldLabel"
-					android:id="@+id/tv_ftp_host" />
-				<EditText
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					style="@style/FormFieldEntry"
-					android:layout_marginRight="0dp"
-					android:autofillHints="server_address"
-					tools:ignore="LabelFor,UnusedAttribute"
-					android:inputType="text"
-					android:hint="@string/eg_ip_addr"
-					android:id="@+id/et_ftp_host" />
-			</LinearLayout>
-			<!-- port -->
-			<LinearLayout
-				android:layout_width="100sp"
-				android:layout_height="wrap_content"
-				android:orientation="vertical">
-				<TextView
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					style="@style/FormFieldLabel"
-					android:id="@+id/tv_ftp_port" />
-				<EditText
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:autofillHints="server_address"
-					style="@style/FormFieldEntry"
-					android:layout_marginLeft="0dp"
-					tools:ignore="LabelFor,UnusedAttribute"
-					android:inputType="number"
-					android:hint=""
-					android:id="@+id/et_ftp_port" />
-			</LinearLayout>
-		</LinearLayout>
-		<!--FTP/FTPS/SFTP-->
-		<RadioGroup
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:orientation="horizontal"
-			android:id="@+id/rg_ftp_auth">
-			<RadioButton
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:checked="true"
-				android:id="@+id/rb_ftp_plain" />
-			<TextView
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:text="FTP"
-				android:id="@+id/tv_ftp_plain" />
-			<RadioButton
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:id="@+id/rb_ftps" />
-			<TextView
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:text="FTPS (SSL/TLS)"
-				android:id="@+id/tv_ftps" />
-			<RadioButton
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:id="@+id/rb_sftp" />
-			<TextView
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:text="SFTP (SSH~)"
-				android:id="@+id/tv_sftp" />
-		</RadioGroup>
-	<!--domain-->
-		<TextView
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			style="@style/FormFieldLabel"
-			android:visibility="gone"
-			android:id="@+id/tv_ftp_domain" />
-		<EditText
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			style="@style/FormFieldEntry"
-			android:autofillHints="@string/username"
-			tools:ignore="LabelFor,UnusedAttribute"
-			android:inputType="text"
-			android:hint=""
-			android:visibility="gone"
-			android:id="@+id/et_ftp_domain" />
-	<!--	username-->
-		<TextView
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			style="@style/FormFieldLabel"
-			android:id="@+id/tv_ftp_username" />
-		<EditText
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			style="@style/FormFieldEntry"
-			android:autofillHints="@string/username"
-			tools:ignore="LabelFor,UnusedAttribute"
-			android:inputType="text"
-			android:hint=""
-			android:id="@+id/et_ftp_username" />
-	<!--password-->
-		<TextView
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			style="@style/FormFieldLabel"
-			android:id="@+id/tv_ftp_password" />
-		<EditText
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			style="@style/FormFieldEntry"
-			android:autofillHints="@string/password"
-			tools:ignore="LabelFor,UnusedAttribute"
-			android:inputType="textPassword"
-			android:hint=""
-			android:id="@+id/et_ftp_password" />
-	<!--	init_path-->
-		<TextView
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			style="@style/FormFieldLabel"
-			android:id="@+id/tv_ftp_init_path" />
-		<EditText
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			style="@style/FormFieldEntry"
-			android:autofillHints="@string/username"
-			tools:ignore="LabelFor,UnusedAttribute"
-			android:inputType="text"
-			android:hint=""
-			android:id="@+id/et_ftp_init_path" />
+			android:layout_height="wrap_content">
 
+			<View
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:visibility="gone"
+				android:id="@+id/connType" />
+			<!--title-->
+			<TextView
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				style="@style/FormFieldLabel"
+				android:id="@+id/tv_ftp_title" />
+
+			<EditText
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				style="@style/FormFieldEntry"
+				android:autofillHints="server_address"
+				tools:ignore="LabelFor,UnusedAttribute"
+				android:inputType="textCapWords"
+				android:hint=""
+				android:id="@+id/et_ftp_rename" />
+
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:baselineAligned="false"
+				android:orientation="horizontal">
+				<!-- host -->
+				<LinearLayout
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					android:layout_weight="1"
+					android:orientation="vertical">
+
+					<TextView
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						style="@style/FormFieldLabel"
+						android:id="@+id/tv_ftp_host" />
+
+					<EditText
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						style="@style/FormFieldEntry"
+						android:layout_marginRight="0dp"
+						android:autofillHints="server_address"
+						tools:ignore="LabelFor,UnusedAttribute"
+						android:inputType="text"
+						android:hint="@string/eg_ip_addr"
+						android:id="@+id/et_ftp_host" />
+				</LinearLayout>
+				<!-- port -->
+				<LinearLayout
+					android:layout_width="100sp"
+					android:layout_height="wrap_content"
+					android:orientation="vertical">
+
+					<TextView
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						style="@style/FormFieldLabel"
+						android:id="@+id/tv_ftp_port" />
+
+					<EditText
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:autofillHints="server_address"
+						style="@style/FormFieldEntry"
+						android:layout_marginLeft="0dp"
+						tools:ignore="LabelFor,UnusedAttribute"
+						android:inputType="number"
+						android:hint=""
+						android:id="@+id/et_ftp_port" />
+				</LinearLayout>
+			</LinearLayout>
+			<!--FTP/FTPS/SFTP-->
+			<RadioGroup
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="horizontal"
+				android:id="@+id/rg_ftp_auth">
+
+				<RadioButton
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:checked="true"
+					android:id="@+id/rb_ftp_plain" />
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="FTP"
+					android:id="@+id/tv_ftp_plain" />
+
+				<RadioButton
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:id="@+id/rb_ftps" />
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="FTPS (SSL/TLS)"
+					android:id="@+id/tv_ftps" />
+
+				<RadioButton
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:id="@+id/rb_sftp" />
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="SFTP (SSH~)"
+					android:id="@+id/tv_sftp" />
+			</RadioGroup>
+			<!--domain-->
+			<TextView
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				style="@style/FormFieldLabel"
+				android:visibility="gone"
+				android:id="@+id/tv_ftp_domain" />
+
+			<EditText
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				style="@style/FormFieldEntry"
+				android:autofillHints="@string/username"
+				tools:ignore="LabelFor,UnusedAttribute"
+				android:inputType="text"
+				android:hint=""
+				android:visibility="gone"
+				android:id="@+id/et_ftp_domain" />
+			<!--	username-->
+			<TextView
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				style="@style/FormFieldLabel"
+				android:id="@+id/tv_ftp_username" />
+
+			<EditText
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				style="@style/FormFieldEntry"
+				android:autofillHints="@string/username"
+				tools:ignore="LabelFor,UnusedAttribute"
+				android:inputType="text"
+				android:hint=""
+				android:id="@+id/et_ftp_username" />
+			<!--password-->
+			<TextView
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				style="@style/FormFieldLabel"
+				android:id="@+id/tv_ftp_password" />
+
+			<EditText
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				style="@style/FormFieldEntry"
+				android:autofillHints="@string/password"
+				tools:ignore="LabelFor,UnusedAttribute"
+				android:inputType="textPassword"
+				android:hint=""
+				android:id="@+id/et_ftp_password" />
+			<!--	init_path-->
+			<TextView
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				style="@style/FormFieldLabel"
+				android:id="@+id/tv_ftp_init_path" />
+
+			<EditText
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				style="@style/FormFieldEntry"
+				android:autofillHints="@string/username"
+				tools:ignore="LabelFor,UnusedAttribute"
+				android:inputType="text"
+				android:hint=""
+				android:id="@+id/et_ftp_init_path" />
+
+			<ImageView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:id="@+id/iv_ftp_progress"
+				android:visibility="invisible"
+				android:contentDescription="@string/testConnect" />
+		</LinearLayout>
+	</ScrollView>
+
+	<ProgressBar
+		android:layout_width="42dp"
+		android:layout_height="42dp"
+		android:layout_gravity="center"
+		android:visibility="gone"
+		android:id="@+id/pb_ftp_spinner" />
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:visibility="gone"
+		android:gravity="center"
+		android:id="@+id/ll_ftp_response"
+		android:orientation="vertical">
 		<ImageView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:id="@+id/iv_ftp_progress"
-			android:visibility="invisible"
-			android:contentDescription="@string/testConnect" />
+			android:id="@+id/iv_ftp_response"
+			android:layout_gravity="center_horizontal" />
+		<TextView
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:textAlignment="center"
+			android:textSize="20sp"
+			android:textStyle="bold"
+			android:layout_gravity="center_horizontal"
+			android:id="@+id/tv_ftp_response" />
 	</LinearLayout>
-</ScrollView>
+</FrameLayout>
