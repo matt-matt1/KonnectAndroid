@@ -6,6 +6,10 @@
 <!--    <uses-sdk android:minSdkVersion="4"-->
 <!--        android:targetSdkVersion="14" />-->
 
+	<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+	<!--	^dialog window - https://stackoverflow.com/questions/5796611/dialog-throwing-unable-to-add-window-token-null-is-not-for-an-application-wi-->
+	<uses-permission android:name="android.permission.INTERNAL_SYSTEM_WINDOW"
+		tools:ignore="ProtectedPermissions" />
     <!--	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />-->
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" /> <!-- <uses-permission android:name="android.permission.WRITE_CONTACTS" /> -->

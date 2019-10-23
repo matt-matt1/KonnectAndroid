@@ -45,7 +45,9 @@ public class LeftArrayAdapter extends ArrayAdapter<ListItem> /*implements Action
 
 	public interface OnListener {
 		void SelectedLeftItemId(int id);
+		void SelectedLeftItemIndex(int index);
 		void LongPressedLeftItemId(int id);
+		void LongPressedLeftItemIndex(int index);
 	}
 	private final OnListener listener;
 	public LeftArrayAdapter(@NonNull Context context, int resource, @NonNull ArrayList<ListItem> objects,
@@ -120,6 +122,7 @@ public class LeftArrayAdapter extends ArrayAdapter<ListItem> /*implements Action
 			lastSelected = v;
 //			mActionMode = view.startActionMode(LeftArrayAdapter.this);
 			listener.LongPressedLeftItemId(clickedItem.getID());
+			listener.LongPressedLeftItemIndex(position);
 			return true;
 		});
 /*		view.setOnTouchListener(new View.OnTouchListener() {
@@ -176,6 +179,7 @@ public class LeftArrayAdapter extends ArrayAdapter<ListItem> /*implements Action
 			}
 			lastSelected = v;
 			listener.SelectedLeftItemId(clickedItem.getID());
+			listener.SelectedLeftItemIndex(position);
 		});
 		return view;
 	}

@@ -11,7 +11,10 @@ import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.RequiresApi;
+import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.ViewModelProviders;
 
+import com.yumatechnical.konnectandroid.Model.MyViewModel;
 import com.yumatechnical.konnectandroid.Vars;
 
 import java.io.BufferedReader;
@@ -34,6 +37,7 @@ import static org.apache.commons.net.telnet.TelnetCommand.IP;
 public class LocalNetwork {
 
 	private static final String TAG = LocalNetwork.class.getSimpleName();
+//	private MyViewModel model;
 
 
 	/**
@@ -109,10 +113,12 @@ public class LocalNetwork {
 		boolean networkConnection = false;
 		boolean wifiConnection = false;
 		boolean mobileConnection = false;
+//		private MyViewModel model;
 
 
 		public ConnectionInfoTask(Context context, OnNetworkConnectionInfo listener) {
-			mContextRef = new WeakReference<Context>(context);
+			mContextRef = new WeakReference<>(context);
+//			model = ViewModelProviders.of((FragmentActivity) this).get(MyViewModel.class);
 			this.listener = listener;
 		}
 
@@ -137,12 +143,14 @@ public class LocalNetwork {
 							if (networkInfo != null && networkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
 								wifiConnection |= networkInfo.isConnected();
 //								wifiConnection = !networkInfo.isConnected();
-								((Vars)mContextRef.get()).setWifiConn(wifiConnection);
+//								((Vars)mContextRef.get()).setWifiConn(wifiConnection);
+//								model.setWifiConn(wifiConnection);
 							}
 							if (networkInfo != null && networkInfo.getType() == ConnectivityManager.TYPE_MOBILE) {
 								mobileConnection |= networkInfo.isConnected();
 //								mobileConnection = !networkInfo.isConnected();
-								((Vars)mContextRef.get()).setMobileConn(mobileConnection);
+//								((Vars)mContextRef.get()).setMobileConn(mobileConnection);
+//								model.setMobileConn(mobileConnection);
 							}
 						}
 						Log.d(TAG, "Wifi connected: "+ wifiConnection);
@@ -163,7 +171,8 @@ public class LocalNetwork {
 								ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(ipInt).array())
 								.getHostAddress();
 						Log.d(TAG, "IP Address: "+ ipString);
-						((Vars)context).setMyIPString(ipString);
+//						((Vars)context).setMyIPString(ipString);
+//						model.setMyIPString(ipString);
 					}
 //					int ipAddress = connectionInfo.getIpAddress();
 				}
@@ -190,6 +199,7 @@ public class LocalNetwork {
 
 		private static final String TAG = NetworkSniffTask.class.getSimpleName();
 		private WeakReference<Context> mContextRef;
+		private MyViewModel model;
 
 
 		public NetworkSniffTask(Context context) {
@@ -224,7 +234,8 @@ public class LocalNetwork {
 								.getHostAddress();
 
 						Log.d(TAG, "ipString: "+ ipString);
-						((Vars)context).setMyIPString(ipString);
+//						((Vars)context).setMyIPString(ipString);
+//						mo.setMyIPString(ipString);
 
 						String prefix = ipString.substring(0, ipString.lastIndexOf(".") + 1);
 						Log.d(TAG, "prefix: " + prefix);

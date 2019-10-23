@@ -1,9 +1,15 @@
 package com.yumatechnical.konnectandroid.Model;
 
+import android.net.Uri;
+
 import androidx.annotation.NonNull;
 
 import org.parceler.Parcel;
 import org.parceler.ParcelConstructor;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Locale;
 
 @Parcel
 public class ConnectionItem {
@@ -125,4 +131,50 @@ public class ConnectionItem {
 				", token="+ getAccessToken()+ ", scheme="+ getScheme()+ ", user="+ getUsername()+
 				", pass="+ getPassword()+ ", host="+ getHost()+ ", port="+ getPort()+ ", path="+ getPath()+ ")";
 	}
+
+	public String toConnectionString() {
+		StringBuilder output = new StringBuilder();
+		if (getScheme() != null && !getScheme().equals("")) {
+			output.append(getScheme());
+			output.append("/");
+		}
+		if (getUsername() != null && !getUsername().equals("")) {
+			output.append(getUsername());
+			output.append(":");
+			if (getPassword() != null && !getPassword().equals("")) {
+				output.append(getPassword());
+			}
+			output.append("@");
+		}
+		if (getHost() != null && !getHost().equals("")) {
+			output.append(getHost());
+			if (getPort() > 0) {
+				output.append(":");
+				output.append(getPort());
+			}
+			output.append("/");
+		}
+		output.append("/");
+		if (getPath() != null && !getPath().equals("")) {
+			if (!getPath().startsWith("/")) {
+				output.append("/");
+			}
+			output.append(getPath());
+		}
+		try {
+			URL url = new URL(output.toString());
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
+		return output.toString();
+	}
+
+	public String toConnectionUri() {
+		Uri.Builder builder = new Uri.Builder();
+		builder.scheme(getScheme());
+		builder.encodedAuthority(getUsername()+ ":"+ getPassword()+ "@"+ getHost());
+		builder.path(getPath());
+		return builder.build().toString();
+	}
+
 }

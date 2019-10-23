@@ -12,6 +12,7 @@ import android.widget.ListView;
 import android.widget.SeekBar;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.lifecycle.ViewModelProviders;
 
 import com.dropbox.core.DbxAppInfo;
 import com.dropbox.core.DbxRequestConfig;
@@ -24,6 +25,7 @@ import com.yumatechnical.konnectandroid.Adapter.CustomDialogListAdapter;
 import com.yumatechnical.konnectandroid.Helper.Tools;
 import com.yumatechnical.konnectandroid.Model.ConnectionItem;
 import com.yumatechnical.konnectandroid.Model.ListItem;
+import com.yumatechnical.konnectandroid.Model.MyViewModel;
 import com.yumatechnical.konnectandroid.Settings.SettingsActivity;
 
 import java.util.ArrayList;
@@ -31,12 +33,14 @@ import java.util.ArrayList;
 public class MyOptionsMenu extends MainActivity {
 
 	private static final String TAG = MyOptionsMenu.class.getSimpleName();
+	private MyViewModel model;
 
 	/**
 	 * Methods for setting up the menu
 	 **/
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+		model = ViewModelProviders.of(this).get(MyViewModel.class);
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.visualizer_menu, menu);
 		return true;
@@ -46,7 +50,8 @@ public class MyOptionsMenu extends MainActivity {
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		MenuItem menuItem;
 
-		if (!((Vars)this.getApplication()).isNetworkConnected()) {
+//		if (!((Vars)this.getApplication()).isNetworkConnected()) {
+		if (!model.isNetworkConnected()) {
 			menuItem = menu.findItem(R.id.add_connect);
 			menuItem.setIcon(new IconicsDrawable(this, FontAwesome.Icon.faw_plus)
 					.color(IconicsColor.colorRes(R.color.White)).size(IconicsSize.TOOLBAR_ICON_SIZE));
@@ -90,14 +95,16 @@ public class MyOptionsMenu extends MainActivity {
 		Log.d(TAG, "right width="+ maxIconSize);
 		slider.setMax(maxIconSize);
 		int factorPercent = (maxIconSize - minIconSize) / 100;
-		int itemSize = ((Vars) getApplicationContext()).getIconSize();
+//		int itemSize = ((Vars) getApplicationContext()).getIconSize();
+		int itemSize = model.getIconSize().getValue();
 		slider.setProgress((itemSize-minIconSize)*factorPercent);
 		int initial = itemSize;
 		slider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 			@Override
 			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 				seekBar.setProgress(progress);
-				((Vars) getApplicationContext()).setIconSize((progress / factorPercent) + minIconSize);
+//				((Vars) getApplicationContext()).setIconSize((progress / factorPercent) + minIconSize);
+				model.setIconSize((progress / factorPercent) + minIconSize);
 //						if (((Fragment)RightFragment()).rightAdapter != null) {
 //							((Fragment)RightFragment()).rightAdapter.notifyDataSetChanged();
 //						}
@@ -119,7 +126,8 @@ public class MyOptionsMenu extends MainActivity {
 		resizeDialog.setButton(AlertDialog.BUTTON_NEGATIVE, getResources().getString(android.R.string.cancel),
 				(dialog1, which) -> {
 					slider.setProgress(initial);
-					((Vars) getApplicationContext()).setIconSize(initial);
+//					((Vars) getApplicationContext()).setIconSize(initial);
+					model.setIconSize(initial);
 					dialog1.cancel();
 				});
 		resizeDialog.show();

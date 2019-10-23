@@ -36,6 +36,30 @@ public class Tools extends AppCompatActivity {
 	private static final String TAG = Tools.class.getSimpleName();
 
 
+	public static String[] getShareNameFromPath(String path) {
+		String[] separated = path.split("/");
+		if (separated.length > 0) {
+			ArrayList<String> list = new ArrayList<>();
+			for (String pa : separated) {
+				String part = pa.trim();
+				if (part.equals(""))
+					continue;
+				list.add(part);
+			}
+			String shareName = list.get(0);
+			list.remove(0);
+			StringBuilder builder = new StringBuilder();
+//			builder.append("/");
+			for (String str : list) {
+				builder.append("/");
+				builder.append(str);
+			}
+			return new String[]{shareName, builder.toString()};
+		} else {
+			return separated;
+		}
+	}
+
 	//https://stackoverflow.com/questions/3679432/images-for-alertdialog-buttons
 	public static void centerImageAndTextInButton(Button button) {
 		Rect textBounds = new Rect();

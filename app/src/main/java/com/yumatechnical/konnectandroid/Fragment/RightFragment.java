@@ -1,5 +1,5 @@
 package com.yumatechnical.konnectandroid.Fragment;
-
+//
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Fragment;
@@ -14,6 +14,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.ContactsContract;
@@ -22,35 +23,39 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.mikepenz.iconics.IconicsColor;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.iconics.IconicsSize;
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome;
+import com.yumatechnical.konnectandroid.Adapter.CustomDialogListAdapter;
 import com.yumatechnical.konnectandroid.Adapter.RightAdapter;
 import com.yumatechnical.konnectandroid.Helper.Network.TestInternetLoader;
 import com.yumatechnical.konnectandroid.Helper.Tools;
-import com.yumatechnical.konnectandroid.MainActivity;
 import com.yumatechnical.konnectandroid.Model.FileItem;
+import com.yumatechnical.konnectandroid.Model.ListItem;
 import com.yumatechnical.konnectandroid.Model.MyPhone;
 import com.yumatechnical.konnectandroid.R;
 import com.yumatechnical.konnectandroid.Vars;
+
+import org.apache.tika.Tika;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -65,8 +70,7 @@ import static com.mikepenz.iconics.Iconics.getApplicationContext;
 /**
  * Fragment for the right panel
  */
-public class RightFragment extends Fragment implements AdapterView.OnClickListener,
-		LoaderManager.LoaderCallbacks {
+public class RightFragment extends Fragment implements LoaderManager.LoaderCallbacks {
 
 	private static final String RIGHT_URI = "id";
 	private static final String RIGHT_TEXT = "text";
@@ -78,7 +82,6 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 	private String msg, title;
 	TextView msgView, titleView;
 	ProgressBar spinner;
-	RightAdapter.ListItemClickListener listener;
 	ContentResolver resolver;
 	Uri uri;
 	private static final String TAG = RightFragment.class.getSimpleName();
@@ -87,6 +90,13 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 	private static final int LOADER_GATHER_MY_CONTACTS = 22;
 	private static final int LOADER_GATHER_MY_FILES = 23;
 	private SwipeRefreshLayout swipeContainer;
+//	private MyViewModel model;
+	private Drawable fileIcon = new IconicsDrawable(getApplicationContext(),
+		FontAwesome.Icon.faw_file)
+		.color(IconicsColor.colorRes(R.color.Gray)).size(IconicsSize.dp(100));
+	private Drawable dirIcon = new IconicsDrawable(getApplicationContext(),
+			FontAwesome.Icon.faw_folder)
+			.color(IconicsColor.colorRes(R.color.Gray)).size(IconicsSize.dp(100));
 
 	/**
 	 * default constructor
@@ -116,6 +126,7 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+//		model = ViewModelProviders.of((FragmentActivity) getActivity()).get(MyViewModel.class);
 		if (getArguments() != null) {
 			msg = getArguments().getString(RIGHT_TEXT);
 			title = getArguments().getString(RIGHT_TITLE);
@@ -136,61 +147,6 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 		return inflater.inflate(R.layout.right_panel, container, false);
 	}
 
-/*
-	public void setupAdapter() {
-		mGestureDetector = new GestureDetector(this, new MyList.SideIndexGestureListener());
-
-//		List<FileItem> countries = Populate.populateCountries();
-//		Collections.sort(countries);
-
-		List rows = new ArrayList();
-		int start = 0;
-		int end = 0;
-		String previousLetter = null;
-		Object[] tmpIndexItem = null;
-		Pattern numberPattern = Pattern.compile("[0-9]");
-
-		for (FileItem item : wholeList) {
-			String firstLetter = item.getName().substring(0, 1);
-
-			if (numberPattern.matcher(firstLetter).matches()) {
-				firstLetter = "#";
-			}
-
-			if (previousLetter != null && !firstLetter.equals(previousLetter)) {
-				end = rows.size() - 1;
-				tmpIndexItem = new Object[3];
-				tmpIndexItem[0] = previousLetter.toUpperCase(Locale.UK);
-				tmpIndexItem[1] = start;
-				tmpIndexItem[2] = end;
-				alphabet.add(tmpIndexItem);
-
-				start = end + 1;
-			}
-
-			if (!firstLetter.equals(previousLetter)) {
-				rows.add(new AlphabetListAdapter.Section(firstLetter));
-				sections.put(firstLetter, start);
-			}
-
-			rows.add(new AlphabetListAdapter.Item(item.getName()));
-			previousLetter = firstLetter;
-		}
-
-		if (previousLetter != null) {
-			tmpIndexItem = new Object[3];
-			tmpIndexItem[0] = previousLetter.toUpperCase(Locale.UK);
-			tmpIndexItem[1] = start;
-			tmpIndexItem[2] = rows.size() - 1;
-			alphabet.add(tmpIndexItem);
-		}
-
-		adapter.setRows(rows);
-		setListAdapter(adapter);
-
-		updateList();
-	}
-*/
 
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
@@ -201,31 +157,33 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 		msgView = getActivity().findViewById(R.id.tv_right);
 		titleView = getActivity().findViewById(R.id.tv_right_title);
 		((Vars)getActivity().getApplication()).recyclerView = getActivity().findViewById(R.id.rv_right);
+//		model.recyclerView = getActivity().findViewById(R.id.rv_right);
 		swipeContainer = getActivity().findViewById(R.id.sr_right);
 		swipeContainer.setOnRefreshListener(() -> functionOnTitle());
-		// Configure the refreshing colors
 		swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
 				android.R.color.holo_green_light,
 				android.R.color.holo_orange_light,
 				android.R.color.holo_red_light);
 		if (title != null && !title.isEmpty()) {
-			titleView.setText(title);
+			if (uri != null) {
+				titleView.setText(String.format("%s\n%s", title, uri.toString()));
+			} else {
+				titleView.setText(title);
+			}
 		}
 		if (msg != null && !msg.isEmpty()) {
 			msgView.setText(msg);
 		} else {
 			spinner.setVisibility(View.VISIBLE);
 			((Vars)getActivity().getApplication()).recyclerView.setVisibility(View.INVISIBLE);
-//			myList = new MyList();
-//			myList.onCreate();
-//			setupAdapter();
-//			listAdapter = new AlphabetListAdapter();
+//			model.recyclerView.setVisibility(View.INVISIBLE);
 //			rightAdapter = new RightAdapter(null, null, null);
 			((Vars)getActivity().getApplication()).rightAdapter = new RightAdapter(null, null, null);
-//			LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+//			model.rightAdapter = new RightAdapter(null, null, null);
 			GridLayoutManager layoutManager = new GridLayoutManager(getApplicationContext(),
 					Tools.calculateNoOfColumns(getApplicationContext(),
 							(1.2f * ((Vars)getApplicationContext()).getIconSize())
+//							(1.2f * model.getIconSize().getValue())
 									+ Tools.dpToPx(40, getApplicationContext())));
 //			ColumnQty columnQty = new ColumnQty(getApplicationContext(), R.layout.inner_right);
 //			GridLayoutManager layoutManager = new GridLayoutManager(getApplicationContext(),
@@ -236,11 +194,15 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 //			boolean includeEdge = true;
 //			recyclerView.addItemDecoration(new GridSpacingItemDecoration(spanCount, spacing, includeEdge));
 			((Vars)getActivity().getApplication()).recyclerView.setLayoutManager(layoutManager);
+//			model.recyclerView.setLayoutManager(layoutManager);
 			((Vars)getActivity().getApplication()).recyclerView.setHasFixedSize(true);
+//			model.recyclerView.setHasFixedSize(true);
 //			recyclerView.setAdapter(rightAdapter);
 			((Vars)getActivity().getApplication()).recyclerView.setAdapter(((Vars)getActivity().getApplication()).rightAdapter);
+//			model.recyclerView.setAdapter(model.rightAdapter);
 //			recyclerView.setAdapter(listAdapter);
-			((Vars)getActivity().getApplication()).recyclerView.setOnClickListener(this);
+			/*((Vars)getActivity().getApplication()).recyclerView.setOnClickListener(this);*/
+//			model.recyclerView.setOnClickListener(this);
 		}
 		Bundle bundle;
 		// Initializes the loader
@@ -291,20 +253,17 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 				new FetchMusicTask(-1).execute();
 //			}
 		} else {
-			File dir = new File(Environment.getExternalStorageDirectory().getPath());
-			Log.d(TAG, title+ ":"+ dir.getPath()+ ":");
+//			File dir = new File(Environment.getExternalStorageDirectory().getPath());
+			File dir = new File(Environment.getRootDirectory().getPath());
+			Log.d(TAG, title+ ":"+ dir.toString()+ ":");
 			new FetchFilesTask(dir).execute();
 			//files
 		}
 	}
 
-
-	@Override
-	public void onClick(View v) {
-		listener.onListItemClick(v.toString());
-//		Log.d(TAG, "onClick was fired");
-	}
-
+/*
+ * override for LoaderManager.LoaderCallbacks
+ */
 	@NonNull
 	@Override
 	public Loader onCreateLoader(int id, @Nullable Bundle args) {
@@ -336,7 +295,6 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 
 		int id;
 
-
 		FetchContactsTask(int id) {
 			super();
 			this.id = id;
@@ -346,6 +304,7 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 		protected void onPreExecute() {
 			spinner.setVisibility(View.VISIBLE);
 			((Vars)getActivity().getApplication()).recyclerView.setVisibility(View.INVISIBLE);
+//			model.recyclerView.setVisibility(View.INVISIBLE);
 		}
 
 		@Override
@@ -355,61 +314,35 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 		}
 
 		@Override
-		protected void onPostExecute(Void aVoid) {//done
+		protected void onPostExecute(Void aVoid) {
 			if (contactsList.size() > 0) {
-/*				myList.setData(contactsList, new IconicsDrawable(getApplicationContext(),
-						FontAwesome.Icon.faw_user_circle1)
-						.color(IconicsColor.colorRes(R.color.White)).size(IconicsSize.dp(100)));*/
-//				rightAdapter = new RightAdapter(null, null, new RightAdapter.ListItemClickListener() {
-				((Vars)getActivity().getApplication()).rightAdapter = new RightAdapter(null, null, new RightAdapter.ListItemClickListener() {
-					@Override
-					public void onListItemClick(String item) {
-//						Log.d(TAG, "ListItemClickListener:"+ item);
-//						Intent intent = new Intent();
-//						intent.setType("image/*");
-//						intent.setAction(Intent.ACTION_GET_CONTENT);
-//						startActivityForResult(Intent.createChooser(intent, "Choose picture"),
-//								4);
-					}
-
-					@Override
-					public void onListItemClick(FileItem item) {
-//						ArrayList<String> shares = new ArrayList<>();
-//						shares.add("Email");
-//						shares.add("SMS/MMS");
-						AlertDialog.Builder contactDialogBuilder = new AlertDialog.Builder(getActivity(), R.style.CustomDialogTheme);
-						contactDialogBuilder.setTitle(R.string.contactMethod);
-						contactDialogBuilder.setItems(R.array.contactShare, new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								Log.d(TAG, "share via: "+ which);
-							}
-						});
-						contactDialogBuilder.show();
-//						Uri uri = Uri.parse("contact:"+ item.getName());
-						Intent intent = new Intent(Intent.ACTION_EDIT);
-//						Intent intent = new Intent(Intent.ACTION_VIEW);
-//						Log.d(TAG, "viewing contact: "+ uri.toString());
-//						intent.putExtra(ContactsContract.Intents.Insert.EMAIL, item.getName());
-						intent.setData(item.getFullPath());
-						if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
-							startActivity(intent);
-						}
-					}
-				});
-//				recyclerView.setAdapter(rightAAdapter);
-//				((Vars)getActivity().getApplication()).recyclerView.setLayoutManager(new LinearLayoutManager());
-				((Vars)getActivity().getApplication()).recyclerView.setAdapter(((Vars)getActivity().getApplication()).rightAdapter);
-				((Vars)getActivity().getApplication()).rightAdapter.setDefaultImage(new IconicsDrawable(getApplicationContext(),
+				((Vars)getActivity().getApplication()).rightAdapter.setData(contactsList);
+				((Vars)getActivity().getApplication()).rightAdapter.setDefaultImage(new IconicsDrawable(
+						getApplicationContext(),
 						FontAwesome.Icon.faw_user_circle1)
 						.color(IconicsColor.colorRes(R.color.White))
 						.size(IconicsSize.dp(((Vars) getApplicationContext()).getIconSize())));
-				((Vars)getActivity().getApplication()).rightAdapter.setData(contactsList);
-//				rightAdapter.setDefaultImage(new IconicsDrawable(getApplicationContext(),
-//						FontAwesome.Icon.faw_user_circle1)
-//						.color(IconicsColor.colorRes(R.color.White))
-//						.size(IconicsSize.dp(((Vars) getApplicationContext()).getIconSize())));
-//				rightAdapter.setData(contactsList);
+				((Vars)getActivity().getApplication()).rightAdapter.setListener((name, item, position) -> {
+					AlertDialog.Builder contactDialogBuilder = new AlertDialog.Builder(getActivity(), R.style.CustomDialogTheme);
+					contactDialogBuilder.setTitle(name);
+					contactDialogBuilder.setItems(R.array.contactShare, new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							Log.d(TAG, "share via: "+ which);
+						}
+					});
+					contactDialogBuilder.setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.cancel());
+					contactDialogBuilder.show();
+//						Uri uri = Uri.parse("contact:"+ item.getName());
+					Intent intent = new Intent(Intent.ACTION_EDIT);
+//						Intent intent = new Intent(Intent.ACTION_VIEW);
+//						Log.d(TAG, "viewing contact: "+ uri.toString());
+//						intent.putExtra(ContactsContract.Intents.Insert.EMAIL, item.getName());
+					intent.setData(item.getFullPath());
+					if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+						startActivity(intent);
+					}
+				});
 				((Vars)getActivity().getApplication()).rightAdapter.notifyDataSetChanged();
 				spinner.setVisibility(View.INVISIBLE);
 				((Vars)getActivity().getApplication()).recyclerView.setVisibility(View.VISIBLE);
@@ -550,7 +483,6 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 
 		int id;
 
-
 		FetchPhotosTask(int id) {
 			super();
 			this.id = id;
@@ -560,6 +492,7 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 		protected void onPreExecute() {
 			spinner.setVisibility(View.VISIBLE);
 			((Vars)getActivity().getApplication()).recyclerView.setVisibility(View.INVISIBLE);
+//			model.recyclerView.setVisibility(View.INVISIBLE);
 		}
 
 		@Override
@@ -574,31 +507,49 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 				Drawable defaultImg = new IconicsDrawable(getApplicationContext(),
 						FontAwesome.Icon.faw_image)
 						.color(IconicsColor.colorRes(R.color.White)).size(IconicsSize.dp(((Vars) getApplicationContext()).getIconSize()));
+//						.color(IconicsColor.colorRes(R.color.White)).size(IconicsSize.dp(Objects.requireNonNull(model.getIconSize().getValue())));
 //				myList.setData(listOfAllImages, defaultImg);
 //				rightAdapter = new RightAdapter(null, null, new RightAdapter.ListItemClickListener() {
-				((Vars)getActivity().getApplication()).rightAdapter = new RightAdapter(null, null, new RightAdapter.ListItemClickListener() {
+				((Vars)getActivity().getApplication()).rightAdapter.setListener(new RightAdapter.ListItemClickListener() {
 					@Override
-					public void onListItemClick(String item) {
+					public void onListItemClick(String name, FileItem item, int position) {
+						if (item.getFullPath() != null) {
+							Intent intent = new Intent(Intent.ACTION_VIEW, item.getFullPath());
+							intent.setType("image/*");
+							if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+								startActivity(intent);
+							}
+						}
 					}
-
+				});
+/*				((Vars)getActivity().getApplication()).rightAdapter = new RightAdapter(null, null, new RightAdapter.ListItemClickListener() {
+//				model.rightAdapter = new RightAdapter(null, null, new RightAdapter.ListItemClickListener() {
 					@Override
-					public void onListItemClick(FileItem item) {
-						Intent intent = new Intent(Intent.ACTION_VIEW, item.getFullPath());
-						intent.setType("image/*");
-						if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
-							startActivity(intent);
+					public void onListItemClick(String name, FileItem item, int position) {
+						if (item.getFullPath() != null) {
+							Intent intent = new Intent(Intent.ACTION_VIEW, item.getFullPath());
+							intent.setType("image/*");
+							if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+								startActivity(intent);
+							}
 						}
 					}
 				});
 //				recyclerView.setAdapter(rightAdapter);
-				((Vars)getActivity().getApplication()).recyclerView.setAdapter(((Vars)getActivity().getApplication()).rightAdapter);
+				((Vars)getActivity().getApplication()).recyclerView.setAdapter(((Vars)getActivity().getApplication()).rightAdapter);*/
+//				model.recyclerView.setAdapter(((Vars)getActivity().getApplication()).rightAdapter);
+//				model.recyclerView.setAdapter(model.rightAdapter);
 //				rightAdapter.setData(listOfAllImages);
 				((Vars)getActivity().getApplication()).rightAdapter.setData(listOfAllImages);
+//				model.rightAdapter.setData(listOfAllImages);
 				((Vars)getActivity().getApplication()).rightAdapter.notifyDataSetChanged();
+//				model.rightAdapter.notifyDataSetChanged();
 //				rightAdapter.setDefaultImage(defaultImg);
 				((Vars)getActivity().getApplication()).rightAdapter.setDefaultImage(defaultImg);
+//				model.rightAdapter.setDefaultImage(defaultImg);
 				spinner.setVisibility(View.INVISIBLE);
 				((Vars)getActivity().getApplication()).recyclerView.setVisibility(View.VISIBLE);
+//				model.recyclerView.setVisibility(View.VISIBLE);
 			} else {
 				spinner.setVisibility(View.INVISIBLE);
 				msgView.setText(R.string.empty);
@@ -657,7 +608,6 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 		FileItem fileItem;
 //		listener;
 
-
 //		public DownloadImageTask(ImageView bmImage) {
 		public DownloadImageTask(FileItem fileItem) {
 //			this.bmImage = bmImage;
@@ -697,7 +647,6 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 
 		int id;
 
-
 		FetchMusicTask(int id) {
 			super();
 			this.id = id;
@@ -707,6 +656,7 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 		protected void onPreExecute() {
 			spinner.setVisibility(View.VISIBLE);
 			((Vars)getActivity().getApplication()).recyclerView.setVisibility(View.INVISIBLE);
+//			model.recyclerView.setVisibility(View.INVISIBLE);
 		}
 
 		@Override
@@ -718,34 +668,26 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 		@Override
 		protected void onPostExecute(Void aVoid) {//done
 			if (listOfMyMusic.size() > 0) {
-/*				myList.setData(listOfMyMusic, new IconicsDrawable(getApplicationContext(),
-						FontAwesome.Icon.faw_music)
-						.color(IconicsColor.colorRes(R.color.White)).size(IconicsSize.dp(100)));*/
-//				rightAdapter = new RightAdapter(null, null, new RightAdapter.ListItemClickListener() {
-				((Vars)getActivity().getApplication()).rightAdapter = new RightAdapter(null, null, new RightAdapter.ListItemClickListener() {
-					@Override
-					public void onListItemClick(String item) {
-					}
-
-					@Override
-					public void onListItemClick(FileItem item) {
-						Intent intent = new Intent(Intent.ACTION_VIEW);
-						intent.setData(item.getFullPath());
-						if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
-							startActivity(intent);
-						}
+				((Vars)getActivity().getApplication()).rightAdapter.setListener((name, item, position) -> {
+					Intent intent = new Intent(Intent.ACTION_VIEW);
+					intent.setData(item.getFullPath());
+					if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+						startActivity(intent);
 					}
 				});
-//				recyclerView.setAdapter(rightAdapter);
-				((Vars)getActivity().getApplication()).recyclerView.setAdapter(((Vars)getActivity().getApplication()).rightAdapter);
-//				rightAdapter.setData(listOfMyMusic);
+//				model.recyclerView.setAdapter(((Vars)getActivity().getApplication()).rightAdapter);
+//				model.recyclerView.setAdapter(model.rightAdapter);
 				((Vars)getActivity().getApplication()).rightAdapter.setData(listOfMyMusic);
-//				rightAdapter.setDefaultImage(new IconicsDrawable(getApplicationContext(),
-				((Vars)getActivity().getApplication()).rightAdapter.setDefaultImage(new IconicsDrawable(getApplicationContext(),
+				((Vars)getActivity().getApplication()).rightAdapter.notifyDataSetChanged();
+//				model.rightAdapter.setData(listOfMyMusic);
+				((Vars)getActivity().getApplication()).rightAdapter.setDefaultImage(
+						new IconicsDrawable(getApplicationContext(),
+//				model.rightAdapter.setDefaultImage(new IconicsDrawable(getApplicationContext(),
 						FontAwesome.Icon.faw_music)
 						.color(IconicsColor.colorRes(R.color.White)).size(IconicsSize.dp(100)));
 				spinner.setVisibility(View.INVISIBLE);
 				((Vars)getActivity().getApplication()).recyclerView.setVisibility(View.VISIBLE);
+//				model.recyclerView.setVisibility(View.VISIBLE);
 			} else {
 				spinner.setVisibility(View.INVISIBLE);
 				msgView.setText(R.string.empty);
@@ -805,12 +747,12 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 		}
 	}
 
+
 	@SuppressLint("StaticFieldLeak")
 	public class FetchFilesTask extends AsyncTask<Void, Void, File[]> {
 
 		String directoryStr;
 		File directory;
-
 
 		FetchFilesTask(String directory) {
 			super();
@@ -827,7 +769,9 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 		@Override
 		protected void onPreExecute() {
 			spinner.setVisibility(View.VISIBLE);
+			titleView.setText(String.format("%s\n%s", title, directory));
 			((Vars)getActivity().getApplication()).recyclerView.setVisibility(View.INVISIBLE);
+//			model.recyclerView.setVisibility(View.INVISIBLE);
 		}
 
 		@Override
@@ -836,60 +780,239 @@ public class RightFragment extends Fragment implements AdapterView.OnClickListen
 			return files;
 		}
 
+		@RequiresApi(api = Build.VERSION_CODES.O)
 		@Override
 		protected void onPostExecute(File[] files) {
 			super.onPostExecute(files);
-			if (files.length > 0) {
-				Log.d(TAG, "FetchFilesTask count="+ files.length);
-//				rightAdapter = new RightAdapter(null, null, new RightAdapter.ListItemClickListener() {
-				((Vars)getActivity().getApplication()).rightAdapter = new RightAdapter(null, null, new RightAdapter.ListItemClickListener() {
+			if (files != null) {
+//				Log.d(TAG, "FetchFilesTask count="+ files.length);
+				Tika tika = new Tika();
+				((Vars)getActivity().getApplication()).rightAdapter.setListener(new RightAdapter.ListItemClickListener() {
 					@Override
-					public void onListItemClick(String item) {
-					}
-
-					@Override
-					public void onListItemClick(FileItem item) {
+					public void onListItemClick(String name, FileItem item, int position) {
+						if (item.getMIME() == "directory") {
+							openDirectory(item, (files.length > 0) ? files[0] : new File(directoryStr));
+						} else {
+							drawFileContextMenu(item);
+						}
 					}
 				});
-//				recyclerView.setAdapter(rightAdapter);
 				((Vars)getActivity().getApplication()).recyclerView.setAdapter(((Vars)getActivity().getApplication()).rightAdapter);
-//				ArrayList<listOfFiles = ;
-				Drawable fileIcon = new IconicsDrawable(getApplicationContext(),
-						FontAwesome.Icon.faw_file)
-						.color(IconicsColor.colorRes(R.color.Gray)).size(IconicsSize.dp(100));
-				Drawable dirIcon = new IconicsDrawable(getApplicationContext(),
-						FontAwesome.Icon.faw_folder)
-						.color(IconicsColor.colorRes(R.color.Gray)).size(IconicsSize.dp(100));
-				for (File f : files) {
-					listOfAllFiles.add(new FileItem(f.getName(), Uri.fromFile(f), 0,
-							(f.isDirectory()) ? Tools.drawableToBitmap(dirIcon) : Tools.drawableToBitmap(fileIcon),
-							"", f.canRead(), f.getName(), null, false, f.getAbsolutePath()));
+//				model.recyclerView.setAdapter(model.rightAdapter);
+//				if (!directoryStr.equals(Environment.getExternalStorageDirectory().toString())) {
+				if (!directoryStr.equals(Environment.getRootDirectory().toString())) {
+					FileItem item = new FileItem(getString(R.string.up), null, 0,
+							Tools.drawableToBitmap(dirIcon), "directory", true,
+							"", null, false, "..");
+					listOfAllFiles.add(item);
 				}
-//				rightAdapter.setData(listOfAllFiles);
+				for (File f : files) {
+					String mime = "directory";
+					FileItem item = new FileItem(f.getName(), Uri.fromFile(f), 0,
+							Tools.drawableToBitmap(fileIcon), mime, false, f.getName(),
+							null, false, f.getAbsolutePath());
+					if (f.isFile()) {
+						setMIME(mime, item);
+					} else {
+						String[] children = f.list();
+						item.setHasContents(children != null && children.length > 0);
+						item.setBitmap(Tools.drawableToBitmap(dirIcon));
+					}
+					listOfAllFiles.add(item);
+					Log.d(TAG, "file item is "+ item.toString());
+				}
 				((Vars)getActivity().getApplication()).rightAdapter.setData(listOfAllFiles);
-//				rightAdapter.setDefaultImage(new IconicsDrawable(getApplicationContext(),
-				((Vars)getActivity().getApplication()).rightAdapter.setDefaultImage(new IconicsDrawable(getApplicationContext(),
+//				model.rightAdapter.setData(listOfAllFiles);
+				((Vars)getActivity().getApplication()).rightAdapter.setDefaultImage(
+						new IconicsDrawable(getApplicationContext(),
+//				model.rightAdapter.setDefaultImage(new IconicsDrawable(getApplicationContext(),
 						FontAwesome.Icon.faw_file)
 						.color(IconicsColor.colorRes(R.color.White)).size(IconicsSize.dp(100)));
 				spinner.setVisibility(View.INVISIBLE);
 				((Vars)getActivity().getApplication()).recyclerView.setVisibility(View.VISIBLE);
-			} else {
-				spinner.setVisibility(View.INVISIBLE);
-				msgView.setText(R.string.empty);
+//				model.recyclerView.setVisibility(View.VISIBLE);
 			}
 		}
 
 	}
 
 
-	public File[] listFiles(File directory) {
+	private void setMIME(String mime, FileItem item) {
+	/*	try {
+			mime = tika.detect(f);
+		} catch (IOException e) {
+			e.printStackTrace();*/
+			mime = "";
+	/*	}*/
+		switch (mime) {
+			case "a":
+				item.setMIME("a");
+				break;
+			case "b":
+				item.setMIME("b");
+				break;
+			default:
+//				Log.d(TAG, "file ("+ f.toString()+ ") is mime "+ mime);
+				break;
+		}
+	}
+
+
+	private void openDirectory(FileItem item, File file) {
+		String path = "";
+		if (item.getLabel().equals("..")) {
+			if (file != null && file.getParent() != null) {
+				path = file.getParent();
+				Log.d(TAG, "opening parent directory: "+ path);
+			}
+		} else {
+			path = item.getFullPath().getPath();
+			Log.d(TAG, "opening directory: " + path);
+		}
+		listOfAllFiles.clear();
+		((Vars)getActivity().getApplication()).rightAdapter.clear();
+		((Vars)getActivity().getApplication()).rightAdapter.notifyDataSetChanged();
+		new FetchFilesTask(path).execute();
+	}
+
+
+	private void drawFileContextMenu(FileItem item) {
+		boolean editFaded = false;
+//		Log.d(TAG, "drawFileContextMenu index "+ index);
+		AlertDialog.Builder contextmenuBuilder = new AlertDialog.Builder(getActivity(), R.style.CustomDialogTheme);
+		contextmenuBuilder.setTitle(item.getName());
+		ArrayList<ListItem> items = new ArrayList<>();
+		items.add(new ListItem(0, items.size(), Tools.toTitleCase(getString(R.string.open)), null,
+				new IconicsDrawable(getApplicationContext(), FontAwesome.Icon.faw_ellipsis_h)
+						.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE),
+				Tools.dpToPx(16, getApplicationContext()), Tools.dpToPx(16, getApplicationContext()),
+				Tools.dpToPx(18, getApplicationContext()), true, Tools.dpToPx(8, getApplicationContext()),
+				false));
+		items.add(new ListItem(0, items.size(), Tools.toTitleCase(getString(R.string.rename, "")),null,
+				new IconicsDrawable(getApplicationContext(), FontAwesome.Icon.faw_newspaper1)
+						.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE),
+				Tools.dpToPx(16, getApplicationContext()), Tools.dpToPx(16, getApplicationContext()),
+				Tools.dpToPx(18, getApplicationContext()), true, Tools.dpToPx(8, getApplicationContext()),
+				false));
+		items.add(new ListItem(0, items.size(), Tools.toTitleCase(getString(R.string.edit)),null,
+				new IconicsDrawable(getApplicationContext(), FontAwesome.Icon.faw_edit1)
+						.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE),
+				Tools.dpToPx(16, getApplicationContext()), Tools.dpToPx(16, getApplicationContext()),
+				Tools.dpToPx(18, getApplicationContext()), true, Tools.dpToPx(8, getApplicationContext()),
+				editFaded));
+		items.add(new ListItem(0, items.size(), Tools.toTitleCase(getString(R.string.delete)),null,
+				new IconicsDrawable(getApplicationContext(), FontAwesome.Icon.faw_eraser)
+						.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE),
+				Tools.dpToPx(16, getApplicationContext()), Tools.dpToPx(16, getApplicationContext()),
+				Tools.dpToPx(18, getApplicationContext()), true, Tools.dpToPx(8, getApplicationContext()),
+				false));
+		items.add(new ListItem(0, items.size(), Tools.toTitleCase(getString(R.string.copy)),null,
+				new IconicsDrawable(getApplicationContext(), FontAwesome.Icon.faw_copy)
+						.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE),
+				Tools.dpToPx(16, getApplicationContext()), Tools.dpToPx(16, getApplicationContext()),
+				Tools.dpToPx(18, getApplicationContext()), true, Tools.dpToPx(8, getApplicationContext()),
+				false));
+		items.add(new ListItem(0, items.size(), Tools.toTitleCase(getString(R.string.move)),null,
+				new IconicsDrawable(getApplicationContext(), FontAwesome.Icon.faw_arrows_alt)
+						.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE),
+				Tools.dpToPx(16, getApplicationContext()), Tools.dpToPx(16, getApplicationContext()),
+				Tools.dpToPx(18, getApplicationContext()), true, Tools.dpToPx(8, getApplicationContext()),
+				listOfAllFiles.size() > 1));
+
+		final View customView = View.inflate(getActivity(), R.layout.dialog_list, null);
+		customView.setPadding(Tools.dpToPx(8, getApplicationContext()), Tools.dpToPx(10, getApplicationContext()),
+				Tools.dpToPx(8, getApplicationContext()), Tools.dpToPx(10, getApplicationContext()));
+		contextmenuBuilder.setView(customView);
+
+		final AlertDialog contextmenuDialog = contextmenuBuilder.create();
+		contextmenuDialog.setButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE, getResources().getString(R.string.cancel),
+				(dialog1, which) -> dialog1.cancel());
+		contextmenuDialog.setCanceledOnTouchOutside(false);
+		contextmenuDialog.show();
+		CustomDialogListAdapter adapter = new CustomDialogListAdapter(getApplicationContext(),
+				R.layout.dialog_list, items, item1 -> {
+			contextmenuDialog.cancel();
+			String name = item1.getName();
+			fileContextmenuSelection(name, item);
+		});
+		ListView listView = customView.findViewById(R.id.lv_dialog_list);
+		listView.setAdapter(adapter);
+		listView.setOnItemClickListener((parent, view, position, itemId) -> contextmenuDialog.dismiss());
+	}
+
+
+	private void fileContextmenuSelection(String operation, FileItem item) {
+		int i = 0;
+		int pos = -1;
+		for (FileItem fileItem : listOfAllFiles) {
+			i++;
+			if (fileItem.getName().equals(item.getName())) {
+				pos = i;
+				break;
+			}
+		}
+		pos--;
+		final int position = pos;
+		if (operation.toUpperCase().equals(getString(R.string.remove).toUpperCase())) {
+				androidx.appcompat.app.AlertDialog.Builder rusureDialog = new androidx.appcompat.app.AlertDialog.Builder(getApplicationContext(), R.style.CustomDialogTheme);
+				rusureDialog.setTitle(getString(R.string.rusure));
+				rusureDialog.setMessage(getString(R.string.delete_conn_x, item.getName()));
+				rusureDialog.setNegativeButton(getString(android.R.string.cancel), null);
+				rusureDialog.setPositiveButton(getString(android.R.string.ok), (dialog, which) -> {
+					listOfAllFiles.remove(item);
+					((Vars)getActivity().getApplication()).rightAdapter.notifyDataSetChanged();
+				});
+				rusureDialog.show();
+		} else if (operation.toUpperCase().equals(getString(R.string.rename, "").toUpperCase())) {
+			androidx.appcompat.app.AlertDialog.Builder renameDialogBuilder = new androidx.appcompat.app.AlertDialog.Builder(getActivity(), R.style.CustomDialogTheme);
+			renameDialogBuilder.setTitle(getString(R.string.rename, item.getName()));
+			final View customView = View.inflate(getApplicationContext(), R.layout.edit_one_field, null);
+			customView.setPadding(Tools.dpToPx(8, getApplicationContext()), Tools.dpToPx(24, getApplicationContext()),
+					Tools.dpToPx(8, getApplicationContext()), Tools.dpToPx(24, getApplicationContext()));
+			final TextView label = customView.findViewById(R.id.tv_edit_label);
+			final EditText value = customView.findViewById(R.id.et_edit_field);
+			label.setText(Tools.toTitleCase(getString(R.string.name)));
+			value.setHint(item.getName());
+			renameDialogBuilder.setView(customView);
+
+			final androidx.appcompat.app.AlertDialog renameDialog = renameDialogBuilder.create();
+			renameDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_PANEL);
+			renameDialog.setButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE, getResources().getString(android.R.string.cancel),
+					(dialog1, which) -> dialog1.cancel());
+			renameDialog.setButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE, getResources().getString(android.R.string.ok),
+					(dialog1, which) -> {
+						if (position > -1 && value.getText() != null) {
+							Log.d(TAG, "renaming "+ item.getName()+ " at "+ position);
+							listOfAllFiles.get(position).setName(value.getText().toString());
+						}
+						((Vars)getActivity().getApplication()).rightAdapter.notifyDataSetChanged();
+					});
+			renameDialog.show();
+		} else if (operation.toUpperCase().equals(getString(R.string.move).toUpperCase())) {
+		} else if (operation.toUpperCase().equals(getString(R.string.connto).toUpperCase())) {
+//			SelectedLeftItemIndex(index);
+		} else if (operation.toUpperCase().equals(getString(R.string.edit_conn).toUpperCase())) {
+				Log.d(TAG, "editing:" + item.toString());
+		}
+	}
+
+
+	private File[] listFiles(File directory) {
 		if (!directory.isDirectory()) {
-			Toast.makeText(getApplicationContext(), "ERROR", Toast.LENGTH_SHORT).show();
+			new Thread()
+			{
+				public void run()
+				{
+					getActivity().runOnUiThread(() -> Toast.makeText(getApplicationContext(), "ERROR", Toast.LENGTH_SHORT).show());
+//					drawFileContextMenu();
+				}
+			}.start();
+//			Toast.makeText(getApplicationContext(), "ERROR", Toast.LENGTH_SHORT).show();
 			Log.d(TAG, "listFiles error for "+ directory.getPath());
 			return null;
 		}
 		File[] files = directory.listFiles();
-		Log.d(TAG, "listFiles length="+ files.length);
+//		Log.d(TAG, "listFiles length="+ files.length);
 		return files;
 	}
 

@@ -15,16 +15,10 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.chrisbanes.photoview.PhotoView;
-import com.mikepenz.iconics.IconicsColor;
-import com.mikepenz.iconics.IconicsDrawable;
-import com.mikepenz.iconics.IconicsSize;
-import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome;
 import com.yumatechnical.konnectandroid.Model.FileItem;
 import com.yumatechnical.konnectandroid.R;
 
 import java.util.ArrayList;
-
-import static com.mikepenz.iconics.Iconics.getApplicationContext;
 
 
 public class RightAdapter extends RecyclerView.Adapter<RightAdapter.RightAdapterViewHolder> {
@@ -35,10 +29,10 @@ public class RightAdapter extends RecyclerView.Adapter<RightAdapter.RightAdapter
 	private Drawable defaultImage;
 
     public interface ListItemClickListener {
-    	void onListItemClick(String item);
-    	void onListItemClick(FileItem item);
+    	void onListItemClick(String name, FileItem item, int position);
 	}
-	final private ListItemClickListener listener;
+	private ListItemClickListener listener;
+
 
     public RightAdapter(ArrayList<FileItem> items, Drawable defaultImage, ListItemClickListener listener) {
 //    	Log.d(TAG, "constructor made");
@@ -47,12 +41,16 @@ public class RightAdapter extends RecyclerView.Adapter<RightAdapter.RightAdapter
     	this.defaultImage = defaultImage;
     }
 
-    class RightAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+	public RightAdapter() {
+	}
+
+
+	class RightAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         final TextView labelView, labelText;
-        final ImageView /*imageView,*/ labelImg;
+        final ImageView imageView, labelImg;
         final FrameLayout labelFrame;
-        final PhotoView imageView;
+//        final PhotoView imageView;
 
 
         RightAdapterViewHolder(@NonNull View itemView) {
@@ -63,7 +61,6 @@ public class RightAdapter extends RecyclerView.Adapter<RightAdapter.RightAdapter
 	        labelText = itemView.findViewById(R.id.tv_right_item_label);
 	        labelImg = itemView.findViewById(R.id.iv_right_item_label);
             itemView.setOnClickListener(this);
-//            itemView.setTag(getPosition());
         }
 
         void bind(int position) {
@@ -81,24 +78,16 @@ public class RightAdapter extends RecyclerView.Adapter<RightAdapter.RightAdapter
 		        labelView.setText(entry.getName());
 		        labelView.setGravity(Gravity.CENTER_HORIZONTAL);
 	        }
-	        if (entry.getLabel() != null) {
-	        	labelText.setText(entry.getLabel());
-	        	labelImg.setImageDrawable(new IconicsDrawable(getApplicationContext())
-				        .icon(FontAwesome.Icon.faw_circle).color(IconicsColor.colorRes(R.color.Gray))
-				        .size(IconicsSize.TOOLBAR_ICON_SIZE));
-		        labelFrame.setVisibility(View.VISIBLE);
-	        }
         }
 
 	    @Override
 	    public void onClick(View v) {
 		    if (getAdapterPosition() == RecyclerView.NO_POSITION) return;
 		    FileItem clickedItem = my_data.get(getAdapterPosition());
-		    if (listener != null) {
-			    listener.onListItemClick(String.valueOf(labelView.getText()));
-			    listener.onListItemClick(clickedItem);
-		    }
 		    notifyItemChanged(selectedPos);
+		    if (listener != null) {
+			    listener.onListItemClick(String.valueOf(labelView.getText()), clickedItem, selectedPos);
+		    }
 		    selectedPos = getAdapterPosition();
 		    notifyItemChanged(selectedPos);
 	    }
@@ -117,16 +106,6 @@ public class RightAdapter extends RecyclerView.Adapter<RightAdapter.RightAdapter
     public void onBindViewHolder(@NonNull RightAdapterViewHolder holder, int position) {
     	holder.bind(position);
 	    holder.itemView.setBackgroundColor(selectedPos == position ? Color.LTGRAY : Color.TRANSPARENT);
-//	    FileItem entry = my_data.get(position);
-//	    if (entry.getBitmap() != null) {
-//	    	holder.imageView.setImageBitmap(entry.getBitmap());
-//	    }
-//	    if (entry.getName() != null && !entry.getName().isEmpty()) {
-//	    	if (!entry.getHasContents()) {
-//	    		holder.labelView.setTextColor(Color.LTGRAY);
-//		    }
-//		    holder.labelView.setText(entry.getName());
-//	    }
     }
 
     @Override
@@ -150,9 +129,13 @@ public class RightAdapter extends RecyclerView.Adapter<RightAdapter.RightAdapter
 		notifyDataSetChanged();
 	}
 
+	public void setListener(ListItemClickListener listener) {
+    	this.listener = listener;
+	}
+/*
 	public void addAll(ArrayList<FileItem> list) {
 		my_data.addAll(list);
 		notifyDataSetChanged();
 	}
-
+*/
 }

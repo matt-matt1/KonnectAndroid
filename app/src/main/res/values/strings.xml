@@ -88,6 +88,12 @@
 	<string name="save_OK">Press OK to save</string>
 	<string name="conn_bad">Connection is bad</string>
 	<string name="adjust_sett">Adjust the settings</string>
+	<string name="eg_server">ftp.myserver.com</string>
+	<string name="up">..</string>
+	<string name="delete">delete</string>
+	<string name="open">open</string>
+	<string name="copy">copy</string>
+	<string name="edit">edit</string>
 
 	<string-array name="contactShare">
 		<item>Email</item>

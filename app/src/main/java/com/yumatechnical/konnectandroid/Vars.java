@@ -32,9 +32,8 @@ public class Vars extends Application {
 	public static final int MY_CONTACTS_ID = 3;
 	public static final int MY_FILES_ID = 4;
 	public LeftArrayAdapter leftAdapter;
-	public ArrayList<ListItem> leftList = new ArrayList<>();
+	public ListItem tempListItem;
 	public RightAdapter rightAdapter;
-//	public ArrayList<FileItem> rightList = new ArrayList<>();
 	public RecyclerView recyclerView;
 
 	public boolean WifiConn = false;
@@ -65,6 +64,30 @@ public class Vars extends Application {
 		this.networkConnected = networkConnected;
 	}
 
+
+	//leftItem
+	public ArrayList<ListItem> leftList = new ArrayList<>();
+
+	public ListItem getLeftListItemByID(int id) {
+		for (ListItem item : leftList) {
+			if (item.getID() == id) {
+				return item;
+			}
+		}
+		return null;
+	}
+
+	public int getLeftListItemNextID() {
+		int id = 0;
+		for (ListItem item : leftList) {
+			if (item.getID() > id) {
+				id = item.getID();
+			}
+		}
+		return id+1;
+	}
+
+
 	//ip address
 	private int[] myIP = new int[4];
 
@@ -85,6 +108,7 @@ public class Vars extends Application {
 	public void setMyIP(int[] myIP) {
 		this.myIP = myIP;
 	}
+
 
 	//iconSize
 	private int iconSize = 100;
@@ -110,12 +134,23 @@ public class Vars extends Application {
 	}
 
 	public ConnectionItem getConnectItem(int index) {
+		if (index >= getConnectionItems().size())
+			return null;
 		return connectionItems.get(index);
 	}
 
 	public void addConnectionItem(ConnectionItem item) {
 		if (item != null && connectionItems != null)
 		connectionItems.add(item);
+	}
+
+	public void removeConnectionItem(ConnectionItem item) {
+		if (item != null && connectionItems != null)
+		connectionItems.remove(item);
+	}
+
+	public void removeConnectionItem(int index) {
+		connectionItems.remove(index);
 	}
 
 	public ConnectionItem getConnectionItemByID(int id) {
@@ -148,4 +183,5 @@ public class Vars extends Application {
 	public static void setDropboxAccessToken(String dropboxAccessToken) {
 		DROPBOX_ACCESS_TOKEN = dropboxAccessToken;
 	}
+
 }
