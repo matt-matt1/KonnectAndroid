@@ -19,9 +19,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
+import android.graphics.Point;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -29,10 +27,15 @@ import android.os.Process;
 import android.provider.ContactsContract;
 import android.text.Html;
 import android.util.Log;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.view.animation.Animation;
+import android.view.animation.Transformation;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -58,6 +61,7 @@ import com.hierynomus.smbj.auth.AuthenticationContext;
 import com.hierynomus.smbj.connection.Connection;
 import com.hierynomus.smbj.session.Session;
 import com.hierynomus.smbj.share.DiskShare;
+//import com.jakewharton.rxbinding3.view.RxView;
 import com.mikepenz.iconics.IconicsColor;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.iconics.IconicsSize;
@@ -79,8 +83,11 @@ import com.yumatechnical.konnectandroid.Model.ConnectionItem;
 import com.yumatechnical.konnectandroid.Model.ListItem;
 import com.yumatechnical.konnectandroid.Settings.SettingsActivity;
 
+import org.apache.commons.net.ftp.FTPFile;
+
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -94,7 +101,7 @@ public class MainActivity extends AppCompatActivity
 		LocalNetwork.ConnectionInfoTask.OnNetworkConnectionInfo,
 		MyDialogFragment.OnMyDialogInteraction {
 
-	FrameLayout right, base;
+	FrameLayout left, right, base;
 	public static final int OPERATION_SMB_LOADER = 22;
 	private static final int MY_PERMISSION_RECORD_AUDIO_REQUEST_CODE = 88;
 //	private static final int MY_PERMISSION_RECORD__REQUEST_CODE = 124;
@@ -145,16 +152,75 @@ int minIconSize = 50;
 
 		new LocalNetwork.ConnectionInfoTask(getApplicationContext(), this).execute();
 		testCustomDialog();
-		setLeftList();
-		right = findViewById(R.id.right_frame);
+		left = findViewById(R.id.left_frame);
+		right = findViewById(R.id.fl_right_panel);
 		base = findViewById(R.id.base_frame);
+		setLeftList();
 		// Get current account info
 //		FullAccount account = DropboxInstance.main().users().getCurrentAccount();
 //		System.out.println(account.getName().getDisplayName());
 /**/
 		testSMB();
+//		testFTP();
 /**/
 		getSupportLoaderManager().initLoader(OPERATION_SMB_LOADER, null, this);
+
+//		screenDimentions();
+//		openCloseLeftPanel(false);
+//		openCloseLeftPanel(true);
+	}
+
+	private void screenDimentions() {
+		Display display = getWindowManager().getDefaultDisplay();
+		Point size = new Point();
+		display.getSize(size);
+		int width = size.x;
+		int height = size.y;
+		Log.e("Width", "" + width);
+		Log.e("height", "" + height);
+	}
+
+	private void testFTP() {
+		FTPoperation ftPoperation = new FTPoperation();
+		ftPoperation.connectFTP("xo3.x10hosting.com",
+				"yumax10h",
+				"suguna24",
+//				"/public_html");
+				"/");
+//				"");
+//		ftPoperation.connectFTP("yumatechnical.com",
+//				"yumatechnicalcom",
+//				"Suguna24!@",
+//				"");
+		ftPoperation.setListener(result -> {
+//			Log.d(TAG, "FTP connection complete");
+			if (result != null) {
+				ftPoperation.getFTPstatus(result, status -> Log.d(TAG, "FTP status: "+ status));
+
+				ftPoperation.getFTPDirsAndFiles(result, new FTPoperation.OnFTPlistResult() {
+					@Override
+					public void listedDirs(FTPFile[] dirs) {
+						for (FTPFile dir : dirs) {
+							Log.d(TAG, "FTP dir: "+ dir.getName());
+						}
+					}
+
+					@Override
+					public void listedFiles(FTPFile[] files) {
+						for (FTPFile file : files) {
+							Log.d(TAG, "FTP file: "+ file.getName());
+						}
+					}
+				});
+/*
+				try {
+					Log.d(TAG, "FTP list: "+ result.list());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+*/
+			}
+		});
 	}
 
 	private void testSMB() {
@@ -196,9 +262,12 @@ int minIconSize = 50;
 			}
 		}
 //		DoThreadSMB smb = new DoThreadSMB();
-
+/****/
 		SMBoperation smBoperation = new SMBoperation();
-		smBoperation.setTimeout(120, TimeUnit.SECONDS, 100, TimeUnit.SECONDS);
+//		smBoperation.configSMB(false, true, true,
+//				true, 8*1024*1024, 300, TimeUnit.SECONDS,
+//				300, TimeUnit.SECONDS, null);
+/*		smBoperation.setTimeout(120, TimeUnit.SECONDS, 100, TimeUnit.SECONDS);
 		smBoperation.connect("192.168.1.222", "yumausa", "yuma", "");
 		smBoperation.listFiles("pop");
 		smBoperation.setListener(new SMBoperation.OnSMBinteraction() {
@@ -208,11 +277,89 @@ int minIconSize = 50;
 
 			@Override
 			public void OnListFiles(DiskShare share) {
-				for (FileIdBothDirectoryInformation file : share.list("/")) {
-					Log.d(TAG, "SMB file: "+ file.getShortName());
+				if (share != null) {
+					for (FileIdBothDirectoryInformation file : share.list("/")) {
+						Log.d(TAG, "SMB file: " + file.getShortName());
+					}
+				} else {
+					Log.d(TAG, "SMB filelist is null");
 				}
 			}
-		});
+		});*/
+		/****/
+//		smBoperation.getSMBfileslist("192.168.1.222", "yumausa", "yuma",
+//				"", "pop", "/", new SMBoperation.OnSMBinteraction2() {
+//					@Override
+//					public void OnListFiles2(List<String> files) {
+//						if (files != null) {
+//							for (String file : files) {
+//								Log.d(TAG, "SMB file: " + file);
+//							}
+//						} else {
+//							Log.d(TAG, "recieved null!");
+//						}
+//					}
+//				});
+//		BELOW STATEMENT WORKS WELL
+//		smBoperation.listShares("192.168.1.222", "yumausa", "yuma",
+//				"", new SMBoperation.OnSMBshares() {
+//					@Override
+//					public void OnListShares(ArrayList<String> shares) {
+//						if (shares != null) {
+//							Log.d(TAG, "SMB share count: "+ shares.size());
+////							int cnt = 0;
+//							for (String share : shares) {
+////								Log.d(TAG, "SMB share name("+ (++cnt)+ "): " + share);
+//								Log.d(TAG, "SMB share name: " + share);
+//							}
+//						} else {
+//							Log.d(TAG, "Error: Shares is null!");
+//						}
+//					}
+//				});
+//		BELOW STATEMENT WORKS WELL
+//		smBoperation.getSMBfileslist("192.168.1.222", "yumausa", "yuma",
+//				"", "2019", "", new SMBoperation.OnSMBinteraction() {
+//					@Override
+//					public void OnListFiles(List<String> files) {
+//						if (files != null) {
+//							for (String file : files) {
+//								Log.d(TAG, "SMB file: " + file);
+//							}
+//						} else {
+//							Log.d(TAG, "recieved null!");
+//						}
+//					}
+//				});
+/*		smBoperation.listShares("192.168.1.29", "yuma", "yuma",
+				"", new SMBoperation.OnSMBshares() {
+					@Override
+					public void OnListShares(ArrayList<String> shares) {
+						if (shares != null) {
+							Log.d(TAG, "SMB share count: "+ shares.size());
+//							int cnt = 0;
+							for (String share : shares) {
+//								Log.d(TAG, "SMB share name("+ (++cnt)+ "): " + share);
+								Log.d(TAG, "SMB share name: " + share);
+							}
+						} else {
+							Log.d(TAG, "Error: Shares is null!");
+						}
+					}
+				});*/
+//		smBoperation.getSMBfileslist("192.168.1.29", "yuma", "yuma",
+//				"", "time", "", new SMBoperation.OnSMBinteraction() {
+//					@Override
+//					public void OnListFiles(List<String> files) {
+//						if (files != null) {
+//							for (String file : files) {
+//								Log.d(TAG, "SMB file: " + file);
+//							}
+//						} else {
+//							Log.d(TAG, "recieved null!");
+//						}
+//					}
+//				});
 //		smb.run();
 /*		String string = "/share/folder1/folder2/file.extension";
 		String[] separated = Tools.getShareNameFromPath(string);
@@ -266,6 +413,47 @@ int minIconSize = 50;
 //		model.setIconSize(100);
 	}
 
+	/**
+	 * openCloseLeftPanel
+	 * opens/expands or closes/shrinks the left panel/frame
+	 *
+	 * @param makeOpen boolean : true to open ; false to close
+	 */
+	public void openCloseLeftPanel(boolean makeOpen) {
+		FrameLayout fakeLeft = findViewById(R.id.fake_left_frame);
+		if (makeOpen == ((Vars)getApplication()).isLeftPanelOpen())
+			return;
+		Log.d(TAG, makeOpen ? "opening left panel..." : "closing left panel...");
+		((Vars)getApplication()).markLeftPanelOpen(makeOpen);
+		LinearLayout sides = findViewById(R.id.ll_sides);
+//				int leftWidth = (makeOpen) ? Tools.dpToPx(300, this) :
+//						Tools.dpToPx(65, this);
+		ViewGroup.LayoutParams layoutParams = fakeLeft.getLayoutParams();
+		Animation animation = new Animation() {
+			@Override
+			protected void applyTransformation(float interpolatedTime, Transformation t) {
+//				ViewGroup.LayoutParams layoutParams = fakeLeft.getLayoutParams();
+//				int width = makeOpen
+//						? layoutParams.width + 20//468
+//						: layoutParams.width - 21;//468;
+				int width = makeOpen
+						? layoutParams.width + 468
+						: layoutParams.width - 468;
+				fakeLeft.setLayoutParams(new LinearLayout.LayoutParams(width,
+						FrameLayout.LayoutParams.MATCH_PARENT));
+				sides.requestLayout();
+			}
+
+			@Override
+			public boolean willChangeBounds() {
+				return true;
+			}
+		};
+		animation.setDuration(400);//no effect
+		sides.startAnimation(animation);
+	}
+
+
 	private void setLeftList() {
 		//setup left panel with list
 //		left = findViewById(R.id.left_frame);
@@ -285,6 +473,7 @@ int minIconSize = 50;
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.visualizer_menu, menu);
+//		inflater.inflate(R.menu.hamburger, menu);
 		return true;
 	}
 
@@ -292,19 +481,23 @@ int minIconSize = 50;
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		MenuItem menuItem;
 
+		menuItem = menu.findItem(R.id.hamburger);
+		menuItem.setIcon(new IconicsDrawable(this, FontAwesome.Icon.faw_bars)
+				.color(IconicsColor.colorRes(R.color.white)).size(IconicsSize.TOOLBAR_ICON_SIZE));
+
 		if (!((Vars)this.getApplication()).isNetworkConnected()) {
 //		if (!model.isNetworkConnected()) {
 			menuItem = menu.findItem(R.id.add_connect);
 			menuItem.setIcon(new IconicsDrawable(this, FontAwesome.Icon.faw_plus)
-					.color(IconicsColor.colorRes(R.color.White)).size(IconicsSize.TOOLBAR_ICON_SIZE));
+					.color(IconicsColor.colorRes(R.color.white)).size(IconicsSize.TOOLBAR_ICON_SIZE));
 		}
 		menuItem = menu.findItem(R.id.settings);
 		menuItem.setIcon(new IconicsDrawable(this, FontAwesome.Icon.faw_sliders_h)
-				.color(IconicsColor.colorRes(R.color.White)).size(IconicsSize.TOOLBAR_ICON_SIZE));
+				.color(IconicsColor.colorRes(R.color.white)).size(IconicsSize.TOOLBAR_ICON_SIZE));
 
 		menuItem = menu.findItem(R.id.resize);
 		menuItem.setIcon(new IconicsDrawable(this, FontAwesome.Icon.faw_arrows_alt)
-				.color(IconicsColor.colorRes(R.color.White)).size(IconicsSize.TOOLBAR_ICON_SIZE));
+				.color(IconicsColor.colorRes(R.color.white)).size(IconicsSize.TOOLBAR_ICON_SIZE));
 
 		return true;
 	}
@@ -314,6 +507,9 @@ int minIconSize = 50;
 	public boolean onOptionsItemSelected(MenuItem item) {
 //		Intent intent;
 		switch (item.getItemId()) {
+			case R.id.hamburger:
+				openCloseLeftPanel(((Vars)getApplication()).isLeftPanelOpen() ? false : true);
+				break;
 			case R.id.add_connect:
 				optionsMenuAddConnection();
 				return true;
@@ -432,10 +628,13 @@ int minIconSize = 50;
 		customView.setPadding(Tools.dpToPx(8, this), Tools.dpToPx(24, this),
 				Tools.dpToPx(8, this), Tools.dpToPx(24, this));
 		addConnectBuilder.setView(customView);
+//		ProgressBar dialogSpinner = customView.findViewById(R.id.pb_dialog_spinner);
+//		dialogSpinner.setVisibility(View.INVISIBLE);
 
 		final AlertDialog addConnectionDialog = addConnectBuilder.create();
 		addConnectionDialog.setTitle(Html.fromHtml("<font color='#111111'>"+ getString(R.string.addConnection)+ "</font>"));
-		addConnectionDialog.setButton(AlertDialog.BUTTON_NEGATIVE, getResources().getString(R.string.cancel),
+		addConnectionDialog.setButton(AlertDialog.BUTTON_NEGATIVE,
+				getResources().getString(android.R.string.cancel),
 				(dialog1, which) -> dialog1.cancel());
 		addConnectionDialog.setCanceledOnTouchOutside(false);
 		addConnectionDialog.show();
@@ -466,6 +665,7 @@ int minIconSize = 50;
 					"",
 					"drive.google.com",
 					80,
+					"",
 					"/");
 //							ShareCompat.IntentBuilder.from(this)
 //									.setChooserTitle("title")
@@ -496,6 +696,7 @@ int minIconSize = 50;
 					"",
 					"onedrive.microsoft.com",
 					80,
+					"",
 					"/");
 			((Vars)getApplication()).addConnectionItem(item);
 //			model.addConnectionItem(item);
@@ -536,6 +737,7 @@ int minIconSize = 50;
 					"",
 					"dropbox.com",
 					80,
+					"",
 					"/");
 			((Vars)getApplication()).addConnectionItem(item);
 //			model.addConnectionItem(item);
@@ -574,6 +776,7 @@ int minIconSize = 50;
 					"",
 					"box.microsoft.com",
 					80,
+					"",
 					"/");
 			((Vars)getApplication()).addConnectionItem(item);
 //			model.addConnectionItem(item);
@@ -612,61 +815,36 @@ int minIconSize = 50;
 //		fade_contacts = Permissons.Check_READ_CONTACTS(this);
 		ArrayList<ListItem> items = new ArrayList<>();
 		items.add(new ListItem(0, items.size(), getString(R.string.gdrive),null,
-				new IconicsDrawable(this, FontAwesome.Icon.faw_google_drive)
-						.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE),
-				Tools.dpToPx(16, this), Tools.dpToPx(16, this),
-				Tools.dpToPx(18, this), true, Tools.dpToPx(8, this),
+				Vars.gdrive_icon(this), Vars.pxFrom16dp(this), Vars.pxFrom16dp(this),
+				Vars.pxFrom18dp(this), true, Vars.pxFrom8dp(this),
 				false));
-//		items.add(new ListItem(0, items.size(), getString(R.string.onedrive),null,
-//				new IconicsDrawable(this, FontAwesome.Icon.faw_cloud)
-//						.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE),
-//				Tools.dpToPx(16, this), Tools.dpToPx(16, this),
-//				Tools.dpToPx(18, this), true, Tools.dpToPx(8, this),
-//				false));
-		Drawable oneDrive_d = getResources().getDrawable(R.drawable.ms_onedrive);
-		Bitmap oneDrive_b = ((BitmapDrawable)oneDrive_d).getBitmap();
-		Drawable oneDrive = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(oneDrive_b, 64, 64, true));
+
 		items.add(new ListItem(0, items.size(), getString(R.string.onedrive),null,
-				oneDrive, Tools.dpToPx(16, this), Tools.dpToPx(16, this),
-				Tools.dpToPx(18, this), true, Tools.dpToPx(8, this),
+				Vars.onedrive_icon2(this), Vars.pxFrom16dp(this), Vars.pxFrom16dp(this),
+				Vars.pxFrom18dp(this), true, Vars.pxFrom8dp(this),
 				false));
+
 		items.add(new ListItem(0, items.size(), getString(R.string.dropbox),null,
-				new IconicsDrawable(this, FontAwesome.Icon.faw_dropbox)
-						.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE),
-				Tools.dpToPx(16, this), Tools.dpToPx(16, this),
-				Tools.dpToPx(18, this), true, Tools.dpToPx(8, this),
+				Vars.dropbox_icon(this), Vars.pxFrom16dp(this), Vars.pxFrom16dp(this),
+				Vars.pxFrom18dp(this), true, Vars.pxFrom8dp(this),
 				false));
-//		items.add(new ListItem(0, items.size(), getString(R.string.box),null,
-//				new IconicsDrawable(this, FontAwesome.Icon.faw_box)
-//						.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE),
-//				Tools.dpToPx(16, this), Tools.dpToPx(16, this),
-//				Tools.dpToPx(18, this), true, Tools.dpToPx(8, this),
-//				false));
-		Drawable box_d = getResources().getDrawable(R.drawable.box_icon);
-		Bitmap box_b = ((BitmapDrawable)box_d).getBitmap();
-		Drawable box = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(box_b, 64, 64, true));
+
 		items.add(new ListItem(0, items.size(), getString(R.string.box),null,
-				box, Tools.dpToPx(16, this), Tools.dpToPx(16, this),
-				Tools.dpToPx(18, this), true, Tools.dpToPx(8, this),
+				Vars.box_icon2(this), Vars.pxFrom16dp(this), Vars.pxFrom16dp(this),
+				Vars.pxFrom18dp(this), true, Vars.pxFrom8dp(this),
 				false));
+
 		items.add(new ListItem(0, items.size(), getString(R.string.ftp),null,
 				new IconicsDrawable(this, FontAwesome.Icon.faw_server)
 						.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE),
-				Tools.dpToPx(16, this), Tools.dpToPx(16, this),
-				Tools.dpToPx(18, this), true, Tools.dpToPx(8, this),
+				Vars.pxFrom16dp(this), Vars.pxFrom16dp(this),
+				Vars.pxFrom18dp(this), true, Vars.pxFrom8dp(this),
 				false));
-//		Drawable ftp_d = getResources().getDrawable(R.drawable.ftp_connection);
-//		Bitmap ftp_b = ((BitmapDrawable)ftp_d).getBitmap();
-//		Drawable ftp = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(ftp_b, 64, 64, true));
-//		items.add(new ListItem(0, items.size(), getString(R.string.ftp),null,
-//				ftp, Tools.dpToPx(16, this), Tools.dpToPx(16, this),
-//				Tools.dpToPx(18, this), true, Tools.dpToPx(8, this),
-//				false));
+
 		items.add(new ListItem(0, items.size(), getString(R.string.local_network),null,
-				new IconicsDrawable(this, FontAwesome.Icon.faw_network_wired)
-						.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE),
-				Tools.dpToPx(16, this), Tools.dpToPx(16, this),
-				Tools.dpToPx(18, this), true, Tools.dpToPx(8, this),
+				Vars.local_network_icon(this),
+				Vars.pxFrom16dp(this), Vars.pxFrom16dp(this),
+				Vars.pxFrom18dp(this), true, Vars.pxFrom8dp(this),
 				false));
 		return items;
 	}
@@ -713,17 +891,22 @@ int minIconSize = 50;
 			TextView plabel = alertViewFTP.findViewById(R.id.tv_ftp_password);
 			TextView tlabel = alertViewFTP.findViewById(R.id.tv_ftp_port);
 			TextView iplabel = alertViewFTP.findViewById(R.id.tv_ftp_init_path);
+			TextView shlabel = alertViewFTP.findViewById(R.id.tv_ftp_share_name);
 			EditText ipath = alertViewFTP.findViewById(R.id.et_ftp_init_path);
 			EditText hname = alertViewFTP.findViewById(R.id.et_ftp_host);
 			EditText uname = alertViewFTP.findViewById(R.id.et_ftp_username);
 			EditText pword = alertViewFTP.findViewById(R.id.et_ftp_password);
 			EditText portn = alertViewFTP.findViewById(R.id.et_ftp_port);
 			EditText etitle = alertViewFTP.findViewById(R.id.et_ftp_rename);
+			EditText shname = alertViewFTP.findViewById(R.id.et_ftp_share_name);
 			ImageView spinner = alertViewFTP.findViewById(R.id.iv_ftp_progress);
 			RadioGroup radios = alertViewFTP.findViewById(R.id.rg_ftp_auth);
 			TextView domlabel = alertViewFTP.findViewById(R.id.tv_ftp_domain);
 			EditText domain = alertViewFTP.findViewById(R.id.et_ftp_domain);
 			View method = alertViewFTP.findViewById(R.id.connType);
+			Button search_shares = alertViewFTP.findViewById(R.id.b_ftp_search_shares);
+			ScrollView main = alertViewFTP.findViewById(R.id.sv_ftp);
+			FrameLayout frame = alertViewFTP.findViewById(R.id.fl_ftp);
 
 			method.setTag(type);
 			title.setText(Tools.toTitleCase(getString(R.string.title)));
@@ -732,9 +915,23 @@ int minIconSize = 50;
 			ulabel.setText(Tools.toTitleCase(getString(R.string.username)));
 			plabel.setText(Tools.toTitleCase(getString(R.string.password)));
 			tlabel.setText(Tools.toTitleCase(getString(R.string.port)));
+			shlabel.setText(Tools.toTitleCase(getString(R.string.share_name)));
+			search_shares.setText(Tools.toTitleCase(getString(R.string.search_shares)));
+//			search_shares.setWidth((main.getWidth() < 300) ? main.getWidth()-10 : 300);
 			iplabel.setText(Tools.toTitleCase(getString(R.string.init_path)));
 			spinner.setImageDrawable(new IconicsDrawable(this, FontAwesome.Icon.faw_spinner)
 					.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE));
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+				main.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+					@Override
+					public boolean onPreDraw() {
+						if (main.getViewTreeObserver().isAlive())
+							main.getViewTreeObserver().removeOnPreDrawListener(this);
+						//
+						return true;
+					}
+				});
+			}
 			if (type == CONNECTION_TYPE_SMB) {
 				radios.setVisibility(View.GONE);
 				tlabel.setVisibility(View.GONE);
@@ -742,21 +939,144 @@ int minIconSize = 50;
 				tlabel.setVisibility(View.GONE);
 				domlabel.setVisibility(View.VISIBLE);
 				domain.setVisibility(View.VISIBLE);
+				shlabel.setVisibility(View.VISIBLE);
+				search_shares.setVisibility(View.VISIBLE);
+				shname.setVisibility(View.VISIBLE);
 			} else {
 				RadioButton authFTP = alertViewFTP.findViewById(R.id.rb_ftp_plain);
 				RadioButton authFTPS = alertViewFTP.findViewById(R.id.rb_ftps);
 				RadioButton authSFTP = alertViewFTP.findViewById(R.id.rb_sftp);
-				authSFTP.setOnClickListener(v -> {
-					portn.setHint("22");
-				});
-				authFTPS.setOnClickListener(v -> {
-					portn.setHint("21");
-				});
-				authFTP.setOnClickListener(v -> {
-					portn.setHint("21");
-				});
+				authSFTP.setOnClickListener(v -> portn.setHint("22"));
+				authFTPS.setOnClickListener(v -> portn.setHint("21"));
+				authFTP.setOnClickListener(v -> portn.setHint("21"));
 				hname.setHint(Tools.toTitleCase(getString(R.string.eg_server)));
+//				shlabel.setVisibility(View.GONE);
 			}
+			search_shares.setOnClickListener(v -> {
+				if (hname.getText() == null || hname.getText().toString().equals("")) {
+					Log.d(TAG, "missing host address");
+				} else {
+//						String host = hname.getText().toString();
+				if (uname.getText() == null || uname.getText().toString().equals("")) {
+//						Log.d(TAG, "missing username");
+					uname.setText("guest");
+				}
+//						String user = uname.getText().toString();
+//					if (hname.getText() == null || hname.getText().toString().equals("")) {
+//						Log.d(TAG, "missing username");
+//					}
+//						String passwd = pword.getText().toString();
+//					if (hname.getText() == null || hname.getText().toString().equals("")) {
+//						Log.d(TAG, "missing username");
+//					}
+//						String domain = domain.getText().toString();
+/*					int color = Color.TRANSPARENT;
+					Drawable background = alertViewFTP.getBackground();
+					if (background instanceof ColorDrawable)
+						color = ((ColorDrawable) background).getColor();
+					int finalColor = color;
+					myDialogFragment.getView().setBackgroundColor(Color.GRAY);
+//					alertViewFTP.setBackgroundColor(Color.GRAY);
+					spinner.setVisibility(View.VISIBLE);*/
+					alertDialogBuilderActWide = new AlertDialog.Builder(MainActivity.this,
+							R.style.CustomDialogTheme);
+					alertDialogBuilderActWide.setTitle(hname.getText().toString());
+					alertDialogBuilderActWide.setNegativeButton(android.R.string.cancel,
+							(dialog, which) -> dialog.dismiss());
+//										alertDialogBuilderActWide.show();
+
+					final View customView = View.inflate(MainActivity.this, R.layout.dialog_list, null);
+					customView.setPadding(Tools.dpToPx(8, MainActivity.this), Tools.dpToPx(10, MainActivity.this),
+							Tools.dpToPx(8, MainActivity.this), Tools.dpToPx(10, MainActivity.this));
+					alertDialogBuilderActWide.setView(customView);
+					ProgressBar dialogSpinner = customView.findViewById(R.id.pb_dialog_spinner);
+					dialogSpinner.setVisibility(View.VISIBLE);
+
+					final AlertDialog sharesDialog = alertDialogBuilderActWide.create();
+					ArrayList<ListItem> shareList = new ArrayList<>();
+					CustomDialogListAdapter adapter =
+							new CustomDialogListAdapter(MainActivity.this,
+									R.layout.dialog_list, shareList, new CustomDialogListAdapter.OnClickListener() {
+								@Override
+								public void OnSelectItem(ListItem item1) {
+									Log.d(TAG, "selected "+ item1.getName());
+									shname.setText(item1.getName());
+									sharesDialog.dismiss();
+								}
+							});
+					ListView listView = customView.findViewById(R.id.lv_dialog_list);
+					listView.setAdapter(adapter);
+					sharesDialog.show();
+
+					SMBoperation smBoperation = new SMBoperation();
+//					String host = hname.getText().toString();
+//					String user = uname.getText().toString();
+//					String pass = pword.getText().toString();
+//					String wrkg = domain.getText().toString();
+					smBoperation.listShares(
+//							host, user, pass, wrkg
+							hname.getText().toString(), uname.getText().toString(),
+							pword.getText().toString(), domain.getText().toString(),
+							shares -> {
+								if (shares != null) {
+									Log.d(TAG, "SMB share count: " + shares.size());
+									for (String share : shares) {
+										Log.d(TAG, "SMB share name: " + share);
+										shareList.add(new ListItem(0, 0, share, "",
+												null, 0, 0, 0,
+												false, 0, false));
+									}
+									dialogSpinner.setVisibility(View.GONE);
+/*									if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+										alertViewFTP.setBackground(background);
+//										myDialogFragment.getView().setBackground(background);
+									} else {
+										alertViewFTP.setBackgroundColor(finalColor);
+//										myDialogFragment.getView().setBackgroundColor(finalColor);
+									}*/
+									Log.d(TAG, "shareList "+ shareList.size()+ ":"+ shareList.toString());
+/*										AlertDialog.Builder builderSingle = new AlertDialog.Builder(
+											getApplicationContext());
+//										builderSingle.setIcon(R.drawable.ic_launcher);
+									builderSingle.setTitle("Select One Name:-");
+
+									builderSingle.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+										@Override
+										public void onClick(DialogInterface dialog, int which) {
+											dialog.dismiss();
+										}
+									});
+									CustomDialogListAdapter adapter = new CustomDialogListAdapter(
+											getApplicationContext(), 0, shareList, null
+									);
+									builderSingle.setAdapter(adapter, new DialogInterface.OnClickListener() {
+										@Override
+										public void onClick(DialogInterface dialog, int which) {
+											ListItem listItem = adapter.getItem(which);
+											AlertDialog.Builder builderInner = new AlertDialog.Builder(
+											getApplicationContext());
+* /
+											builderInner.setMessage(listItem.getName());
+											builderInner.setTitle("Your Selected Item is");
+											builderInner.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+												@Override
+												public void onClick(DialogInterface dialog,int which) {
+													dialog.dismiss();
+												}
+											});
+											builderInner.show();
+										}
+									});
+									builderSingle.show();
+*/
+/**/
+									/**/
+								} else {
+									Log.d(TAG, "Error: Shares is null!");
+								}
+							});
+				}
+			});
 			if (item != null) {
 				alertViewFTP.setTag(item.getID());
 				if (item.getConnectionName() != null && !item.getConnectionName().equals("")) {
@@ -798,7 +1118,64 @@ int minIconSize = 50;
 				ipath.setHint("/");
 			}
 			myDialogFragment.setArguments(bundle);
+//			main.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+//				@Override
+//				public void onGlobalLayout() {
+//					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+//						main.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+//					}
+//					Log.d(TAG, "showFTPsettings - scroll width, height: "+ main.getWidth()+ ", "+ main.getHeight());
+//				}
+//			});
+//			main.post(() -> Log.d(TAG, "showFTPsettings - scroll width, height: "+ main.getWidth()+ ", "+ main.getHeight()));
+			main.post(new Runnable() {
+				@Override
+				public void run() {
+					int max = Math.max(0, main.getChildAt(0).getHeight() - (main.getHeight()
+							- main.getPaddingBottom() - main.getPaddingTop()));
+//					Log.d(TAG, "showFTPsettings - scroll contents height: "+ max);
+					if (max == 0) {
+						Log.d(TAG, "showFTPsettings - scroll fits");
+					} else {
+						LinearLayout overlay = alertViewFTP.findViewById(R.id.ll_ftp_scrolloverlay);
+						ImageView ol_image = alertViewFTP.findViewById(R.id.iv_ftp_scroll),
+								ol_image2 = alertViewFTP.findViewById(R.id.iv_ftp_scroll2);
+						ol_image.setImageDrawable(new IconicsDrawable(MainActivity.this,
+								FontAwesome.Icon.faw_hand_point_up)
+								.color(IconicsColor.colorRes(R.color.lightGray))
+								.size(IconicsSize.TOOLBAR_ICON_SIZE));
+						ol_image2.setImageDrawable(new IconicsDrawable(MainActivity.this,
+								FontAwesome.Icon.faw_hand_point_down)
+								.color(IconicsColor.colorRes(R.color.lightGray))
+								.size(IconicsSize.TOOLBAR_ICON_SIZE));
+						overlay.setVisibility(View.VISIBLE);
+					}
+				}
+			});
+/*			RxView.layoutChanges(main).take(1)
+					.subscribe(aVoid -> {
+						// width and height have been calculated here
+					});*/
+//			frame.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+//				@Override
+//				public void onGlobalLayout() {
+//					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+//						frame.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+//					}
+//					Log.d(TAG, "showFTPsettings - frame height: "+ frame.getHeight());
+//				}
+//			});
+//			frame.post(() -> Log.d(TAG, "showFTPsettings - frame height: "+ frame.getHeight()));
+//			Log.d(TAG, "showFTPsettings - scroll stretched to max: "+ main.isFillViewport());
+//			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+//				Log.d(TAG, "showFTPsettings - scroll getFitsSystemWindows: "+ main.getFitsSystemWindows());
+//			}
 			myDialogFragment.show(fm, "fragment_edit_ftp");
+//			Log.d(TAG, "showFTPsettings - scroll width, height, frame height: "+
+//					main.getWidth()+ ", "+ main.getHeight()+ ", "+ frame.getHeight());
+/*			Log.d(TAG, "showFTPsettings - scroll contents height: "+
+					Math.max(0, main.getChildAt(0).getHeight() - (main.getHeight()
+							- main.getPaddingBottom() - main.getPaddingTop())));*/
 		}
 	}
 
@@ -872,7 +1249,7 @@ int minIconSize = 50;
 //			});
 //			client.connect(connStr, uname.getText().toString(), pword.getText().toString(), .getText().toString());
 			final String connString = connStr;
-			SMBoperation client = new SMBoperation(new SMBoperation.OnSMBinteraction() {
+/*			SMBoperation client = new SMBoperation(new SMBoperation.OnSMBinteraction() {
 				@Override
 				public void OnConnection(Session result) {
 //					Log.d(TAG, "tested smb connection:" + connString);
@@ -898,6 +1275,7 @@ int minIconSize = 50;
 				}
 			});
 			client.connect(connStr, uname.getText().toString(), pword.getText().toString(), domain.getText().toString());
+*/
 		} else {
 //			LoaderFTP ftp = new LoaderFTP(result -> {
 //				Log.d(TAG, "tested connection:");
@@ -915,7 +1293,7 @@ int minIconSize = 50;
 				spinner.setVisibility(View.GONE);
 				try {
 					Log.d(TAG, "ftp response=" + result.getStatus()+ ":" + result.getReplyString());
-					response.setText(getString(R.string.conn_good)+ ".\n"+ getString(R.string.save_OK));
+					response.setText(String.format("%s.\n%s", getString(R.string.conn_good), getString(R.string.save_OK)));
 					rimage.setImageDrawable(new IconicsDrawable(MainActivity.this, FontAwesome.Icon.faw_check)
 							.color(IconicsColor.colorRes(R.color.springGreen)).size(IconicsSize.TOOLBAR_ICON_SIZE));
 					response.setVisibility(View.VISIBLE);
@@ -1099,10 +1477,11 @@ int minIconSize = 50;
 		// TODO Auto-generated method stub
 		super.onSaveInstanceState(outState);
 		Log.d(TAG, "onSaveInstanceState");
-		outState.putSerializable("leftList", ((Vars)this.getApplication()).leftList);
+/*		outState.putSerializable("leftList", ((Vars)this.getApplication()).leftList);
 //		outState.putSerializable("leftList", model.getLeftList().getValue());
 		outState.putSerializable("conns", ((Vars)this.getApplication()).getConnectionItems());
 //		outState.putSerializable("conns", model.getConnectionItems().getValue());
+*/
 	}
 
 	@Override
@@ -1246,52 +1625,6 @@ int minIconSize = 50;
 	}
 
 
-	/**
-	 * Draw a list of files on right panel
-	 */
-	void doListFiles() {
-		FragmentManager manager = getFragmentManager();
-		Fragment fragment;
-		FragmentTransaction transaction = manager.beginTransaction();
-		transaction.addToBackStack(null);
-		fragment = RightFragment.newInstance(getString(R.string.files), "/", "");
-		transaction.replace(R.id.fl_right_panel, fragment);
-		transaction.commit();
-	}
-
-
-	private void doListMusic() {
-		FragmentManager manager = getFragmentManager();
-		Fragment fragment;
-		FragmentTransaction transaction = manager.beginTransaction();
-		transaction.addToBackStack(null);
-		fragment = RightFragment.newInstance(getString(R.string.music), null, "");
-		transaction.replace(R.id.fl_right_panel, fragment);
-		transaction.commit();
-	}
-
-
-	private void doListPhotos() {
-		FragmentManager manager = getFragmentManager();
-		Fragment fragment;
-		FragmentTransaction transaction = manager.beginTransaction();
-		transaction.addToBackStack(null);
-		fragment = RightFragment.newInstance(getString(R.string.photos), null, "");
-		transaction.replace(R.id.fl_right_panel, fragment);
-		transaction.commit();
-	}
-
-
-	private void doListContacts() {
-		FragmentManager manager = getFragmentManager();
-		Fragment fragment;
-		FragmentTransaction transaction = manager.beginTransaction();
-		transaction.addToBackStack(null);
-		fragment = RightFragment.newInstance(getString(R.string.contacts), null, "");
-		transaction.replace(R.id.fl_right_panel, fragment);
-		transaction.commit();
-	}
-
 /*
 	@NonNull
 	@Override
@@ -1432,9 +1765,9 @@ int minIconSize = 50;
 	@Override
 	public void LongPressedLeftItemIndex(int index) {
 		Log.d(TAG, "LongPressedLeftItemIndex on "+ index);
-		boolean editFaded = index < 4;
+		boolean editFaded = index < Vars.NUM_THIS_DEVICE;
 //		Log.d(TAG, "items="+ model.getConnectionItems().getValue().toString());
-		if (index > 3) {
+		if (index > (Vars.NUM_THIS_DEVICE-1)) {
 			Log.d(TAG, "items="+ ((Vars)this.getApplication()).getConnectionItems().toString());
 //			Log.d(TAG, "looking for "+ id);
 			final ConnectionItem item = ((Vars)this.getApplication()).getConnectionItemByID(index-4);
@@ -1467,7 +1800,7 @@ int minIconSize = 50;
 						.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE),
 				Tools.dpToPx(16, this), Tools.dpToPx(16, this),
 				Tools.dpToPx(18, this), true, Tools.dpToPx(8, this),
-				index <= 3));
+				index <= (Vars.NUM_THIS_DEVICE-1)));
 		items.add(new ListItem(0, items.size(), Tools.toTitleCase(getString(R.string.edit_conn)),null,
 				new IconicsDrawable(this, FontAwesome.Icon.faw_edit1)
 						.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE),
@@ -1479,13 +1812,13 @@ int minIconSize = 50;
 						.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE),
 				Tools.dpToPx(16, this), Tools.dpToPx(16, this),
 				Tools.dpToPx(18, this), true, Tools.dpToPx(8, this),
-				index <= 3));
+				index <= (Vars.NUM_THIS_DEVICE-1)));
 		items.add(new ListItem(0, items.size(), Tools.toTitleCase(getString(R.string.move)),null,
 				new IconicsDrawable(this, FontAwesome.Icon.faw_arrows_alt)
 						.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE),
 				Tools.dpToPx(16, this), Tools.dpToPx(16, this),
 				Tools.dpToPx(18, this), true, Tools.dpToPx(8, this),
-				index < 4 && ((Vars)MainActivity.this.getApplication()).leftList.size() < 5));
+				index < (Vars.NUM_THIS_DEVICE-1) && ((Vars)MainActivity.this.getApplication()).leftList.size() < Vars.NUM_THIS_DEVICE));
 //				index < 4 && model.getLeftList().getValue().size() < 5));
 
 		final View customView = View.inflate(this, R.layout.dialog_list, null);
@@ -1494,13 +1827,15 @@ int minIconSize = 50;
 		contextmenuBuilder.setView(customView);
 
 		final AlertDialog contextmenuDialog = contextmenuBuilder.create();
-		contextmenuDialog.setButton(AlertDialog.BUTTON_NEGATIVE, getResources().getString(R.string.cancel),
+		contextmenuDialog.setButton(AlertDialog.BUTTON_NEGATIVE, getResources().getString(android.R.string.cancel),
 				(dialog1, which) -> dialog1.cancel());
 //				addConnectionDialog.setButton(AlertDialog.BUTTON_NEGATIVE, getResources().getString(R.string.cancel), (DialogInterface.OnClickListener) null);
 		contextmenuDialog.setCanceledOnTouchOutside(false);
 		contextmenuDialog.show();
 		CustomDialogListAdapter adapter = new CustomDialogListAdapter(this,
-				R.layout.dialog_list, items, item1 -> {
+				R.layout.dialog_list, items, new CustomDialogListAdapter.OnClickListener() {
+			@Override
+			public void OnSelectItem(ListItem item1) {
 //			if (index > 4) {
 				//						addConnectionDialog.dismiss();
 				contextmenuDialog.cancel();
@@ -1509,6 +1844,7 @@ int minIconSize = 50;
 				//				item1.setID(((Vars) MainActivity.this.getApplication()).leftList.size() + 1);
 				MainActivity.this.contextmenuSelection(name, index);
 //			}
+			}
 		});
 		ListView listView = customView.findViewById(R.id.lv_dialog_list);
 		listView.setAdapter(adapter);
@@ -1570,7 +1906,7 @@ int minIconSize = 50;
 //			SelectedLeftItemId(id);
 			SelectedLeftItemIndex(index);
 		} else if (name.toUpperCase().equals(getString(R.string.edit_conn).toUpperCase())) {
-			if (index > 3) {
+			if (index > (Vars.NUM_THIS_DEVICE-1)) {
 				ConnectionItem item = ((Vars) MainActivity.this.getApplication()).getConnectionItemByID(index-4);
 //			ConnectionItem item = model.getConnectionItemByID(index-5);
 				Log.d(TAG, "editing:" + item.toString());
@@ -1677,16 +2013,91 @@ int minIconSize = 50;
 		*/
 	}
 
+	/**
+	 * Draw a list of files on right panel
+	 */
+	void doListFiles() {
+		FragmentManager manager = getFragmentManager();
+		Fragment fragment;
+		FragmentTransaction transaction = manager.beginTransaction();
+		transaction.addToBackStack(null);
+		fragment = RightFragment.newInstance(getString(R.string.files), "/", "");
+		transaction.replace(R.id.fl_right_panel, fragment);
+		transaction.commit();
+	}
+
+
+	private void doListMusic() {
+		FragmentManager manager = getFragmentManager();
+		Fragment fragment;
+		FragmentTransaction transaction = manager.beginTransaction();
+		transaction.addToBackStack(null);
+		fragment = RightFragment.newInstance(getString(R.string.music), null, "");
+		transaction.replace(R.id.fl_right_panel, fragment);
+		transaction.commit();
+	}
+
+
+	private void doListPhotos() {
+		FragmentManager manager = getFragmentManager();
+		Fragment fragment;
+		FragmentTransaction transaction = manager.beginTransaction();
+		transaction.addToBackStack(null);
+		fragment = RightFragment.newInstance(getString(R.string.photos), null, "");
+		transaction.replace(R.id.fl_right_panel, fragment);
+		transaction.commit();
+	}
+
+
+	private void doOnRightPanel(Fragment fragment) {
+		FragmentManager manager = getFragmentManager();
+//		Fragment fragment;
+		FragmentTransaction transaction = manager.beginTransaction();
+		transaction.addToBackStack(null);
+//		fragment = RightFragment.newInstance(getString(R.string.photos), null, "");
+		transaction.replace(R.id.fl_right_panel, fragment);
+		transaction.commit();
+	}
+
+
+	private void doListContacts() {
+		FragmentManager manager = getFragmentManager();
+		Fragment fragment;
+		FragmentTransaction transaction = manager.beginTransaction();
+		transaction.addToBackStack(null);
+		fragment = RightFragment.newInstance(getString(R.string.contacts), null, "");
+		transaction.replace(R.id.fl_right_panel, fragment);
+		transaction.commit();
+	}
+
+	private void doListHosts() {
+	}
+
+
 	@Override
 	public void SelectedLeftItemIndex(int index) {
-		Log.d(TAG, "leftItems:"+ ((Vars)this.getApplication()).leftList.toString());
+//		Log.d(TAG, "leftItems:"+ ((Vars)this.getApplication()).leftList.toString());
+//		Log.d(TAG, "Connection Items:"+ ((Vars)this.getApplication()).getConnectionItems().toString());
 //		Log.d(TAG, "leftItems:"+ model.getLeftList().getValue().toString());
 		Log.d(TAG, "selected left item with index:"+ index);
 		ListItem listItem = ((Vars)this.getApplication()).leftList.get(index);
 //		ListItem listItem = model.getLeftList().getValue().get(index);
 		ConnectionItem item = new ConnectionItem();
-		if (index > 3) {
-			item = ((Vars) this.getApplication()).getConnectItem(index - 4);
+//		int itemId = -99;
+		int itemId = index - Vars.NUM_THIS_DEVICE+1;
+		if (index > (Vars.NUM_THIS_DEVICE-1)) {
+			if (0 > itemId || (((Vars) this.getApplication()).getConnectionItems() != null &&
+					itemId > ((Vars) this.getApplication()).getConnectionItems().size())) {
+				Log.d(TAG, "itemId is not in bounds: "+ itemId);
+				return;
+			}
+			Log.d(TAG, "getting connection item: "+ itemId);
+			item = ((Vars) this.getApplication()).getConnectItem(itemId-1);
+			if (item != null) {
+				Log.d(TAG, "selected item: "+ item.toString());
+			} else {
+				Log.d(TAG, "Error getting selected item - null!");
+			}
 //		ConnectionItem item = model.getConnectItem(index-4);
 		}
 		switch (listItem.getID()) {
@@ -1698,7 +2109,8 @@ int minIconSize = 50;
 						requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, MY_PERMISSION_PHOTOS_READ_EXTERNAL_STORAGE_REQUEST_CODE);
 					}
 				} else {
-					doListPhotos();
+					doOnRightPanel(RightFragment.newInstance(getString(R.string.photos), null, ""));
+//					doListPhotos();
 				}
 				break;
 			case Vars.MY_MUSIC_ID:
@@ -1709,7 +2121,8 @@ int minIconSize = 50;
 						requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, MY_PERMISSION_MUSIC_READ_EXTERNAL_STORAGE_REQUEST_CODE);
 					}
 				} else {
-					doListMusic();
+					doOnRightPanel(RightFragment.newInstance(getString(R.string.music), null, ""));
+//					doListMusic();
 				}
 				break;
 			case Vars.MY_CONTACTS_ID:
@@ -1720,23 +2133,48 @@ int minIconSize = 50;
 						requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, MY_PERMISSION_RECORD_READ_CONTACTS_REQUEST_CODE);
 					}
 				} else {
-					doListContacts();
+					doOnRightPanel(RightFragment.newInstance(getString(R.string.contacts), null, ""));
+//					doListContacts();
 				}
 				break;
 			case Vars.MY_FILES_ID:
 //			case model.MY_FILES_ID:
-				doListFiles();
+//				doListFiles();
+				doOnRightPanel(RightFragment.newInstance(getString(R.string.files), "/", ""));
+				break;
+			case Vars.MY_LOCAL_HOSTS:
+				doOnRightPanel(RightFragment.newInstance(getString(R.string.my_network), null, ""));
+//				doListHosts();
 				break;
 			default:
+				if (item == null) {
+					Log.d(TAG, "selected left item accioated connection item is null (item id:"+ itemId);
+					return;
+				}
 				if (item.getType() == CONNECTION_TYPE_SMB) {
 					SMBoperation smb = new SMBoperation();
+					smb.configSMB(false, true, true,
+							true, 8*1024*1024, 300, TimeUnit.SECONDS,
+							300, TimeUnit.SECONDS, null);
 //					SMBoperation smb = new SMBoperation(result -> {
 //						if (result != null) {
 //							Log.d(TAG, "result="+ result.getSessionId()+ ":"+ result.getConnection().getRemoteHostname());
 //						}
 //					});
-					smb.connect(item.getHost(), item.getUsername(), item.getPassword(), item.getAccessToken());
-//					smb.connect("192.168.1.222", "yumausa", "yuma", "");
+//					smb.connect(item.getHost(), item.getUsername(), item.getPassword(), item.getAccessToken());
+					smb.getSMBfileslist(item.getHost(), item.getUsername(), item.getPassword(),
+							item.getAccessToken(), item.getShareName(), item.getPath(), new SMBoperation.OnSMBinteraction() {
+								@Override
+								public void OnListFiles(List<String> files) {
+									if (files != null) {
+										for (String file : files) {
+											Log.d(TAG, "SMB file: " + file);
+										}
+									} else {
+										Log.d(TAG, "recieved null!");
+									}
+								}
+							});
 				} else if (item.getType() == CONNECTION_TYPE_FTP) {
 					/**/
 //				FTPoperation ftPoperation = new FTPoperation(result -> {

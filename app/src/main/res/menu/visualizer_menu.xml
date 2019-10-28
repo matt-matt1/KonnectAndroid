@@ -3,6 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/hamburger"
+        android:orderInCategory="1"
+        app:showAsAction="ifRoom"
+        android:title="@string/expand__menu" />
+
+
+
+    <item
         android:id="@+id/add_connect"
         android:orderInCategory="1"
         app:showAsAction="ifRoom"
@@ -17,6 +25,7 @@
     <item
         android:id="@+id/resize"
         android:orderInCategory="5"
-        app:showAsAction="never"
+        app:showAsAction="ifRoom"
         android:title="@string/resize" />
+
 </menu>

@@ -54,15 +54,15 @@ public class MyOptionsMenu extends MainActivity {
 		if (!model.isNetworkConnected()) {
 			menuItem = menu.findItem(R.id.add_connect);
 			menuItem.setIcon(new IconicsDrawable(this, FontAwesome.Icon.faw_plus)
-					.color(IconicsColor.colorRes(R.color.White)).size(IconicsSize.TOOLBAR_ICON_SIZE));
+					.color(IconicsColor.colorRes(R.color.white)).size(IconicsSize.TOOLBAR_ICON_SIZE));
 		}
 		menuItem = menu.findItem(R.id.settings);
 		menuItem.setIcon(new IconicsDrawable(this, FontAwesome.Icon.faw_cog)
-				.color(IconicsColor.colorRes(R.color.White)).size(IconicsSize.TOOLBAR_ICON_SIZE));
+				.color(IconicsColor.colorRes(R.color.white)).size(IconicsSize.TOOLBAR_ICON_SIZE));
 
 		menuItem = menu.findItem(R.id.resize);
 		menuItem.setIcon(new IconicsDrawable(this, FontAwesome.Icon.faw_arrows_alt)
-				.color(IconicsColor.colorRes(R.color.White)).size(IconicsSize.TOOLBAR_ICON_SIZE));
+				.color(IconicsColor.colorRes(R.color.white)).size(IconicsSize.TOOLBAR_ICON_SIZE));
 
 		return true;
 	}

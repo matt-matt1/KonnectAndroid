@@ -6,28 +6,35 @@
 		android:defaultValue="@bool/PREFS_show_hidden_default"
 		android:key="@string/PREFS_show_hidden"
 		android:summaryOff="@string/default_hidden"
-		app:summaryOn="@string/displayed"
-		android:title="@string/PREFS_show_hidden_title" />
+		android:title="@string/PREFS_show_hidden_title"
+		app:summaryOn="@string/displayed" />
 
 	<CheckBoxPreference
 		android:defaultValue="@bool/PREFS_save_pass_default"
 		android:key="@string/PREFS_save_pass"
 		android:summaryOff="@string/no"
-		app:summaryOn="@string/yes"
-		android:title="@string/PREFS_save_pass_title" />
+		android:title="@string/PREFS_save_pass_title"
+		app:summaryOn="@string/yes" />
 
 	<CheckBoxPreference
 		android:defaultValue="@bool/PREFS_rem_local_default"
-		android:key="@string/PREFS_show_hidden"
+		android:key="@string/PREFS_rem_local"
 		android:summaryOff="@string/no"
-		app:summaryOn="@string/yes"
-		android:title="@string/PREFS_rem_local_title" />
+		android:title="@string/PREFS_rem_local_title"
+		app:summaryOn="@string/yes" />
 
 	<CheckBoxPreference
 		android:defaultValue="@bool/PREFS_rem_remote_default"
-		android:key="@string/PREFS_show_hidden"
+		android:key="@string/PREFS_rem_remote"
 		android:summaryOff="@string/no"
-		app:summaryOn="@string/yes"
-		android:title="@string/PREFS_rem_remote_title" />
+		android:title="@string/PREFS_rem_remote_title"
+		app:summaryOn="@string/yes" />
+
+	<CheckBoxPreference
+		android:defaultValue="@bool/PREFS_network_transfers_default"
+		android:key="@string/PREFS_network_transfers"
+		android:summaryOff="@string/no"
+		android:title="@string/PREFS_network_transfers"
+		app:summaryOn="@string/yes" />
 
 </PreferenceScreen>

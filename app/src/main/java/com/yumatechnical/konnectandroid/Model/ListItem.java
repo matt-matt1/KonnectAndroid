@@ -9,7 +9,7 @@ import org.parceler.Parcel;
 import org.parceler.ParcelConstructor;
 
 //@Parcel
-public class ListItem {
+public class ListItem /*implements Parcel*/ {
 
 	int priority;
 	int ID;

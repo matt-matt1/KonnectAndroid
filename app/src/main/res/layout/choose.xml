@@ -13,7 +13,7 @@
 		android:layout_width="match_parent"
 		android:layout_height="1dp"
 		android:id="@+id/v_choose_title_underline"
-		android:background="@color/Gray" />
+		android:background="@color/gray_gray" />
 
 	<ListView
 		android:layout_width="match_parent"

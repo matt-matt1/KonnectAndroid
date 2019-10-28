@@ -13,52 +13,51 @@
         android:layout_weight="100"
         android:id="@+id/fv_top"
 	    tools:ignore="UselessParent">
+        <FrameLayout
+            android:layout_width="230dp"
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            android:id="@+id/left_frame">
+        </FrameLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:baselineAligned="false"
+            android:id="@+id/ll_sides"
             tools:ignore="UselessParent">
             <FrameLayout
-                android:layout_width="220dp"
+                android:layout_width="230dp"
                 android:layout_height="match_parent"
-                android:background="@color/White"
-                android:id="@+id/left_frame">
-<!--                <androidx.recyclerview.widget.RecyclerView-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="match_parent"-->
-<!--                    android:id="@+id/rv_left" />-->
-<!--                <ListView-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="match_parent"-->
-<!--                    android:choiceMode="singleChoice"-->
-<!--                    android:smoothScrollbar="true"-->
-<!--                    android:fastScrollEnabled="false"-->
-<!--                    android:id="@+id/lv_left" />-->
+                android:background="@android:color/transparent"
+                android:id="@+id/fake_left_frame">
             </FrameLayout>
+
             <LinearLayout
                 android:layout_width="5dp"
                 android:layout_height="match_parent"
                 android:id="@+id/lin_div_column"
-                android:background="@color/Gray"
+                android:background="@color/gray_gray"
                 android:baselineAligned="false">
                 <FrameLayout
                     android:layout_width="1dp"
                     android:layout_height="match_parent"
-                    android:background="@color/Gray" />
+                    android:background="@color/gray_gray" />
                 <FrameLayout
                     android:layout_width="0dp"
-                    android:background="@color/White"
+                    android:background="@color/white"
                     android:layout_height="match_parent"
                     android:layout_weight="100" />
                 <FrameLayout
                     android:layout_width="1dp"
                     android:layout_height="match_parent"
-                    android:background="@color/Gray" />
+                    android:background="@color/gray_gray" />
             </LinearLayout>
 
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:background="@color/white"
                 android:id="@+id/fl_right_panel" />
 
         </LinearLayout>

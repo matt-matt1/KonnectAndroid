@@ -4,8 +4,10 @@
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
 	android:orientation="vertical"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:android="http://schemas.android.com/apk/res/android">
 
+<!--	title-->
 	<TextView
 		android:layout_height="wrap_content"
 		android:layout_width="match_parent"
@@ -15,13 +17,13 @@
 		android:textStyle="bold"
 		android:textAlignment="center"
 		android:id="@+id/tv_right_title" />
-
+<!--	underline-->
 	<View
 		android:layout_width="match_parent"
 		android:layout_height="1dp"
 		android:paddingTop="4dp"
 		android:paddingBottom="2dp"
-		android:background="@color/Gray"/>
+		android:background="@color/gray_gray"/>
 
 	<FrameLayout
 		android:layout_width="match_parent"
@@ -30,13 +32,48 @@
 		android:paddingRight="8dp"
 		android:paddingLeft="8dp"
 		android:layout_weight="100">
+<!--		progress bar (spinner) with percent-->
+		<FrameLayout
+			android:id="@+id/fl_progress_right"
+			android:visibility="invisible"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent">
+			<ProgressBar
+				android:layout_width="220dp"
+				android:layout_height="220dp"
+				android:id="@+id/pb_progress"
+				style="?android:attr/progressBarStyleHorizontal"
+				android:layout_gravity="center"
+				android:indeterminate="false"
+				android:max="100"
+				android:progress="60"
+				android:progressDrawable="@drawable/circular"
+				android:secondaryProgress="100" />
 
+			<ImageView
+				android:layout_width="100dp"
+				android:layout_height="100dp"
+				android:background="@drawable/whitecircle"
+				android:layout_gravity="center" />
+
+			<TextView
+				android:id="@+id/tv_progress"
+				android:layout_width="250dp"
+				android:layout_height="250dp"
+				android:gravity="center"
+				app:fontFamily="monospace"
+				android:text="25%"
+				android:layout_gravity="center"
+				android:textColor="@color/design_default_color_primary_dark"
+				android:textSize="20sp" />
+		</FrameLayout>
+<!--		infinite spinner-->
 		<ProgressBar
-			android:layout_width="42dp"
-			android:layout_height="42dp"
-			android:id="@+id/pb_right"
-			android:layout_gravity="center"
-			android:visibility="invisible" />
+			android:layout_width="100dp"
+			android:layout_height="100dp"
+			android:id="@+id/pb_progress_infinite"
+			android:visibility="invisible"
+			android:layout_gravity="center" />
 
 		<TextView
 			android:layout_width="wrap_content"
@@ -47,7 +84,7 @@
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
 			android:orientation="horizontal">
-
+<!--			refreshable recyleview-->
 			<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 				android:layout_width="0dp"
 				android:layout_height="match_parent"
@@ -59,6 +96,7 @@
 					android:fastScrollEnabled="true"
 					android:id="@+id/rv_right" />
 			</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+<!--			alfabetical index-->
 			<LinearLayout
 				android:layout_width="40dip"
 				android:layout_height="fill_parent"

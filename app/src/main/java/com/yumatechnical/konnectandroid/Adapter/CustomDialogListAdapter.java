@@ -38,9 +38,9 @@ public class CustomDialogListAdapter extends ArrayAdapter<ListItem> {
 	private static final String TAG = CustomDialogListAdapter.class.getSimpleName();
 
 	public interface OnClickListener {
-//		void OnSelecttem(int connectionID);
-//		void OnSelecttem(String name);
-		void OnSelecttem(ListItem item);
+//		void OnSelectItem(int connectionID);
+//		void OnSelectItem(String name);
+		void OnSelectItem(ListItem item);
 	}
 	private final OnClickListener listener;
 
@@ -57,7 +57,7 @@ public class CustomDialogListAdapter extends ArrayAdapter<ListItem> {
 	public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
 		View view = null;
 		if (convertView == null) {
-			view = LayoutInflater.from(getContext()).inflate(R.layout.inner_left/*android.R.layout.simple_list_item_1*/,
+			view = LayoutInflater.from(getContext()).inflate(R.layout.inner_left,
 					parent, false);
 			final ViewHolder holder = new ViewHolder();
 			holder.textView1 = view.findViewById(R.id.tv_left_1);
@@ -113,7 +113,7 @@ public class CustomDialogListAdapter extends ArrayAdapter<ListItem> {
 			if (position > -1) {
 				lastSelected = v;
 			}
-			listener.OnSelecttem(clickedItem);
+			listener.OnSelectItem(clickedItem);
 		});
 		return view;
 	}

@@ -7,10 +7,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ListView;
-
-import androidx.fragment.app.FragmentActivity;
-import androidx.lifecycle.ViewModelProviders;
 
 import com.mikepenz.iconics.IconicsColor;
 import com.mikepenz.iconics.IconicsDrawable;
@@ -20,14 +18,12 @@ import com.yumatechnical.konnectandroid.Adapter.LeftArrayAdapter;
 import com.yumatechnical.konnectandroid.Helper.Tools;
 import com.yumatechnical.konnectandroid.Model.ConnectionItem;
 import com.yumatechnical.konnectandroid.Model.ListItem;
-import com.yumatechnical.konnectandroid.Model.MyViewModel;
 import com.yumatechnical.konnectandroid.R;
 import com.yumatechnical.konnectandroid.Vars;
 
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 
 /**
@@ -69,6 +65,7 @@ public class LeftItemFragment extends Fragment {
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
+		/*
 //		outState.putParcelable("leftList", Parcels.wrap(((Vars)getActivity().getApplication()).leftList));
 		outState.putParcelable("conns", Parcels.wrap(((Vars)getActivity().getApplication()).getConnectionItems()));
 //		outState.putParcelable("conns", Parcels.wrap(model.getConnectionItems().getValue()));
@@ -76,6 +73,7 @@ public class LeftItemFragment extends Fragment {
 //		outState.putSerializable("leftList", model.getLeftList().getValue());
 		outState.putSerializable("conns", ((Vars)getActivity().getApplication()).getConnectionItems());
 //		outState.putInt("iconSize", model.getIconSize().getValue());
+		*/
 	}
 
 
@@ -164,31 +162,34 @@ public class LeftItemFragment extends Fragment {
 		int leftListDefaultTopPadding = Tools.dpToPx(16, context);
 		int leftListDefaultBottomPadding = Tools.dpToPx(18, context);
 		int leftListDefaultBetweenPadding = Tools.dpToPx(8, context);
-		Boolean fade_photos = false, fade_music = false, fade_contacts = false, fade_files = false;
-		((Vars)getActivity().getApplication()).leftList.add(new ListItem(0, Vars.MY_PHOTOS_ID, context.getString(R.string.photos),null,
+		Boolean fade_photos = false, fade_music = false, fade_contacts = false, fade_files = false,
+				fade_hosts = false;
+		((Vars)getActivity().getApplication()).leftList.add(new ListItem(
+				0, Vars.MY_PHOTOS_ID, context.getString(R.string.photos),null,
 //		model.addLeftListItem(new ListItem(0, Vars.MY_PHOTOS_ID, context.getString(R.string.photos),null,
-				new IconicsDrawable(context, FontAwesome.Icon.faw_images)
-						.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE),
-				leftListDefaultLeftPadding, leftListDefaultTopPadding, leftListDefaultBottomPadding,
-				true, leftListDefaultBetweenPadding, fade_photos));
+				Vars.myPhotos_icon2(context), leftListDefaultLeftPadding, leftListDefaultTopPadding,
+				leftListDefaultBottomPadding, true, leftListDefaultBetweenPadding, fade_photos));
 		((Vars)getActivity().getApplication()).leftList.add(new ListItem(0, Vars.MY_MUSIC_ID, context.getString(R.string.music),null,
 //		model.addLeftListItem(new ListItem(0, Vars.MY_MUSIC_ID, context.getString(R.string.music),null,
-				new IconicsDrawable(context, FontAwesome.Icon.faw_music)
-						.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE),
-				leftListDefaultLeftPadding, leftListDefaultTopPadding, leftListDefaultBottomPadding,
-				true, leftListDefaultBetweenPadding, fade_music));
+				Vars.myMusic_icon(context), leftListDefaultLeftPadding, leftListDefaultTopPadding,
+				leftListDefaultBottomPadding, true, leftListDefaultBetweenPadding, fade_music));
 		((Vars)getActivity().getApplication()).leftList.add(new ListItem(0,Vars.MY_CONTACTS_ID, context.getString(R.string.contacts),null,
 //		model.addLeftListItem(new ListItem(0,Vars.MY_CONTACTS_ID, context.getString(R.string.contacts),null,
-				new IconicsDrawable(context, FontAwesome.Icon.faw_address_book)
-						.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE),
-				leftListDefaultLeftPadding, leftListDefaultTopPadding, leftListDefaultBottomPadding,
-				true, leftListDefaultBetweenPadding, fade_contacts));
+				Vars.myContacts_icon(context), leftListDefaultLeftPadding, leftListDefaultTopPadding,
+				leftListDefaultBottomPadding, true, leftListDefaultBetweenPadding, fade_contacts));
 		((Vars)getActivity().getApplication()).leftList.add(new ListItem(0, Vars.MY_FILES_ID, context.getString(R.string.files),null,
 //		model.addLeftListItem(new ListItem(0, Vars.MY_FILES_ID, context.getString(R.string.files),null,
-				new IconicsDrawable(context, FontAwesome.Icon.faw_file)
-						.color(IconicsColor.colorRes(R.color.Teal)).size(IconicsSize.TOOLBAR_ICON_SIZE),
-				leftListDefaultLeftPadding, leftListDefaultTopPadding, leftListDefaultBottomPadding,
-				true, leftListDefaultBetweenPadding, fade_files));
+				Vars.myFiles_icon(context), leftListDefaultLeftPadding, leftListDefaultTopPadding,
+				leftListDefaultBottomPadding, true, leftListDefaultBetweenPadding, fade_files));
+		((Vars)getActivity().getApplication()).leftList.add(new ListItem(0, Vars.MY_LOCAL_HOSTS,
+				context.getString(R.string.my_network),null,
+//		model.addLeftListItem(new ListItem(0, Vars.MY_FILES_ID, context.getString(R.string.files),null,
+				Vars.myLocalHosts_icon(context), leftListDefaultLeftPadding, leftListDefaultTopPadding,
+				leftListDefaultBottomPadding, true, leftListDefaultBetweenPadding, fade_hosts));
 	}
-
+/*
+	public void openLeftPanel(Context context) {
+		FrameLayout leftPanel = context.getV
+	}
+*/
 }

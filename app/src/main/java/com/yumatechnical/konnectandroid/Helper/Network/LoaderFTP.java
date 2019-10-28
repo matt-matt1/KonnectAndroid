@@ -161,6 +161,7 @@ REPLACED WITH LOADER
 				String dir = args.getString("dir");
 				String server = args.getString("server");
 				String port = args.getString("port");
+				String share = args.getString("share");
 				String connStr = args.getString("connstr");
 				if (connStr == null || connStr.equals("")) {
 					if (server != null && !server.equals("")) {
@@ -176,12 +177,18 @@ REPLACED WITH LOADER
 								args.getString("pass"),
 								args.getString("host"),
 								args.getInt("port"),
+								args.getString("share"),
 								args.getString("dir"));
+						String path = "";
+						if (connectionItem.getShareName()!= null && !connectionItem.getShareName().equals("")) {
+							path += connectionItem.getShareName()+ "/";
+						}
 						connStr = String.format(Locale.CANADA, "%s://%s:%d/",
 								connectionItem.getScheme(), connectionItem.getHost(), connectionItem.getPort());
 						user = connectionItem.getUsername();
 						pass = connectionItem.getPassword();
-						dir = connectionItem.getPath();
+						share = connectionItem.getShareName();
+						dir = path+ connectionItem.getPath();
 					}
 				}
 				return connectftp(connStr, user, pass, dir);

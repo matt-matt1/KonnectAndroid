@@ -6,6 +6,13 @@
 	android:layout_height="match_parent"
 	android:orientation="vertical">
 
+	<ProgressBar
+		android:layout_width="42dp"
+		android:layout_height="42dp"
+		android:id="@+id/pb_dialog_spinner"
+		android:visibility="gone"
+		android:layout_centerInParent="true" />
+
 	<ListView
 		android:id="@+id/lv_dialog_list"
 		android:layout_width="wrap_content"
@@ -13,7 +20,7 @@
 		android:layout_centerHorizontal="true"
 		android:layout_marginRight="10dp"
 		android:layout_marginLeft="10dp"
-		android:cacheColorHint="@color/Gray"
+		android:cacheColorHint="@color/gray_gray"
 		/>
 
 </RelativeLayout>

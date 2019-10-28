@@ -24,8 +24,7 @@
 	<string name="files">My Files</string>
 	<string name="empty">empty</string>
 
-	<!-- TODO: Remove or change this placeholder text -->
-	<string name="hello_blank_fragment">Hello blank fragment</string>
+<!--	<string name="hello_blank_fragment">Hello blank fragment</string>-->
 	<string name="view_contacts">View contacts</string>
 	<string name="no_address">no address</string>
 	<string name="no_intent_found">no intent found</string>
@@ -37,7 +36,7 @@
 	<string name="resize">item size</string>
 	<string name="dialog_fire_missiles">Fire missiles?</string>
 	<string name="fire">fire</string>
-	<string name="cancel">cancel</string>
+<!--	<string name="cancel">cancel</string>-->
 	<string name="username">username</string>
 	<string name="password">password</string>
 	<string name="gdrive">Google Drive</string>
@@ -69,7 +68,8 @@
 		Your carrier may impose extra charges by using this appliication.
 		Suggestion: disable the mobile network and restart this application
 	</string>
-	<string name="no_network">No network connection - only this device will be available</string>
+<!--	<string name="no_network">No network connection - only this device will be available</string>-->
+	<string name="no_network">No network connection</string>
 	<string name="wifi_connected">WIFI connected</string>
 	<string name="lost_connection">lost connection</string>
 	<string name="init_path">initial path</string>
@@ -82,7 +82,7 @@
 	<string name="edit_conn">edit connection</string>
 	<string name="eg_conn">Eg. My Connection</string>
 	<string name="domain">domain</string>
-	<string name="connto">connect to ...</string>
+	<string name="connto">connect to …</string>
 	<string name="title">title</string>
 	<string name="conn_good">Connection is good</string>
 	<string name="save_OK">Press OK to save</string>
@@ -94,13 +94,15 @@
 	<string name="open">open</string>
 	<string name="copy">copy</string>
 	<string name="edit">edit</string>
+	<string name="search_shares">Search this Host for Shares</string>
+	<string name="search_shares_text">If share name is not certain:</string>
+	<string name="share_name">Share name</string>
+	<string name="my_network">My Network</string>
+	<string name="error">error</string>
+	<string name="expand__menu">Expand/Shrink Menu</string>
 
 	<string-array name="contactShare">
 		<item>Email</item>
 		<item>SMS/MMS (Text Message)</item>
 	</string-array>
-	<!--	<string name="gdrive">Google Drive</string>-->
-	<!--	<string name="gdrive">Google Drive</string>-->
-	<!--	<string name="gdrive">Google Drive</string>-->
-	<!--	<string name="gdrive">Google Drive</string>-->
 </resources>

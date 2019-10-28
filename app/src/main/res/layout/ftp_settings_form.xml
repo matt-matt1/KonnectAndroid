@@ -2,6 +2,7 @@
 <!--inuse-->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:tools="http://schemas.android.com/tools"
+	android:id="@+id/fl_ftp"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent">
 
@@ -145,7 +146,7 @@
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				style="@style/FormFieldEntry"
-				android:autofillHints="@string/username"
+				android:autofillHints="@string/domain"
 				tools:ignore="LabelFor,UnusedAttribute"
 				android:inputType="text"
 				android:hint=""
@@ -183,6 +184,35 @@
 				android:inputType="textPassword"
 				android:hint=""
 				android:id="@+id/et_ftp_password" />
+			<!--share_name-->
+			<TextView
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:visibility="gone"
+				style="@style/FormFieldLabel"
+				android:text="@string/share_name"
+				android:id="@+id/tv_ftp_share_name" />
+
+			<Button
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:visibility="gone"
+				android:id="@+id/b_ftp_search_shares"
+				android:layout_gravity="center_horizontal"
+				style="@style/MyButtonStyle"
+				android:background="@drawable/button_selector"
+				android:text="@string/search_shares"/>
+
+			<EditText
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:visibility="gone"
+				style="@style/FormFieldEntry"
+				android:autofillHints="@string/password"
+				tools:ignore="LabelFor,UnusedAttribute"
+				android:inputType="text"
+				android:hint=""
+				android:id="@+id/et_ftp_share_name" />
 			<!--	init_path-->
 			<TextView
 				android:layout_width="match_parent"
@@ -209,12 +239,23 @@
 		</LinearLayout>
 	</ScrollView>
 
-	<ProgressBar
-		android:layout_width="42dp"
-		android:layout_height="42dp"
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:gravity="center"
 		android:layout_gravity="center"
-		android:visibility="gone"
-		android:id="@+id/pb_ftp_spinner" />
+		android:orientation="vertical"
+		android:visibility="invisible"
+		android:id="@+id/ll_ftp_scrolloverlay">
+		<ImageView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:id="@+id/iv_ftp_scroll" />
+		<ImageView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:id="@+id/iv_ftp_scroll2" />
+	</LinearLayout>
 
 	<LinearLayout
 		android:layout_width="match_parent"
@@ -237,4 +278,11 @@
 			android:layout_gravity="center_horizontal"
 			android:id="@+id/tv_ftp_response" />
 	</LinearLayout>
+
+	<ProgressBar
+		android:layout_width="42dp"
+		android:layout_height="42dp"
+		android:layout_gravity="center"
+		android:visibility="gone"
+		android:id="@+id/pb_ftp_spinner" />
 </FrameLayout>

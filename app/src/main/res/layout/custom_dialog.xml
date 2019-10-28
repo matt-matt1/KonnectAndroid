@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="wrap_content"
 	android:id="@+id/rl_dialog_background"
@@ -17,7 +18,8 @@
 		android:paddingBottom="12sp"
 		android:background="@drawable/background_rounded_corners"
 		android:clipToPadding="true"
-		android:clipChildren="true">
+		android:clipChildren="true"
+		tools:ignore="UselessParent">
 
 		<RelativeLayout
 			android:id="@+id/relativeLayout1"
@@ -39,7 +41,7 @@
 				android:layout_alignParentTop="true"
 				android:textStyle="bold"
 				android:textAppearance="?android:attr/textAppearanceMedium"
-				android:textColor="@color/White"
+				android:textColor="@color/white"
 				android:textSize="20sp"
 				android:layout_alignParentStart="true" />
 		</RelativeLayout>
@@ -85,32 +87,34 @@
 				android:layout_centerVertical="true"
 				android:text="Medium Text"
 				android:textAppearance="?android:attr/textAppearanceMedium"
-				android:textColor="@color/White"
+				android:textColor="@color/white"
 				android:textSize="13sp"
 				android:layout_alignParentStart="true" />
 
 		</RelativeLayout>
 
 		<!--		android:textSize="10sp"-->
+		<!--		android:background="@drawable/blue_button"-->
 		<Button
 			android:id="@+id/next_button"
 			android:layout_width="90dip"
 			android:layout_height="35dip"
 			android:layout_alignParentBottom="true"
-			android:textColor="@color/White"
-			android:background="@drawable/blue_button"
+			android:textColor="@color/white"
+			android:background="@drawable/button_selector"
 			android:layout_marginBottom="5dp"
 			android:layout_alignRight="@+id/relativeLayout3"
 			android:layout_alignEnd="@+id/relativeLayout3" />
 
 		<!--		android:textSize="10dp"-->
+<!--		android:background="@drawable/blue_button"-->
 		<Button
 			android:id="@+id/button2"
-			android:textColor="@color/White"
+			android:textColor="@color/white"
 			android:layout_width="90dip"
 			android:layout_height="35dip"
 			android:layout_marginBottom="5dp"
-			android:background="@drawable/blue_button"
+			android:background="@drawable/button_selector"
 			android:layout_marginRight="7dp"
 			android:layout_alignParentBottom="true"
 			android:layout_toLeftOf="@+id/next_button"
@@ -118,13 +122,14 @@
 			android:layout_toStartOf="@+id/next_button" />
 
 		<!--		android:textSize="10sp"-->
+		<!--		android:background="@drawable/blue_button"-->
 		<Button
 			android:id="@+id/button3"
-			android:textColor="@color/White"
+			android:textColor="@color/white"
 			android:layout_width="90dip"
 			android:layout_height="35dip"
 			android:layout_marginBottom="5dp"
-			android:background="@drawable/blue_button"
+			android:background="@drawable/button_selector"
 			android:layout_marginRight="7dp"
 			android:layout_alignParentBottom="true"
 			android:layout_toLeftOf="@+id/button2"

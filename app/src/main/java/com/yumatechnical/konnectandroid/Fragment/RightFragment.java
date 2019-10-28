@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
@@ -12,11 +13,16 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -26,6 +32,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -61,6 +68,10 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
+import java.net.InetAddress;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -78,12 +89,16 @@ public class RightFragment extends Fragment implements LoaderManager.LoaderCallb
 	private ArrayList<FileItem> contactsList = new ArrayList<>(),
 			listOfAllImages = new ArrayList<>(),
 			listOfAllFiles = new ArrayList<>(),
+			listofLocalHosts = new ArrayList<>(),
 			listOfMyMusic = new ArrayList<>();
 	private String msg, title;
-	TextView msgView, titleView;
-	ProgressBar spinner;
-	ContentResolver resolver;
-	Uri uri;
+	private TextView msgView, titleView, spinnerText;
+	private ProgressBar spinnerPB, spinner8;
+	private FrameLayout spinner;
+	private int pStatus = 0;
+	private Handler handler = new Handler();
+	private ContentResolver resolver;
+	private Uri uri;
 	private static final String TAG = RightFragment.class.getSimpleName();
 	private static final int LOADER_GATHER_MY_PHOTOS = 20;
 	private static final int LOADER_GATHER_MY_MUSIC = 21;
@@ -93,10 +108,10 @@ public class RightFragment extends Fragment implements LoaderManager.LoaderCallb
 //	private MyViewModel model;
 	private Drawable fileIcon = new IconicsDrawable(getApplicationContext(),
 		FontAwesome.Icon.faw_file)
-		.color(IconicsColor.colorRes(R.color.Gray)).size(IconicsSize.dp(100));
+		.color(IconicsColor.colorRes(R.color.gray_gray)).size(IconicsSize.dp(100));
 	private Drawable dirIcon = new IconicsDrawable(getApplicationContext(),
 			FontAwesome.Icon.faw_folder)
-			.color(IconicsColor.colorRes(R.color.Gray)).size(IconicsSize.dp(100));
+			.color(IconicsColor.colorRes(R.color.gray_gray)).size(IconicsSize.dp(100));
 
 	/**
 	 * default constructor
@@ -153,7 +168,15 @@ public class RightFragment extends Fragment implements LoaderManager.LoaderCallb
 		if (savedInstanceState != null) {
 			Log.d(TAG, "RightFragment-onActivityCreated:" + savedInstanceState.toString());
 		}
-		spinner = getActivity().findViewById(R.id.pb_right);
+		spinnerPB = getActivity().findViewById(R.id.pb_progress);
+		spinner8 = getActivity().findViewById(R.id.pb_progress_infinite);
+		spinner = getActivity().findViewById(R.id.fl_progress_right);
+		spinnerText = getActivity().findViewById(R.id.tv_progress);
+		spinnerPB.setProgress(0);
+		spinnerText.setText("0%");
+		spinnerPB.setSecondaryProgress(100);
+		spinnerPB.setMax(100);
+		spinnerPB.setProgressDrawable(getResources().getDrawable(R.drawable.circular));
 		msgView = getActivity().findViewById(R.id.tv_right);
 		titleView = getActivity().findViewById(R.id.tv_right_title);
 		((Vars)getActivity().getApplication()).recyclerView = getActivity().findViewById(R.id.rv_right);
@@ -174,7 +197,30 @@ public class RightFragment extends Fragment implements LoaderManager.LoaderCallb
 		if (msg != null && !msg.isEmpty()) {
 			msgView.setText(msg);
 		} else {
-			spinner.setVisibility(View.VISIBLE);
+//			spinner.setVisibility(View.VISIBLE);
+			spinner8.setVisibility(View.VISIBLE);
+/*			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					while (pStatus < 100) {
+						pStatus += 1;
+						handler.post(new Runnable() {
+							@Override
+							public void run() {
+								spinnerPB.setProgress(pStatus);
+								spinnerText.setText(pStatus + "%");
+							}
+						});
+						try {
+							// Sleep for 200 milliseconds.=16
+							Thread.sleep(100); //thread will take approx 3 seconds to finish,change its value according to your needs
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			}).start();
+			*/
 			((Vars)getActivity().getApplication()).recyclerView.setVisibility(View.INVISIBLE);
 //			model.recyclerView.setVisibility(View.INVISIBLE);
 //			rightAdapter = new RightAdapter(null, null, null);
@@ -250,8 +296,12 @@ public class RightFragment extends Fragment implements LoaderManager.LoaderCallb
 //			if (!Permissons.Check_STORAGE(this.getActivity())) {
 //				Permissons.Request_STORAGE(this, MY_PERMISSION_MUSIC_READ_EXTERNAL_STORAGE_REQUEST_CODE);
 //			} else {
-				new FetchMusicTask(-1).execute();
+			new FetchMusicTask(-1).execute();
 //			}
+		} else if (title.equals(getString(R.string.my_network))) {
+//			new LocalNetwork.NetworkSniffTask(getApplicationContext()).execute();
+			new LocalHostsTask(getApplicationContext()).execute();
+//			new FetchLocalHosts().execute();
 		} else {
 //			File dir = new File(Environment.getExternalStorageDirectory().getPath());
 			File dir = new File(Environment.getRootDirectory().getPath());
@@ -290,6 +340,153 @@ public class RightFragment extends Fragment implements LoaderManager.LoaderCallb
 	}
 
 
+	public class LocalHostsTask extends AsyncTask<Void, String[], Void> {
+
+		private WeakReference<Context> mContextRef;
+
+		public LocalHostsTask(Context context) {
+			mContextRef = new WeakReference<>(context);
+		}
+
+		@Override
+		protected void onPreExecute() {
+			spinner.setVisibility(View.VISIBLE);
+			spinner8.setVisibility(View.VISIBLE);
+//			((Vars)getActivity().getApplication()).recyclerView.setVisibility(View.INVISIBLE);
+			((Vars)getActivity().getApplication()).recyclerView.setVisibility(View.VISIBLE);
+		}
+
+		@Override
+		protected Void doInBackground(Void... voids) {
+			Log.d(TAG, "Let's sniff the network");
+			try {
+				Context context = mContextRef.get();
+				if (context != null) {
+					ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+					NetworkInfo activeNetwork;
+					if (cm != null) {
+						activeNetwork = cm.getActiveNetworkInfo();
+						Log.d(TAG, "activeNetwork: "+ activeNetwork);
+					}
+					WifiManager wm = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+
+					WifiInfo connectionInfo;
+					if (wm != null) {
+						connectionInfo = wm.getConnectionInfo();
+						int ipInt = connectionInfo.getIpAddress();
+						if (ipInt == 0) {
+							Log.d(TAG, "cannot work on emulator");
+							return null;
+						}
+						Log.d(TAG, "ip as int: "+ ipInt);
+						String ipString = InetAddress.getByAddress(
+								ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(ipInt).array())
+								.getHostAddress();
+
+						Log.d(TAG, "ipString: "+ ipString);
+						((Vars)getApplicationContext()).setMyIPString(ipString);
+
+						String prefix = ipString.substring(0, ipString.lastIndexOf(".") + 1);
+						Log.d(TAG, "prefix: " + prefix);
+						publishProgress(   new String[]{    "title", prefix } );
+
+						for (int i = 0; i < 255; i++) {
+							String testIp = prefix + i;
+							publishProgress(new String[]{    "percent", String.valueOf(i)   }   );
+
+							InetAddress address = InetAddress.getByName(testIp);
+							boolean reachable = address.isReachable(1000);
+							String hostName = address.getCanonicalHostName();
+
+							if (reachable) {
+								Log.i(TAG, "Host: " + hostName + "(" + testIp + ") is reachable!");
+								publishProgress(	new String[]{    "host", hostName,
+										"ip", testIp    }	);
+							}
+						}
+					}
+				}
+			} catch (Throwable t) {
+				Log.e(TAG, "Well that's not good.", t);
+			}
+		return null;
+		}
+
+		@SuppressLint("DefaultLocale")
+		@Override
+		protected void onProgressUpdate(String[]... values) {
+			for (int i = 0; i < values.length; i++) {
+				String[] string = values[i];
+				switch (string[0]) {
+					case "title":
+						titleView.setText(String.format("%s\n(%s)", title, string[1]));
+						break;
+					case "host":
+						try {
+							String ip = string[3];
+							String host = string[1];
+							if (ip.equals(((Vars) getApplicationContext()).getMyIPString())) {
+								host = "My " + string[1];
+								ip = "* " + string[3];
+							}
+							listofLocalHosts.add(new FileItem(host + " (" + ip + ")", null, 0,
+									null, "", false, string[1], null,
+									false, ip));
+						} catch (Exception e) {
+							listofLocalHosts.add(new FileItem(string[1], null, 0, null,
+									"", false, string[1], null,
+									false, string[1]));
+						}
+						((Vars) getActivity().getApplication()).rightAdapter.setData(listofLocalHosts);
+						((Vars) getActivity().getApplication()).rightAdapter.notifyDataSetChanged();
+						break;
+					case "percent":
+						try {
+							int percent = Integer.parseInt(string[1]);
+							Log.d(TAG, "raw percent: "+ percent);
+							percent = (percent * 100) / 255;
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//								spinnerPB.setProgress(percent / 255 * 100, true);
+								spinnerPB.setProgress(percent, true);
+//								Log.d(TAG, "setProgress: "+ percent);
+							} else {
+//								spinnerPB.setProgress(percent / 255 * 100);
+								spinnerPB.setProgress(percent);
+//								Log.d(TAG, "LocalHostsTask:onProgressUpdate error");
+							}
+							spinnerText.setText(String.format("%d%%", percent));
+							Log.d(TAG, "now percent: "+ percent);
+						} catch (Exception e) {
+							Log.d(TAG, "LocalHostsTask:onProgressUpdate error");
+							e.printStackTrace();
+						}
+						break;
+					default:
+				}
+			}
+		}
+
+		@Override
+		protected void onPostExecute(Void aVoid) {
+			if (listofLocalHosts.size() > 0) {
+				((Vars)getActivity().getApplication()).rightAdapter.setData(listofLocalHosts);
+				for (FileItem item : listofLocalHosts) {
+					item.setHasContents(true);
+				}
+				((Vars)getActivity().getApplication()).rightAdapter.notifyDataSetChanged();
+				spinner.setVisibility(View.INVISIBLE);
+				spinner8.setVisibility(View.INVISIBLE);
+				((Vars)getActivity().getApplication()).recyclerView.setVisibility(View.VISIBLE);
+			} else {
+				spinner.setVisibility(View.INVISIBLE);
+				spinner8.setVisibility(View.INVISIBLE);
+				msgView.setText(R.string.no_network);
+			}
+		}
+
+	}
+
+
 	@SuppressLint("StaticFieldLeak")
 	public class FetchContactsTask extends AsyncTask<Void, Void, Void> {
 
@@ -302,7 +499,8 @@ public class RightFragment extends Fragment implements LoaderManager.LoaderCallb
 
 		@Override
 		protected void onPreExecute() {
-			spinner.setVisibility(View.VISIBLE);
+//			spinner.setVisibility(View.VISIBLE);
+			spinner8.setVisibility(View.VISIBLE);
 			((Vars)getActivity().getApplication()).recyclerView.setVisibility(View.INVISIBLE);
 //			model.recyclerView.setVisibility(View.INVISIBLE);
 		}
@@ -320,7 +518,7 @@ public class RightFragment extends Fragment implements LoaderManager.LoaderCallb
 				((Vars)getActivity().getApplication()).rightAdapter.setDefaultImage(new IconicsDrawable(
 						getApplicationContext(),
 						FontAwesome.Icon.faw_user_circle1)
-						.color(IconicsColor.colorRes(R.color.White))
+						.color(IconicsColor.colorRes(R.color.white))
 						.size(IconicsSize.dp(((Vars) getApplicationContext()).getIconSize())));
 				((Vars)getActivity().getApplication()).rightAdapter.setListener((name, item, position) -> {
 					AlertDialog.Builder contactDialogBuilder = new AlertDialog.Builder(getActivity(), R.style.CustomDialogTheme);
@@ -344,10 +542,12 @@ public class RightFragment extends Fragment implements LoaderManager.LoaderCallb
 					}
 				});
 				((Vars)getActivity().getApplication()).rightAdapter.notifyDataSetChanged();
-				spinner.setVisibility(View.INVISIBLE);
+//				spinner.setVisibility(View.INVISIBLE);
+				spinner8.setVisibility(View.INVISIBLE);
 				((Vars)getActivity().getApplication()).recyclerView.setVisibility(View.VISIBLE);
 			} else {
-				spinner.setVisibility(View.INVISIBLE);
+//				spinner.setVisibility(View.INVISIBLE);
+				spinner8.setVisibility(View.INVISIBLE);
 				msgView.setText(R.string.empty);
 			}
 		}
@@ -428,7 +628,7 @@ public class RightFragment extends Fragment implements LoaderManager.LoaderCallb
 				}
 				Drawable drawable = new IconicsDrawable(getApplicationContext(),
 						FontAwesome.Icon.faw_person_booth)
-						.color(IconicsColor.colorRes(R.color.White)).size(IconicsSize.TOOLBAR_ICON_SIZE);
+						.color(IconicsColor.colorRes(R.color.white)).size(IconicsSize.TOOLBAR_ICON_SIZE);
 				FileItem fileItem = new FileItem(name, null, Integer.parseInt(id),
 						 null, "mime", has, name, phoneList, false, label);
 				contactsList.add(fileItem);
@@ -490,7 +690,8 @@ public class RightFragment extends Fragment implements LoaderManager.LoaderCallb
 
 		@Override
 		protected void onPreExecute() {
-			spinner.setVisibility(View.VISIBLE);
+//			spinner.setVisibility(View.VISIBLE);
+			spinner8.setVisibility(View.VISIBLE);
 			((Vars)getActivity().getApplication()).recyclerView.setVisibility(View.INVISIBLE);
 //			model.recyclerView.setVisibility(View.INVISIBLE);
 		}
@@ -506,7 +707,7 @@ public class RightFragment extends Fragment implements LoaderManager.LoaderCallb
 			if (listOfAllImages.size() > 0) {
 				Drawable defaultImg = new IconicsDrawable(getApplicationContext(),
 						FontAwesome.Icon.faw_image)
-						.color(IconicsColor.colorRes(R.color.White)).size(IconicsSize.dp(((Vars) getApplicationContext()).getIconSize()));
+						.color(IconicsColor.colorRes(R.color.white)).size(IconicsSize.dp(((Vars) getApplicationContext()).getIconSize()));
 //						.color(IconicsColor.colorRes(R.color.White)).size(IconicsSize.dp(Objects.requireNonNull(model.getIconSize().getValue())));
 //				myList.setData(listOfAllImages, defaultImg);
 //				rightAdapter = new RightAdapter(null, null, new RightAdapter.ListItemClickListener() {
@@ -547,11 +748,13 @@ public class RightFragment extends Fragment implements LoaderManager.LoaderCallb
 //				rightAdapter.setDefaultImage(defaultImg);
 				((Vars)getActivity().getApplication()).rightAdapter.setDefaultImage(defaultImg);
 //				model.rightAdapter.setDefaultImage(defaultImg);
-				spinner.setVisibility(View.INVISIBLE);
+//				spinner.setVisibility(View.INVISIBLE);
+				spinner8.setVisibility(View.INVISIBLE);
 				((Vars)getActivity().getApplication()).recyclerView.setVisibility(View.VISIBLE);
 //				model.recyclerView.setVisibility(View.VISIBLE);
 			} else {
-				spinner.setVisibility(View.INVISIBLE);
+				spinner8.setVisibility(View.INVISIBLE);
+//				spinner.setVisibility(View.INVISIBLE);
 				msgView.setText(R.string.empty);
 			}
 		}
@@ -654,7 +857,8 @@ public class RightFragment extends Fragment implements LoaderManager.LoaderCallb
 
 		@Override
 		protected void onPreExecute() {
-			spinner.setVisibility(View.VISIBLE);
+//			spinner.setVisibility(View.VISIBLE);
+			spinner8.setVisibility(View.INVISIBLE);
 			((Vars)getActivity().getApplication()).recyclerView.setVisibility(View.INVISIBLE);
 //			model.recyclerView.setVisibility(View.INVISIBLE);
 		}
@@ -684,12 +888,14 @@ public class RightFragment extends Fragment implements LoaderManager.LoaderCallb
 						new IconicsDrawable(getApplicationContext(),
 //				model.rightAdapter.setDefaultImage(new IconicsDrawable(getApplicationContext(),
 						FontAwesome.Icon.faw_music)
-						.color(IconicsColor.colorRes(R.color.White)).size(IconicsSize.dp(100)));
-				spinner.setVisibility(View.INVISIBLE);
+						.color(IconicsColor.colorRes(R.color.white)).size(IconicsSize.dp(100)));
+//				spinner.setVisibility(View.INVISIBLE);
+				spinner8.setVisibility(View.INVISIBLE);
 				((Vars)getActivity().getApplication()).recyclerView.setVisibility(View.VISIBLE);
 //				model.recyclerView.setVisibility(View.VISIBLE);
 			} else {
-				spinner.setVisibility(View.INVISIBLE);
+//				spinner.setVisibility(View.INVISIBLE);
+				spinner8.setVisibility(View.INVISIBLE);
 				msgView.setText(R.string.empty);
 			}
 		}
@@ -768,7 +974,8 @@ public class RightFragment extends Fragment implements LoaderManager.LoaderCallb
 
 		@Override
 		protected void onPreExecute() {
-			spinner.setVisibility(View.VISIBLE);
+//			spinner.setVisibility(View.VISIBLE);
+			spinner8.setVisibility(View.VISIBLE);
 			titleView.setText(String.format("%s\n%s", title, directory));
 			((Vars)getActivity().getApplication()).recyclerView.setVisibility(View.INVISIBLE);
 //			model.recyclerView.setVisibility(View.INVISIBLE);
@@ -827,10 +1034,14 @@ public class RightFragment extends Fragment implements LoaderManager.LoaderCallb
 						new IconicsDrawable(getApplicationContext(),
 //				model.rightAdapter.setDefaultImage(new IconicsDrawable(getApplicationContext(),
 						FontAwesome.Icon.faw_file)
-						.color(IconicsColor.colorRes(R.color.White)).size(IconicsSize.dp(100)));
-				spinner.setVisibility(View.INVISIBLE);
+						.color(IconicsColor.colorRes(R.color.white)).size(IconicsSize.dp(100)));
+//				spinner.setVisibility(View.INVISIBLE);
+				spinner8.setVisibility(View.INVISIBLE);
 				((Vars)getActivity().getApplication()).recyclerView.setVisibility(View.VISIBLE);
 //				model.recyclerView.setVisibility(View.VISIBLE);
+			} else {
+				msgView.setText(R.string.error);
+				spinner8.setVisibility(View.INVISIBLE);
 			}
 		}
 
@@ -925,7 +1136,8 @@ public class RightFragment extends Fragment implements LoaderManager.LoaderCallb
 		contextmenuBuilder.setView(customView);
 
 		final AlertDialog contextmenuDialog = contextmenuBuilder.create();
-		contextmenuDialog.setButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE, getResources().getString(R.string.cancel),
+		contextmenuDialog.setButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE,
+				getResources().getString(android.R.string.cancel),
 				(dialog1, which) -> dialog1.cancel());
 		contextmenuDialog.setCanceledOnTouchOutside(false);
 		contextmenuDialog.show();

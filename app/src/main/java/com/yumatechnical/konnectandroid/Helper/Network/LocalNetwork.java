@@ -1,5 +1,6 @@
 package com.yumatechnical.konnectandroid.Helper.Network;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.Network;
@@ -11,10 +12,10 @@ import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.RequiresApi;
-import androidx.fragment.app.FragmentActivity;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.fragment.app.Fragment;
 
-import com.yumatechnical.konnectandroid.Model.MyViewModel;
+import com.yumatechnical.konnectandroid.Fragment.RightFragment;
+import com.yumatechnical.konnectandroid.Model.FileItem;
 import com.yumatechnical.konnectandroid.Vars;
 
 import java.io.BufferedReader;
@@ -43,6 +44,7 @@ public class LocalNetwork {
 	/**
 	 * needs: android.permission.ACCESS_WIFI_STATE
 	 */
+	@SuppressWarnings("unused")
 	public static class AsyncMacName extends AsyncTask<Void, Void, Void> {
 
 //		private static final String TAG = macName.class.getSimpleName();
@@ -50,8 +52,9 @@ public class LocalNetwork {
 		private String mac;
 
 
+		@SuppressWarnings("unused")
 		public AsyncMacName(Context context, String macAddress) {
-			mContextRef = new WeakReference<Context>(context);
+			mContextRef = new WeakReference<>(context);
 			this.mac = macAddress;
 		}
 
@@ -63,6 +66,7 @@ public class LocalNetwork {
 
 	}
 
+	@SuppressWarnings("unused")
 	public static void macToManufacturor(String macAddress) {
 //		String macAdress = "5caafd1b0019";
 		Log.d(TAG, "macToManufacturor for "+ macAddress);
@@ -80,7 +84,7 @@ public class LocalNetwork {
 			wr.close();
 			InputStream is = connection.getInputStream();
 			BufferedReader rd = new BufferedReader(new InputStreamReader(is));
-			StringBuffer response = new StringBuffer();
+			StringBuilder response = new StringBuilder();
 			String line;
 			while ((line = rd.readLine()) != null) {response.append(line);response.append('\r');}
 			rd.close();
@@ -109,7 +113,7 @@ public class LocalNetwork {
 			void MobileConnected(boolean isConnection);
 			void NetworkConnected(boolean isConnected);
 		}
-		public OnNetworkConnectionInfo listener = null;
+		public OnNetworkConnectionInfo listener;
 		boolean networkConnection = false;
 		boolean wifiConnection = false;
 		boolean mobileConnection = false;
@@ -130,7 +134,10 @@ public class LocalNetwork {
 				Context context = mContextRef.get();
 				if (context != null) {
 					ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-					NetworkInfo networkInfo1 = cm.getActiveNetworkInfo();
+					NetworkInfo networkInfo1 = null;
+					if (cm != null) {
+						networkInfo1 = cm.getActiveNetworkInfo();
+					}
 					if (networkInfo1 != null && networkInfo1.isConnected()) {
 						networkConnection = true;
 					}
@@ -195,72 +202,95 @@ public class LocalNetwork {
 	/**
 	 * needs: android.permission.ACCESS_WIFI_STATE
 	 */
+	@SuppressWarnings("unused")
 	public static class NetworkSniffTask extends AsyncTask<Void, Void, Void> {
 
 		private static final String TAG = NetworkSniffTask.class.getSimpleName();
 		private WeakReference<Context> mContextRef;
-		private MyViewModel model;
+//		private MyViewModel model;
+		private ArrayList<FileItem> listofLocalHosts = new ArrayList<>();
 
 
+		@SuppressWarnings("unused")
 		public NetworkSniffTask(Context context) {
-			mContextRef = new WeakReference<Context>(context);
+			mContextRef = new WeakReference<>(context);
 		}
 
 		@Override
 		protected Void doInBackground(Void... voids) {
-			Log.d(TAG, "Let's sniff the network");
-			try {
-				Context context = mContextRef.get();
-				if (context != null) {
-					ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-					NetworkInfo activeNetwork;
-					if (cm != null) {
-						activeNetwork = cm.getActiveNetworkInfo();
-						Log.d(TAG, "activeNetwork: "+ activeNetwork);
-					}
-					WifiManager wm = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-
-					WifiInfo connectionInfo;
-					if (wm != null) {
-						connectionInfo = wm.getConnectionInfo();
-						int ipInt = connectionInfo.getIpAddress();
-						if (ipInt == 0) {
-							Log.d(TAG, "cannot work on emulator");
-							return null;
-						}
-						Log.d(TAG, "ip as int: "+ ipInt);
-						String ipString = InetAddress.getByAddress(
-								ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(ipInt).array())
-								.getHostAddress();
-
-						Log.d(TAG, "ipString: "+ ipString);
-//						((Vars)context).setMyIPString(ipString);
-//						mo.setMyIPString(ipString);
-
-						String prefix = ipString.substring(0, ipString.lastIndexOf(".") + 1);
-						Log.d(TAG, "prefix: " + prefix);
-
-						for (int i = 0; i < 255; i++) {
-							String testIp = prefix + i;
-
-							InetAddress address = InetAddress.getByName(testIp);
-							boolean reachable = address.isReachable(1000);
-							String hostName = address.getCanonicalHostName();
-
-							if (reachable)
-								Log.i(TAG, "Host: "+ hostName + "("+ testIp+ ") is reachable!");
-						}
-					}
-//					int ipAddress = connectionInfo.getIpAddress();
-				}
-			} catch (Throwable t) {
-				Log.e(TAG, "Well that's not good.", t);
-			}
-
+			doSniff(mContextRef);
 			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void aVoid) {
+//			if (listofLocalHosts.size() < 0) {
+//
+//			} else {
+//				((RightFragment) Fragment)
+//			}
+		}
+
+		@Override
+		protected void onProgressUpdate(Void... values) {
+			super.onProgressUpdate(values);
 		}
 	}
 
+	public static void doSniff(WeakReference<Context> myContext) {
+		Log.d(TAG, "Let's sniff the network");
+		try {
+//			Context context = mContextRef.get();
+			Context context = myContext.get();
+			if (context != null) {
+				ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+				NetworkInfo activeNetwork;
+				if (cm != null) {
+					activeNetwork = cm.getActiveNetworkInfo();
+					Log.d(TAG, "activeNetwork: "+ activeNetwork);
+				}
+				WifiManager wm = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+
+				WifiInfo connectionInfo;
+				if (wm != null) {
+					connectionInfo = wm.getConnectionInfo();
+					int ipInt = connectionInfo.getIpAddress();
+					if (ipInt == 0) {
+						Log.d(TAG, "cannot work on emulator");
+//						return null;
+						return;
+					}
+					Log.d(TAG, "ip as int: "+ ipInt);
+					String ipString = InetAddress.getByAddress(
+							ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(ipInt).array())
+							.getHostAddress();
+
+					Log.d(TAG, "ipString: "+ ipString);
+//						((Vars)context).setMyIPString(ipString);
+//						mo.setMyIPString(ipString);
+
+					String prefix = ipString.substring(0, ipString.lastIndexOf(".") + 1);
+					Log.d(TAG, "prefix: " + prefix);
+
+					for (int i = 0; i < 255; i++) {
+						String testIp = prefix + i;
+
+						InetAddress address = InetAddress.getByName(testIp);
+						boolean reachable = address.isReachable(1000);
+						String hostName = address.getCanonicalHostName();
+
+						if (reachable) {
+							Log.i(TAG, "Host: " + hostName + "(" + testIp + ") is reachable!");
+						}
+					}
+				}
+//					int ipAddress = connectionInfo.getIpAddress();
+			}
+		} catch (Throwable t) {
+			Log.e(TAG, "Well that's not good.", t);
+		}
+//		return null;
+	}
 /*
 	private String getMyIP() {
 		String ip = "";
@@ -282,15 +312,22 @@ public class LocalNetwork {
 		}
 	}
 */
+	@SuppressLint("DefaultLocale")
+	@SuppressWarnings("unused")
 	private String getSubnetAddress (int address)
 	{
-		String ipString = String.format(
+//		String ipString = String.format(
+//				"%d.%d.%d",
+//				(address & 0xff),
+//				(address >> 8 & 0xff),
+//				(address >> 16 & 0xff));
+//
+//		return ipString;
+		return String.format(
 				"%d.%d.%d",
 				(address & 0xff),
 				(address >> 8 & 0xff),
 				(address >> 16 & 0xff));
-
-		return ipString;
 	}
 
 	/**
@@ -302,6 +339,7 @@ public class LocalNetwork {
 //		String subnet = getSubnetAddress(mWifiManager.getDhcpInfo().gateway);
 //	}
 
+	@SuppressWarnings("unused")
 	private void checkHosts(String subnet)
 	{
 		try
@@ -328,12 +366,13 @@ public class LocalNetwork {
 		}
 	}
 
-	ArrayList<IpAddress> mIpAddressesList;
+	private ArrayList<IpAddress> mIpAddressesList;
 
+	@SuppressWarnings("unused")
 	private boolean getIpFromArpCache()
 	{
 		BufferedReader br = null;
-		char buffer[] = new char[65000];
+		char[] buffer = new char[65000];
 		String currentLine;
 		try
 		{
@@ -371,7 +410,9 @@ public class LocalNetwork {
 		{
 			try
 			{
-				br.close();
+				if (br != null) {
+					br.close();
+				}
 			}
 			catch (IOException e)
 			{
@@ -388,29 +429,34 @@ public class LocalNetwork {
 		private String macAddress;
 
 
-		public IpAddress(String ipAddressName, String macAddress)
+		@SuppressWarnings("unused")
+		IpAddress(String ipAddressName, String macAddress)
 		{
 			setIpAddressName(ipAddressName);
 			setMacAddress(macAddress);
 		}
 
-		public void setIpAddressName(String ipAddressName)
+		@SuppressWarnings("unused")
+		void setIpAddressName(String ipAddressName)
 		{
 			this.ipAddressName = ipAddressName;
 		}
 
+		@SuppressWarnings("unused")
 		public String getIpAddressName()
 		{
 			return this.ipAddressName;
 		}
 
 
-		public void setMacAddress(String macAddress)
+		@SuppressWarnings("unused")
+		void setMacAddress(String macAddress)
 		{
 			this.macAddress = macAddress;
 		}
 
 
+		@SuppressWarnings("unused")
 		public String getMacAddress()
 		{
 			return this.macAddress;
