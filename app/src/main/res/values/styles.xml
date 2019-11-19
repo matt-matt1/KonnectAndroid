@@ -1,15 +1,30 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Base application theme -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/Teal</item>
         <item name="colorPrimaryDark">@color/red_maroon</item>
         <item name="colorAccent">@color/green_emerald</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
     </style>
+<!--    &lt;!&ndash; Base application theme &ndash;&gt;-->
+<!--    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">-->
+<!--        &lt;!&ndash; Customize your theme here. &ndash;&gt;-->
+<!--        <item name="colorPrimary">@color/Teal</item>-->
+<!--        <item name="colorPrimaryDark">@color/red_maroon</item>-->
+<!--        <item name="colorAccent">@color/green_emerald</item>-->
+<!--        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>-->
+<!--	    <item name="windowActionBar">true</item>-->
+<!--	    <item name="windowNoTitle">true</item>-->
+<!--    </style>-->
 
 <!--	<style name="searchTextHiglight"></style>-->
+
+<!--	PreferencesTheme-->
+	<style name="PreferencesTheme">
+<!--		<item name="android:background">@color/red_maroon</item>-->
+	</style>
 
 <!--    alert dialog theme-->
 	<style name="dialog_title_style" parent="android:Widget.TextView">
@@ -62,7 +77,7 @@
 		<item name="android:paddingRight">8dp</item>
 		<item name="android:paddingBottom">2dp</item>
 		<item name="android:textStyle">bold</item>
-		<item name="android:textColor">#111111</item>
+		<item name="android:textColor">@color/VeryDarkGray</item>
 	</style>
 
 <!--	form field entry-->
@@ -74,7 +89,7 @@
 		<item name="android:paddingLeft">24dp</item>
 		<item name="android:paddingRight">24dp</item>
 		<item name="android:paddingBottom">24dp</item>
-		<item name="android:textColor">#555555</item>
+		<item name="android:textColor">@color/gray_iron</item>
 	</style>
 	<!--
 	<style name="Widget.Sphinx.Button.Borderless" parent="@android:style/Widget.Holo.Button.Borderless">

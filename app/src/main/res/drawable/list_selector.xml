@@ -3,6 +3,8 @@
 
 	<item android:state_selected="true"
 		android:drawable="@drawable/drawGray" />
+	<item android:state_activated="true"
+		android:drawable="@drawable/drawGray" />
 	<item
 		android:drawable="@android:color/transparent" />
 	<!--

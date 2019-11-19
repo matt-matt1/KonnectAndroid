@@ -24,7 +24,7 @@
 	<string name="files">My Files</string>
 	<string name="empty">empty</string>
 
-<!--	<string name="hello_blank_fragment">Hello blank fragment</string>-->
+	<!--	<string name="hello_blank_fragment">Hello blank fragment</string>-->
 	<string name="view_contacts">View contacts</string>
 	<string name="no_address">no address</string>
 	<string name="no_intent_found">no intent found</string>
@@ -36,7 +36,7 @@
 	<string name="resize">item size</string>
 	<string name="dialog_fire_missiles">Fire missiles?</string>
 	<string name="fire">fire</string>
-<!--	<string name="cancel">cancel</string>-->
+	<!--	<string name="cancel">cancel</string>-->
 	<string name="username">username</string>
 	<string name="password">password</string>
 	<string name="gdrive">Google Drive</string>
@@ -68,7 +68,7 @@
 		Your carrier may impose extra charges by using this appliication.
 		Suggestion: disable the mobile network and restart this application
 	</string>
-<!--	<string name="no_network">No network connection - only this device will be available</string>-->
+	<!--	<string name="no_network">No network connection - only this device will be available</string>-->
 	<string name="no_network">No network connection</string>
 	<string name="wifi_connected">WIFI connected</string>
 	<string name="lost_connection">lost connection</string>
@@ -100,6 +100,27 @@
 	<string name="my_network">My Network</string>
 	<string name="error">error</string>
 	<string name="expand__menu">Expand/Shrink Menu</string>
+	<string name="anon_user">anonymous user</string>
+	<string name="need_user">Need Username (or set Anonymous) to proceed</string>
+	<string name="need_host">Need Server/Host Name (or IP address) to proceed</string>
+	<string name="smb_share">Local Network Share</string>
+	<string name="cannot_conn">Unable to Retrieve list from server</string>
+	<string name="find_share">Find Share name</string>
+	<string name="num_conn">number of connections</string>
+	<string name="display_name">display_name</string>
+	<string name="conn">connection</string>
+	<string name="token">token</string>
+	<string name="conn_str">connection string</string>
+	<string name="conn_id">connection_id</string>
+	<string name="icloud">iCloud</string>
+	<string name="remove_all">Remove all Custom Connections</string>
+<!--	<string name="remove_settings">remove all settings</string>-->
+	<string name="remove_settings">Remove all Customisations and all Settings</string>
+	<string name="PREFS_TITLE_network_transfers">Transfer only over Wifi</string>
+	<string name="Display">Display</string>
+	<string name="Transfers">Transfers</string>
+	<string name="type_remove_settings">Type \'remove\' to Remove all Customisations and Setting</string>
+	<string name="blank_string" />
 
 	<string-array name="contactShare">
 		<item>Email</item>

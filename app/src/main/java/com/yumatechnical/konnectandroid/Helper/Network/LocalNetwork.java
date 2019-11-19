@@ -11,15 +11,16 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
-import androidx.fragment.app.Fragment;
 
-import com.yumatechnical.konnectandroid.Fragment.RightFragment;
 import com.yumatechnical.konnectandroid.Model.FileItem;
+import com.yumatechnical.konnectandroid.Model.IPdetail;
 import com.yumatechnical.konnectandroid.Vars;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,18 +28,25 @@ import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.NetworkInterface;
+import java.net.Socket;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import static org.apache.commons.net.telnet.TelnetCommand.IP;
+
 
 public class LocalNetwork {
 
 	private static final String TAG = LocalNetwork.class.getSimpleName();
 //	private MyViewModel model;
+	private static List<IPdetail> iPdetails = new ArrayList<>();
 
 
 	/**
@@ -178,6 +186,7 @@ public class LocalNetwork {
 								ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(ipInt).array())
 								.getHostAddress();
 						Log.d(TAG, "IP Address: "+ ipString);
+						Vars.getInstance().setMyIPString(ipString);
 //						((Vars)context).setMyIPString(ipString);
 //						model.setMyIPString(ipString);
 					}
@@ -238,9 +247,8 @@ public class LocalNetwork {
 	}
 
 	public static void doSniff(WeakReference<Context> myContext) {
-		Log.d(TAG, "Let's sniff the network");
+//		Log.d(TAG, "Let's sniff the network");
 		try {
-//			Context context = mContextRef.get();
 			Context context = myContext.get();
 			if (context != null) {
 				ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -250,79 +258,150 @@ public class LocalNetwork {
 					Log.d(TAG, "activeNetwork: "+ activeNetwork);
 				}
 				WifiManager wm = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-
 				WifiInfo connectionInfo;
 				if (wm != null) {
 					connectionInfo = wm.getConnectionInfo();
 					int ipInt = connectionInfo.getIpAddress();
 					if (ipInt == 0) {
 						Log.d(TAG, "cannot work on emulator");
-//						return null;
 						return;
 					}
 					Log.d(TAG, "ip as int: "+ ipInt);
 					String ipString = InetAddress.getByAddress(
 							ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(ipInt).array())
 							.getHostAddress();
-
 					Log.d(TAG, "ipString: "+ ipString);
-//						((Vars)context).setMyIPString(ipString);
-//						mo.setMyIPString(ipString);
-
 					String prefix = ipString.substring(0, ipString.lastIndexOf(".") + 1);
 					Log.d(TAG, "prefix: " + prefix);
-
 					for (int i = 0; i < 255; i++) {
 						String testIp = prefix + i;
-
 						InetAddress address = InetAddress.getByName(testIp);
-						boolean reachable = address.isReachable(1000);
+//						boolean reachable = address.isReachable(1000);
+						boolean reachable = testAddress(testIp);
 						String hostName = address.getCanonicalHostName();
-
+						String mac = getMacAddressFromARPTable(testIp);
 						if (reachable) {
-							Log.i(TAG, "Host: " + hostName + "(" + testIp + ") is reachable!");
+							if (testIp.equals(ipString))
+								mac = getMyMacAddr();
+							Log.i(TAG, "Host: "+ hostName+ "("+ testIp + ")("+ mac+ ") is reachable!");
 						}
 					}
 				}
-//					int ipAddress = connectionInfo.getIpAddress();
 			}
 		} catch (Throwable t) {
 			Log.e(TAG, "Well that's not good.", t);
 		}
-//		return null;
 	}
-/*
-	private String getMyIP() {
-		String ip = "";
-		Enumeration<NetworkInterface> enumNetworkInterfaces = NetworkInterface.getNetworkInterfaces();
 
-		while (enumNetworkInterfaces.hasMoreElements()) {
-			NetworkInterface networkInterface = enumNetworkInterfaces.nextElement();
-			Enumeration<InetAddress> enumInetAddress = networkInterface.getInetAddresses();
+	public static boolean testAddress(String address) {
+		int returnVal = 0;
+		Process p1;
+		try {
+			p1 = Runtime.getRuntime().exec("ping -c 1 "+ address);
+			//...exec("ping -n 1 www.google.com");
+			returnVal = p1.waitFor();
+		} catch (IOException ex) {
+			ex.printStackTrace();
+			return false;
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			return false;
+		}
+		return (returnVal==0);
+	}
 
-			while (enumInetAddress.hasMoreElements()) {
-				InetAddress inetAddress = enumInetAddress.nextElement();
-				String ipAddress = "";
-				if (inetAddress.isSiteLocalAddress()) {
-					ipAddress = "SiteLocalAddress: ";
+	public static boolean isReachable2(String addr, int openPort, int timeOutMillis) {
+		try {
+			try (Socket soc = new Socket()) {
+				soc.connect(new InetSocketAddress(addr, openPort), timeOutMillis);
+			}
+			return true;
+		} catch (IOException ex) {
+			return false;
+		}
+	}
+
+	public static String getMyMacAddr() {
+		try {
+			List<NetworkInterface> all = Collections.list(NetworkInterface.getNetworkInterfaces());
+			for (NetworkInterface nif : all) {
+				if (!nif.getName().equalsIgnoreCase("wlan0"))
+					continue;
+				byte[] macBytes = nif.getHardwareAddress();
+				if (macBytes == null) {
+					return "";
 				}
-				ip += ipAddress + inetAddress.getHostAddress() + "\n";
-				String subnet = getSubnetAddress(ip);
+				StringBuilder res1 = new StringBuilder();
+				for (byte b : macBytes) {
+					res1.append(String.format("%02X:",b));
+				}
+				if (res1.length() > 0) {
+					res1.deleteCharAt(res1.length() - 1);
+				}
+				return res1.toString();
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return "02:00:00:00:00:00";
+	}
+
+	public static void makeArrayFromARPTable() {
+		BufferedReader bufferedReader = null;
+		try {
+			bufferedReader = new BufferedReader(new FileReader("/proc/net/arp"));
+			String line;
+			while ((line = bufferedReader.readLine()) != null) {
+				if (line.startsWith("IP"))
+					continue;
+				String[] splitted = line.split("\\s+");
+				String ip = splitted[0];
+//					int hwType = Integer.decode(splitted[1]);
+//					int flags = Integer.decode(splitted[2]);
+				String mac = splitted[3];
+//					String mask = splitted[4];
+//					String device = splitted[5];
+//					iPdetails.add(new IPdetail(ip, hwType, flags, mac, mask, device));
+				iPdetails.add(new IPdetail(ip, Integer.decode(splitted[1]),
+						Integer.decode(splitted[2]), mac.toUpperCase(), splitted[4], splitted[5]));
+//					Log.i(TAG, "getMacAddressFromIP: "+ cnt+ ":"+ ip+ " has mac "+ mac);
+//					Log.i(TAG, "getMacAddressFromARPTable: " + ip + "-" + hwType + "-" +
+//							flags + "-" + mac + "-" + mask + "-" + device + "-");
+//					}
+			}//while
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally{
+			try {
+				if (bufferedReader != null) {
+					bufferedReader.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 	}
-*/
+
+	/**
+	 * Find device mac address within ARP table
+	 */
+	public static String getMacAddressFromARPTable(@NonNull String ipFinding)
+	{
+		for (IPdetail detail : iPdetails) {
+			if (detail.getAddress().equals(ipFinding))
+				return detail.getMac();
+		}
+		return "unknown";
+//		return "00:00:00:00:00:00";
+	}
+
+
 	@SuppressLint("DefaultLocale")
 	@SuppressWarnings("unused")
 	private String getSubnetAddress (int address)
 	{
-//		String ipString = String.format(
-//				"%d.%d.%d",
-//				(address & 0xff),
-//				(address >> 8 & 0xff),
-//				(address >> 16 & 0xff));
-//
-//		return ipString;
 		return String.format(
 				"%d.%d.%d",
 				(address & 0xff),
@@ -333,11 +412,6 @@ public class LocalNetwork {
 	/**
 	 * needs: android.permission.ACCESS_WIFI_STATE
 	 */
-//	private void myIP() {
-//		WifiManager mWifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-//		WifiInfo mWifiInfo = mWifiManager.getConnectionInfo();
-//		String subnet = getSubnetAddress(mWifiManager.getDhcpInfo().gateway);
-//	}
 
 	@SuppressWarnings("unused")
 	private void checkHosts(String subnet)

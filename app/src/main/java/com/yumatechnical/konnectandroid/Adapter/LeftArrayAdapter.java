@@ -78,37 +78,39 @@ public class LeftArrayAdapter extends ArrayAdapter<ListItem> /*implements Action
 		}
 		ViewHolder holder = (ViewHolder) view.getTag();
 		ListItem entry = getItem(position);
-		if ((entry != null ? entry.getIconBeforeText() : false)) {
-			if (entry.getIconAsString() != null && !entry.getIconAsString().isEmpty()) {
-				holder.textView1.setText(entry.getIconAsString());
+		if (entry != null) {
+			if (entry.getIconBeforeText() != null) {
+				if (entry.getIconAsString() != null && !entry.getIconAsString().isEmpty()) {
+					holder.textView1.setText(entry.getIconAsString());
+				}
+				if (entry.getDrawable() != null) {
+					holder.imgView1.setImageDrawable(entry.getDrawable());
+				}
+				if (entry.getName() != null) {
+					holder.textView2.setText(entry.getName());
+					holder.textView2.setPadding(entry.getIconTextPadding(), 0, 0, 0);
+				}
+			} else {
+				if (entry.getName() != null) {
+					holder.textView1.setText(entry.getName());
+					holder.textView1.setPadding(0, 0, entry.getIconTextPadding(), 0);
+				}
+				if (entry.getIconAsString() != null && !entry.getIconAsString().isEmpty()) {
+					holder.textView2.setText(entry.getIconAsString());
+				}
+				if (entry.getDrawable() != null) {
+					holder.imgView2.setImageDrawable(entry.getDrawable());
+				}
 			}
-			if (entry.getDrawable() != null) {
-				holder.imgView1.setImageDrawable(entry.getDrawable());
-			}
-			if (entry.getName() != null) {
-				holder.textView2.setText(entry.getName());
-				holder.textView2.setPadding(entry.getIconTextPadding(), 0, 0, 0);
-			}
-		} else {
-			if ((entry != null ? entry.getName() : null) != null) {
-				holder.textView1.setText(entry.getName());
-				holder.textView1.setPadding(0, 0, entry.getIconTextPadding(), 0);
-			}
-			if ((entry != null ? entry.getIconAsString() : null) != null && !entry.getIconAsString().isEmpty()) {
-				holder.textView2.setText(entry.getIconAsString());
-			}
-			if (Objects.requireNonNull(entry).getDrawable() != null) {
-				holder.imgView2.setImageDrawable(entry.getDrawable());
+			holder.line.setPadding(entry.getLeftPadding(), entry.getTopPadding(), 0, entry.getBotPadding());
+			if (entry.getFaded()) {
+				holder.textView1.setTextColor(Color.LTGRAY);
+				holder.textView2.setTextColor(Color.LTGRAY);
+				holder.imgView1.setColorFilter(Color.LTGRAY);
+				holder.imgView2.setColorFilter(Color.LTGRAY);
 			}
 		}
 		view.setSelected(selectedPos == position);
-		holder.line.setPadding(entry.getLeftPadding(), entry.getTopPadding(), 0, entry.getBotPadding());
-		if (entry.getFaded()) {
-			holder.textView1.setTextColor(Color.LTGRAY);
-			holder.textView2.setTextColor(Color.LTGRAY);
-			holder.imgView1.setColorFilter(Color.LTGRAY);
-			holder.imgView2.setColorFilter(Color.LTGRAY);
-		}
 		view.setOnLongClickListener(v -> {
 //			if (mActionMode != null) {
 //				return false;
@@ -184,40 +186,4 @@ public class LeftArrayAdapter extends ArrayAdapter<ListItem> /*implements Action
 		return view;
 	}
 
-/*
-	private void show() {
-	}
-	//ActionMode.Callback
-	@Override
-	public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-		MenuInflater inflater = mode.getMenuInflater();
-		inflater.inflate(R.menu.left_context, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-		return false;
-	}
-
-	@Override
-	public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-		switch (item.getItemId()) {
-			case R.id.context_left_remove:
-				show();
-				mode.finish();
-				return true;
-			case R.id.context_left_move:
-				return true;
-			default:
-				return false;
-		}
-	}
-
-	@Override
-	public void onDestroyActionMode(ActionMode mode) {
-		mActionMode = null;
-		selectedPos = RecyclerView.NO_POSITION;
-	}
-*/
 }

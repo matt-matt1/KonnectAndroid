@@ -1,6 +1,7 @@
 package com.yumatechnical.konnectandroid.Model;
 
 import android.net.Uri;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -168,17 +169,22 @@ public class ConnectionItem {
 
 	public String toConnectionString() {
 		StringBuilder output = new StringBuilder();
-		if (getScheme() != null && !getScheme().equals("")) {
+		if (!getScheme().equals("")) {
 			output.append(getScheme());
-			output.append("/");
+			output.append(":/");
+		}
+		output.append("/");
+		if (getAccessToken() != null && !getAccessToken().equals("")) {
+			output.append(getAccessToken());
+			output.append(":");
 		}
 		if (getUsername() != null && !getUsername().equals("")) {
 			output.append(getUsername());
 			output.append(":");
 			if (getPassword() != null && !getPassword().equals("")) {
 				output.append(getPassword());
+				output.append("@");
 			}
-			output.append("@");
 		}
 		if (getHost() != null && !getHost().equals("")) {
 			output.append(getHost());
@@ -188,18 +194,23 @@ public class ConnectionItem {
 			}
 			output.append("/");
 		}
-		output.append("/");
-		if (getPath() != null && !getPath().equals("")) {
-			if (!getPath().startsWith("/")) {
+		if (getShareName() != null && !getShareName().equals("")) {
+			output.append(getShareName());
+			if (!getShareName().endsWith("/"))
 				output.append("/");
-			}
-			output.append(getPath());
 		}
+		if (path != null && !path.equals("") && !path.equals("/")) {
+			output.append(path);
+			if (!path.endsWith("/"))
+				output.append("/");
+		}
+/*
+		Log.d("ConnectionItem", "toConnectionString trying "+ output.toString());
 		try {
 			URL url = new URL(output.toString());
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
-		}
+		}*/
 		return output.toString();
 	}
 

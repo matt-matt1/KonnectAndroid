@@ -1,41 +1,398 @@
 package com.yumatechnical.konnectandroid.Helper;
 
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
+import android.os.Process;
 import android.text.TextPaint;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
+import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.yumatechnical.konnectandroid.Model.KeyStrValueStr;
+import com.yumatechnical.konnectandroid.Model.ConnectionItem;
+import com.yumatechnical.konnectandroid.Vars;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.ByteBuffer;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.InvalidParameterSpecException;
 import java.util.ArrayList;
-import java.util.Objects;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 //import okhttp3.HttpUrl;
+
 
 public class Tools extends AppCompatActivity {
 
 	private static final String TAG = Tools.class.getSimpleName();
 
 
+	/**
+	 * force close/exit application
+	 */
+	public static void exitApplication(Activity activity) {
+		activity.moveTaskToBack(true);
+		if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
+			activity.finishAndRemoveTask();
+		} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+			activity.finishAffinity();
+		} else {
+			Process.killProcess(Process.myPid());
+			System.exit(1);
+		}
+	}
+
+	/**
+	 * encpyt / decrypt strings
+	 *
+	 * eg.
+	 * SecretKey secret = generateKey();
+	 * encrypt
+	 * encryptString(String toEncrypt, secret))
+	 * decrypt
+	 * decryptString(byte[] toDecrypt, secret))
+	 */
+	public static SecretKey generateKey(String key)
+			throws NoSuchAlgorithmException, InvalidKeySpecException
+	{
+		return new SecretKeySpec(key.getBytes(), "AES");
+	}
+
+	public static byte[] encryptString(String message, SecretKey secret) throws NoSuchAlgorithmException,
+			NoSuchPaddingException, InvalidKeyException, InvalidParameterSpecException,
+			IllegalBlockSizeException, BadPaddingException, UnsupportedEncodingException
+	{
+		Cipher cipher = null;
+		cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+		cipher.init(Cipher.ENCRYPT_MODE, secret);
+		byte[] cipherText = cipher.doFinal(message.getBytes("UTF-8"));
+		return cipherText;
+	}
+
+	public static String decryptString(byte[] cipherText, SecretKey secret) throws NoSuchPaddingException,
+			NoSuchAlgorithmException, InvalidParameterSpecException, InvalidAlgorithmParameterException,
+			InvalidKeyException, BadPaddingException, IllegalBlockSizeException, UnsupportedEncodingException
+	{
+		Cipher cipher = null;
+		cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+		cipher.init(Cipher.DECRYPT_MODE, secret);
+		String decryptString = new String(cipher.doFinal(cipherText), "UTF-8");
+		return decryptString;
+	}
+
+
+	/**
+	 * write secure data to file
+	 */
+/*	public boolean writeSecure(String filename, String data) {
+		KeyGenParameterSpec keyGenParameterSpec = MasterKeys.AES256_GCM_SPEC;
+		String masterKeyAlias = MasterKeys.getOrCreate(keyGenParameterSpec);
+
+// Creates a file with this name, or replaces an existing file
+// that has the same name. Note that the file name cannot contain
+// path separators.
+//		String fileToWrite = "my_sensitive_data.txt";
+		try {
+			EncryptedFile encryptedFile = new EncryptedFile.Builder(
+					new File(directory, filename),
+					context,
+					masterKeyAlias,
+					EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
+			).build();
+
+			// Write to a file.
+			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
+					encryptedFile.openFileOutput()));
+			writer.write("MY SUPER-SECRET INFORMATION");
+		} catch (GeneralSecurityException gse) {
+			// Error occurred getting or creating keyset.
+		} catch (IOException ex) {
+			// Error occurred opening file for writing.
+		}
+	}
+*/
+	/**
+	 * Hides the soft-keyboard
+	 */
+	/* MUST BE FROM ACTIVITY - NOT DIALOG FRAGMENT EVEN */
+/*	public static void hideKeyboard(Activity activity, boolean insideClass, boolean fromContentBody, Fragment fragment, boolean openedFromBackground) {
+		InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+		//Find the currently focused view, so we can grab the correct window token from it.
+		View view = null;
+		if (activity == null) {
+//		Inside a fragment class:
+			if (insideClass)
+				view = getView().getRootView().getWindowToken();
+
+			if (fragment != null)
+				view = (View) fragment.getView().getRootView().getWindowToken();
+
+//			if (fromContentBody)
+//				view = findViewById(android.R.id.content).getRootView().getWindowToken();
+		} else {
+			view = activity.getCurrentFocus();
+			if (view == null) {
+				//If no view currently has focus, create a new one, just so we can grab a window token from it
+				view = new View(activity);
+			}
+		}
+		if (imm != null) {
+			imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+		}
+		if (openedFromBackground) {
+			view.clearFocus();
+		}
+	}*/
+	public static void hideKeyboard(Context context, View view) {
+		try {
+			InputMethodManager editTextInput = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+			editTextInput.hideSoftInputFromWindow(view.findFocus().getWindowToken(), 0);
+		} catch (Exception e) {
+			Log.e("hideKeyboard::Tools", "closeKeyboard: " + e);
+		}
+	}
+	public static void hideKeyboard2(Activity activity) {
+		View view = activity.findViewById(android.R.id.content);
+		if (view != null) {
+			InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+			imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+		}
+	}
+	public static void hideKeyboardFrom(Context context, View view) {
+		InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
+		if (imm != null) {
+			imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+		} else
+			Log.d(TAG, "cannot hideKeyboard because view is null");
+	}
+
+	/** Get the current line number.
+	 * @return int - Current line number.
+	 */
+	public static int getLineNumber()
+	{
+		int lineNumber = 0;
+		StackTraceElement[] stackTraceElement = Thread.currentThread()
+				.getStackTrace();
+		int currentIndex = -1;
+		for (int i = 0; i < stackTraceElement.length; i++) {
+			if (stackTraceElement[i].getMethodName().compareTo("getLineNumber") == 0)
+			{
+				currentIndex = i + 1;
+				break;
+			}
+		}
+		lineNumber = stackTraceElement[currentIndex].getLineNumber();
+		return lineNumber;
+	}
+
+
+	/**
+	 * Displays the logcat in a textview
+	 *
+	 * @param textView - output of log
+	 */
+	public static void putLogcatInTextView(TextView textView) {
+		try {
+			java.lang.Process process = Runtime.getRuntime().exec("logcat -d");
+			BufferedReader bufferedReader = new BufferedReader(
+					new InputStreamReader(process.getInputStream()));
+			StringBuilder log = new StringBuilder();
+			String line = "";
+			while ((line = bufferedReader.readLine()) != null) {
+				log.append(line);
+			}
+			textView.setText(log.toString());
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Returns a (URL like) connection string from the given Strings
+	 */
+	/* !! use ConnectionItem.toConnectionString() instead !! */
+/*	public static String makeConnString(String scheme, String domain, String username, String password,
+	                                    String host, String sharename, String path) {
+		StringBuilder output = new StringBuilder();
+		if (!scheme.equals("")) {
+			output.append(scheme);
+			output.append(":/");
+		}
+		output.append("/");
+		if (domain != null && !domain.equals("")) {
+			output.append(domain);
+			output.append(":");
+		}
+		if (username != null && !username.equals("")) {
+			output.append(username);
+			output.append(":");
+			if (password != null && !password.equals("")) {
+				output.append(password);
+				output.append("@");
+			}
+		}
+		if (host != null && !host.equals("")) {
+			output.append(host);
+			output.append("/");
+		}
+		if (sharename != null && !sharename.equals("")) {
+			output.append(sharename);
+			if (!sharename.endsWith("/"))
+				output.append("/");
+		}
+		if (path != null && !path.equals("")) {
+			output.append(path);
+			if (!path.endsWith("/"))
+				output.append("/");
+		}
+		return output.toString();
+	}
+*/
+	/**
+	 * Splits a given connection string into parts and constructs a ConnectionItem
+	 * @param connStr of type String
+	 * @return ConnectionItem
+	 */
+	public static ConnectionItem decryptConnString(String connStr) {
+		if (connStr.length() < 2)
+			return null;
+		ConnectionItem connectionItem = new ConnectionItem(0, 0, "", "",
+				"", "", "", "", 0, "", "");
+		String scheme = "";
+		String[] parts = connStr.split("/");
+		if (!connStr.startsWith("/") && connStr.contains("://")) {
+			//is URL structure?
+			connectionItem.setScheme(parts[0].substring(0, connStr.indexOf(":")));
+			scheme = connectionItem.getScheme().toLowerCase();
+		}
+		String[] auth = parts[2].split("@");
+		//divide [domain][:username[:password]] & host[:port]
+		if (auth.length == 0 || auth.length > 2)
+			Log.d(TAG, "Error: improper connection string - cannot determine host /& domain /& username");
+		else {
+			if (auth.length > 1) {
+				if (!auth[1].contains(":"))
+						connectionItem.setHost(auth[1].trim());
+				//host only (no port)
+				else {  //contains host : port
+					String[] host_port = auth[1].split(":");
+					//divide host[:port]
+					connectionItem.setHost(host_port[0].trim());
+					connectionItem.setPort(Integer.parseInt(host_port[1].trim()));
+				}
+				if (!auth[0].contains(":")) {
+					connectionItem.setAccessToken(auth[0]);
+				} else {
+					String[] auths = auth[0].split(":");
+					//divide [domain][:username[:password]]
+					if (auths.length == 0 || auths.length > 3)
+						Log.d(TAG, "Error: improper connection string - cannot determine domain &/ username");
+					else {
+						if (auths.length != 2) {
+							connectionItem.setAccessToken(auths[0].trim());
+							if (auths.length == 3) {
+								connectionItem.setUsername(auths[1].trim());
+								connectionItem.setPassword(auths[2].trim());
+							}
+						} else {
+							connectionItem.setUsername(auths[0].trim());
+							connectionItem.setPassword(auths[1].trim());
+						}
+					}
+				}
+			} else {
+				if (!auth[0].contains(":"))
+					connectionItem.setHost(auth[0].trim());
+				//host only (no port)
+				else {
+					//contains host : port
+					String[] host_port = auth[0].split(":");
+					//divide host[:port]
+					connectionItem.setHost(host_port[0].trim());
+					connectionItem.setPort(Integer.parseInt(host_port[1].trim()));
+				}
+			}
+			if (parts.length > 3) {
+				if (!parts[3].contains(("/")))
+					if (scheme.equals("smb")) {
+						connectionItem.setShareName(parts[3]);
+						connectionItem.setPath("/");
+					} else
+						connectionItem.setPath(parts[3]);
+				else if (scheme.equals("smb")) {
+					String[] paths = getShareNameFromPath(parts[3]);
+					connectionItem.setShareName(paths[0]);
+					connectionItem.setPath(paths[1]);
+				}
+			} else connectionItem.setPath("/");
+		}
+		//set type for smb & ftp
+		if (scheme.equals("smb"))
+			connectionItem.setType(Vars.SMB_CONN);
+		else if (scheme.equals("ftp") || scheme.equals("ftps") || scheme.equals("sfpt"))
+			connectionItem.setType(Vars.FTP_COMM);
+		return connectionItem;
+	}
+
+
+	/**
+	 * Displays the size width and height
+	 */
+	private void screenDimentions() {
+		Display display = getWindowManager().getDefaultDisplay();
+		Point size = new Point();
+		display.getSize(size);
+		int width = size.x;
+		int height = size.y;
+		Log.e("Width", "" + width);
+		Log.e("height", "" + height);
+	}
+
+
+	/**
+	 * Extracts the first segment (text before first separated)
+	 *
+	 * @param path : entire path as string
+	 * @return String[] : [0] is the share name ; [1] is the remaining path
+	 */
 	public static String[] getShareNameFromPath(String path) {
 		String[] separated = path.split("/");
 		if (separated.length > 0) {

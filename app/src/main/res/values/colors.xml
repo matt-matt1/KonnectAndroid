@@ -4,18 +4,24 @@
 <!--    <color name="colorPrimaryDark">#00574B</color>-->
 <!--    <color name="colorAccent">#D81B60</color>-->
 
-    <color name="color_Primary">#FF008577</color>
+    <color name="colorPrimary">@color/tealAndroid</color>
+    <color name="colorPrimaryDark">@color/darkTealAndroid</color>
+    <color name="colorAccent">@color/magentaAndroid</color>
+
+	<color name="tealAndroid">#FF008577</color>
+	<color name="darkTealAndroid">#00574B</color>
+	<color name="magentaAndroid">#D81B60</color>
 	<color name="white">#FFFFFFFF</color>
 <!--	<color name="gray">#FF808080</color>gray_gray-->
-	<color name="gray2">#FF999999</color>mink/pewter
+	<color name="gray2">#FF999999</color><!--mink/pewter-->
 	<color name="Teal">#FF008080</color>
-	<color name="DarkGray">#FF333333</color>shadow/anchor
-	<color name="VeryDarkGray">#FF111111</color>charcoal
+	<color name="DarkGray">#FF333333</color><!--shadow/anchor-->
+	<color name="VeryDarkGray">#FF111111</color><!--charcoal-->
 	<color name="SkyBlue">#FF569CE3</color>
-	<color name="blue">#FF000FF0</color>navy/blue_blue
-	<color name="lightGray">#FFB1BCBE</color>smoke/thunder
+	<color name="blue">#FF000FF0</color><!--navy/blue_blue-->
+	<color name="lightGray">#FFB1BCBE</color><!--smoke/thunder-->
 	<color name="black">#FF000000</color>
-	<color name="paleYellow">#FFf5f5dd</color>cheam
+	<color name="paleYellow">#FFf5f5dd</color><!--cheam-->
 	<color name="paleRed">#FFFFCCCB</color>
 	<color name="lightRed">#FFFF3232</color>
 	<color name="lighterRed">#FFFF4C4C</color>

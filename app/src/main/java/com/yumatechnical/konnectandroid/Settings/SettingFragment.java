@@ -2,18 +2,23 @@ package com.yumatechnical.konnectandroid.Settings;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.preference.CheckBoxPreference;
+import androidx.preference.EditTextPreference;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceScreen;
 
+import com.yumatechnical.konnectandroid.Helper.Tools;
 import com.yumatechnical.konnectandroid.R;
 
 public class SettingFragment extends PreferenceFragmentCompat
-		implements SharedPreferences.OnSharedPreferenceChangeListener, Preference.OnPreferenceChangeListener {
+		implements SharedPreferences.OnSharedPreferenceChangeListener/*, Preference.OnPreferenceChangeListener*/ {
+
+	EditTextPreference remove;
 
 	@Override
 	public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -51,6 +56,16 @@ public class SettingFragment extends PreferenceFragmentCompat
 				String value = sharedPreferences.getString(preference.getKey(), "");
 //				preference.setSummary(value);
 				setPreferenceSummary(preference, value);
+				if (key.equals(getString(R.string.remove_settings))) {
+//					Log.d("SettingFragment", "remove preference changed to: "+ remove.getText());
+					Log.d("SettingFragment", "preference changed to: "+ value);
+//					if (remove.getText().equals(getString(R.string.remove))) {
+					if (value.equals(getString(R.string.remove))) {
+						sharedPreferences.edit().clear().apply();
+						if (getActivity() != null)
+							Tools.exitApplication(getActivity());
+					}
+				}
 			}
 		}
 	}
@@ -59,6 +74,8 @@ public class SettingFragment extends PreferenceFragmentCompat
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+		remove = (EditTextPreference)findPreference(getString(R.string.remove_settings));
+		remove.setText("");
 	}
 
 	@Override
@@ -67,7 +84,7 @@ public class SettingFragment extends PreferenceFragmentCompat
 		getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
 	}
 
-
+/*
 	@Override
 	public boolean onPreferenceChange(Preference preference, Object newValue) {
 		Toast error = Toast.makeText(getContext(), "Please select a number between 0.1 and 3", Toast.LENGTH_SHORT);
@@ -88,4 +105,5 @@ public class SettingFragment extends PreferenceFragmentCompat
 //		}
 		return true;
 	}
+*/
 }

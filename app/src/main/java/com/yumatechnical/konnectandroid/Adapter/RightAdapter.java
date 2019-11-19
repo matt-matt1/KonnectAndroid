@@ -1,5 +1,6 @@
 package com.yumatechnical.konnectandroid.Adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -28,13 +29,14 @@ public class RightAdapter extends RecyclerView.Adapter<RightAdapter.RightAdapter
 	private int selectedPos = RecyclerView.NO_POSITION;
 	private Drawable defaultImage;
 
-    public interface ListItemClickListener {
-    	void onListItemClick(String name, FileItem item, int position);
+    public interface OnListItemClickListener {
+    	void pressListItem(String name, FileItem item, int position);
+    	void longPressListItem(String name, FileItem item, int position);
 	}
-	private ListItemClickListener listener;
+	private OnListItemClickListener listener;
 
 
-    public RightAdapter(ArrayList<FileItem> items, Drawable defaultImage, ListItemClickListener listener) {
+    public RightAdapter(ArrayList<FileItem> items, Drawable defaultImage, OnListItemClickListener listener) {
 //    	Log.d(TAG, "constructor made");
     	my_data = items;
     	this.listener = listener;
@@ -45,7 +47,9 @@ public class RightAdapter extends RecyclerView.Adapter<RightAdapter.RightAdapter
 	}
 
 
-	class RightAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+	@SuppressLint("NewApi")
+	class RightAdapterViewHolder extends RecyclerView.ViewHolder implements
+			View.OnClickListener, View.OnLongClickListener {
 
         final TextView labelView, labelText;
         final ImageView imageView, labelImg;
@@ -86,12 +90,26 @@ public class RightAdapter extends RecyclerView.Adapter<RightAdapter.RightAdapter
 		    FileItem clickedItem = my_data.get(getAdapterPosition());
 		    notifyItemChanged(selectedPos);
 		    if (listener != null) {
-			    listener.onListItemClick(String.valueOf(labelView.getText()), clickedItem, selectedPos);
+			    listener.pressListItem(String.valueOf(labelView.getText()), clickedItem, selectedPos);
 		    }
 		    selectedPos = getAdapterPosition();
 		    notifyItemChanged(selectedPos);
 	    }
-    }
+
+		@Override
+		public boolean onLongClick(View v) {
+			if (getAdapterPosition() == RecyclerView.NO_POSITION)
+				return false;
+			FileItem clickedItem = my_data.get(getAdapterPosition());
+			notifyItemChanged(selectedPos);
+			if (listener != null) {
+				listener.longPressListItem(String.valueOf(labelView.getText()), clickedItem, selectedPos);
+			}
+			selectedPos = getAdapterPosition();
+			notifyItemChanged(selectedPos);
+			return true;
+		}
+	}
 
     @NonNull
     @Override
@@ -129,7 +147,7 @@ public class RightAdapter extends RecyclerView.Adapter<RightAdapter.RightAdapter
 		notifyDataSetChanged();
 	}
 
-	public void setListener(ListItemClickListener listener) {
+	public void setListener(OnListItemClickListener listener) {
     	this.listener = listener;
 	}
 /*

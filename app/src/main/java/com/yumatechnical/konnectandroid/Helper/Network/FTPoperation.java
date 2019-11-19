@@ -98,9 +98,10 @@ public class FTPoperation {
 //			for (String aReply : replies) {
 //				System.out.println("SERVER: " + aReply);
 //			}
-			System.out.print("SERVER REPLY ("+ replies.length+ "): ");
+			Log.d(TAG, "FtpTask::showServerReply ("+ replies.length+ "): ");
 			for (int i = 0; i < replies.length; i++) {
-				System.out.println("("+ i+ ") "+ replies[i]);
+//				System.out.println("("+ i+ ") "+ replies[i]);
+				Log.d(TAG, "FtpTask::showServerReply ("+ i+ ") "+ replies[i]);
 			}
 		}
 	}
@@ -192,7 +193,7 @@ public class FTPoperation {
 		@Override
 		protected String doInBackground(FTPClient... ftpClients) {
 			try {
-//				Log.d(TAG, "FTP status: "+ ftpClients[0].getStatus());
+//				Log.d(TAG, "[FTPstatus] FTP status: "+ ftpClients[0].getStatus());
 				return ftpClients[0].getStatus();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -205,7 +206,6 @@ public class FTPoperation {
 			statusListener.onResult(s);
 		}
 	}
-
 
 
 	public interface OnReply {
@@ -298,7 +298,7 @@ public class FTPoperation {
 			if (files == null) {
 				Log.d(TAG, "onPostExecute: null value");
 			} else {
-				Log.d(TAG, "onPostExecute: " + files.length);
+				Log.d(TAG, "onPostExecute: "+ files.length+ " dirs");
 				listListener.listedDirs(files);
 			}
 		}
@@ -326,7 +326,7 @@ public class FTPoperation {
 			if (files == null) {
 				Log.d(TAG, "onPostExecute: null value");
 			} else {
-				Log.d(TAG, "onPostExecute: " + files.length);
+				Log.d(TAG, "onPostExecute: "+ files.length+ " files");
 				listListener.listedFiles(files);
 			}
 		}

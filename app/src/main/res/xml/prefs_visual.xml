@@ -2,39 +2,57 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto">
 
-	<CheckBoxPreference
-		android:defaultValue="@bool/PREFS_show_hidden_default"
-		android:key="@string/PREFS_show_hidden"
-		android:summaryOff="@string/default_hidden"
-		android:title="@string/PREFS_show_hidden_title"
-		app:summaryOn="@string/displayed" />
+	<PreferenceCategory
+		android:title="@string/Display">
+		<CheckBoxPreference
+			android:defaultValue="@bool/PREFS_show_hidden_default"
+			android:key="@string/PREFS_show_hidden"
+			android:summaryOff="@string/default_hidden"
+			android:title="@string/PREFS_show_hidden_title"
+			app:summaryOn="@string/displayed" />
 
-	<CheckBoxPreference
-		android:defaultValue="@bool/PREFS_save_pass_default"
-		android:key="@string/PREFS_save_pass"
-		android:summaryOff="@string/no"
-		android:title="@string/PREFS_save_pass_title"
-		app:summaryOn="@string/yes" />
+		<CheckBoxPreference
+			android:defaultValue="@bool/PREFS_save_pass_default"
+			android:key="@string/PREFS_save_pass"
+			android:summaryOff="@string/no"
+			android:title="@string/PREFS_save_pass_title"
+			app:summaryOn="@string/yes" />
 
-	<CheckBoxPreference
-		android:defaultValue="@bool/PREFS_rem_local_default"
-		android:key="@string/PREFS_rem_local"
-		android:summaryOff="@string/no"
-		android:title="@string/PREFS_rem_local_title"
-		app:summaryOn="@string/yes" />
+		<CheckBoxPreference
+			android:defaultValue="@bool/PREFS_rem_local_default"
+			android:key="@string/PREFS_rem_local"
+			android:summaryOff="@string/no"
+			android:title="@string/PREFS_rem_local_title"
+			app:summaryOn="@string/yes" />
 
-	<CheckBoxPreference
-		android:defaultValue="@bool/PREFS_rem_remote_default"
-		android:key="@string/PREFS_rem_remote"
-		android:summaryOff="@string/no"
-		android:title="@string/PREFS_rem_remote_title"
-		app:summaryOn="@string/yes" />
+		<CheckBoxPreference
+			android:defaultValue="@bool/PREFS_rem_remote_default"
+			android:key="@string/PREFS_rem_remote"
+			android:summaryOff="@string/no"
+			android:title="@string/PREFS_rem_remote_title"
+			app:summaryOn="@string/yes" />
+	</PreferenceCategory>
 
-	<CheckBoxPreference
-		android:defaultValue="@bool/PREFS_network_transfers_default"
-		android:key="@string/PREFS_network_transfers"
-		android:summaryOff="@string/no"
-		android:title="@string/PREFS_network_transfers"
-		app:summaryOn="@string/yes" />
+	<PreferenceCategory
+		android:title="@string/Transfers">
+		<CheckBoxPreference
+			android:defaultValue="@bool/PREFS_network_transfers_default"
+			android:key="@string/PREFS_network_transfers"
+			android:summaryOff="@string/no"
+			android:title="@string/PREFS_TITLE_network_transfers"
+			app:summaryOn="@string/yes" />
+	</PreferenceCategory>
+
+	<PreferenceCategory
+		android:title="Miscellaneous">
+<!--		android:dialogLayout="@style/CustomDialogTheme"-->
+		<EditTextPreference
+			android:title="@string/remove_settings"
+			android:dialogTitle="@string/rusure"
+			android:defaultValue="@string/blank_string"
+			android:dialogMessage="@string/type_remove_settings"
+			android:persistent="false"
+			android:key="@string/remove_settings" />
+	</PreferenceCategory>
 
 </PreferenceScreen>

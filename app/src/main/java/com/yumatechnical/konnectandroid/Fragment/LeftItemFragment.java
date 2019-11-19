@@ -4,10 +4,14 @@ import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.Transformation;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.mikepenz.iconics.IconicsColor;
@@ -109,7 +113,8 @@ public class LeftItemFragment extends Fragment {
 //		}
 		if (view instanceof ListView) {
 			Context context = view.getContext();
-			fillLeft(context);
+/*			fillLeft(getActivity().getApplication());*/
+//			fillLeft(context);
 			ListView listView = (ListView) view;
 			listView.setSelector(R.drawable.list_selector);
 			listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
@@ -158,6 +163,12 @@ public class LeftItemFragment extends Fragment {
 
 
 	private void fillLeft(Context context) {
+		((Vars)context).leftList.add(((Vars)context).getSourceItemById(Vars.MY_PHOTOS_ID));
+		((Vars)context).leftList.add(((Vars)context).getSourceItemById(Vars.MY_MUSIC_ID));
+		((Vars)context).leftList.add(((Vars)context).getSourceItemById(Vars.MY_CONTACTS_ID));
+		((Vars)context).leftList.add(((Vars)context).getSourceItemById(Vars.MY_FILES_ID));
+		((Vars)context).leftList.add(((Vars)context).getSourceItemById(Vars.MY_LOCAL_HOSTS));
+/*
 		int leftListDefaultLeftPadding = Tools.dpToPx(16, context);
 		int leftListDefaultTopPadding = Tools.dpToPx(16, context);
 		int leftListDefaultBottomPadding = Tools.dpToPx(18, context);
@@ -168,28 +179,77 @@ public class LeftItemFragment extends Fragment {
 				0, Vars.MY_PHOTOS_ID, context.getString(R.string.photos),null,
 //		model.addLeftListItem(new ListItem(0, Vars.MY_PHOTOS_ID, context.getString(R.string.photos),null,
 				Vars.myPhotos_icon2(context), leftListDefaultLeftPadding, leftListDefaultTopPadding,
-				leftListDefaultBottomPadding, true, leftListDefaultBetweenPadding, fade_photos));
-		((Vars)getActivity().getApplication()).leftList.add(new ListItem(0, Vars.MY_MUSIC_ID, context.getString(R.string.music),null,
+				leftListDefaultBottomPadding, true, leftListDefaultBetweenPadding, fade_photos,
+				"", ""));
+
+		((Vars)getActivity().getApplication()).leftList.add(new ListItem(0, Vars.MY_MUSIC_ID,
+				context.getString(R.string.music),null,
 //		model.addLeftListItem(new ListItem(0, Vars.MY_MUSIC_ID, context.getString(R.string.music),null,
 				Vars.myMusic_icon(context), leftListDefaultLeftPadding, leftListDefaultTopPadding,
-				leftListDefaultBottomPadding, true, leftListDefaultBetweenPadding, fade_music));
-		((Vars)getActivity().getApplication()).leftList.add(new ListItem(0,Vars.MY_CONTACTS_ID, context.getString(R.string.contacts),null,
+				leftListDefaultBottomPadding, true, leftListDefaultBetweenPadding, fade_music,
+				"", ""));
+
+		((Vars)getActivity().getApplication()).leftList.add(new ListItem(0,Vars.MY_CONTACTS_ID,
+				context.getString(R.string.contacts),null,
 //		model.addLeftListItem(new ListItem(0,Vars.MY_CONTACTS_ID, context.getString(R.string.contacts),null,
 				Vars.myContacts_icon(context), leftListDefaultLeftPadding, leftListDefaultTopPadding,
-				leftListDefaultBottomPadding, true, leftListDefaultBetweenPadding, fade_contacts));
-		((Vars)getActivity().getApplication()).leftList.add(new ListItem(0, Vars.MY_FILES_ID, context.getString(R.string.files),null,
+				leftListDefaultBottomPadding, true, leftListDefaultBetweenPadding, fade_contacts,
+				"", ""));
+
+		((Vars)getActivity().getApplication()).leftList.add(new ListItem(0, Vars.MY_FILES_ID,
+				context.getString(R.string.files),null,
 //		model.addLeftListItem(new ListItem(0, Vars.MY_FILES_ID, context.getString(R.string.files),null,
 				Vars.myFiles_icon(context), leftListDefaultLeftPadding, leftListDefaultTopPadding,
-				leftListDefaultBottomPadding, true, leftListDefaultBetweenPadding, fade_files));
+				leftListDefaultBottomPadding, true, leftListDefaultBetweenPadding, fade_files,
+				"", ""));
+
 		((Vars)getActivity().getApplication()).leftList.add(new ListItem(0, Vars.MY_LOCAL_HOSTS,
 				context.getString(R.string.my_network),null,
 //		model.addLeftListItem(new ListItem(0, Vars.MY_FILES_ID, context.getString(R.string.files),null,
 				Vars.myLocalHosts_icon(context), leftListDefaultLeftPadding, leftListDefaultTopPadding,
-				leftListDefaultBottomPadding, true, leftListDefaultBetweenPadding, fade_hosts));
+				leftListDefaultBottomPadding, true, leftListDefaultBetweenPadding, fade_hosts,
+				"", ""));
+*/
 	}
-/*
-	public void openLeftPanel(Context context) {
-		FrameLayout leftPanel = context.getV
+
+	/**
+	 * openCloseLeftPanel
+	 * opens/expands or closes/shrinks the left panel/frame
+	 *
+	 * @param makeOpen boolean : true to open ; false to close
+	 */
+/*	public void openCloseLeftPanel(boolean makeOpen) {
+		FrameLayout fakeLeft = findViewById(R.id.fake_left_frame);
+		if (makeOpen == ((Vars)getApplication()).isLeftPanelOpen())
+			return;
+		Log.d(TAG, makeOpen ? "opening left panel..." : "closing left panel...");
+		((Vars)getApplication()).markLeftPanelOpen(makeOpen);
+		LinearLayout sides = findViewById(R.id.ll_sides);
+//				int leftWidth = (makeOpen) ? Tools.dpToPx(300, this) :
+//						Tools.dpToPx(65, this);
+		ViewGroup.LayoutParams layoutParams = fakeLeft.getLayoutParams();
+		Animation animation = new Animation() {
+			@Override
+			protected void applyTransformation(float interpolatedTime, Transformation t) {
+//				ViewGroup.LayoutParams layoutParams = fakeLeft.getLayoutParams();
+//				int width = makeOpen
+//						? layoutParams.width + 20//468
+//						: layoutParams.width - 21;//468;
+				int width = makeOpen
+						? layoutParams.width + 468
+						: layoutParams.width - 468;
+				fakeLeft.setLayoutParams(new LinearLayout.LayoutParams(width,
+						FrameLayout.LayoutParams.MATCH_PARENT));
+				sides.requestLayout();
+			}
+
+			@Override
+			public boolean willChangeBounds() {
+				return true;
+			}
+		};
+		animation.setDuration(400);//no effect
+		sides.startAnimation(animation);
 	}
 */
 }

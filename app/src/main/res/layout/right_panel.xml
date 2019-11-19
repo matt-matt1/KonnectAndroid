@@ -93,12 +93,13 @@
 				<androidx.recyclerview.widget.RecyclerView
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
+					android:layout_marginRight="42dp"
 					android:fastScrollEnabled="true"
 					android:id="@+id/rv_right" />
 			</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 <!--			alfabetical index-->
 			<LinearLayout
-				android:layout_width="40dip"
+				android:layout_width="40dp"
 				android:layout_height="fill_parent"
 				android:orientation="vertical"
 				android:background="#FFF"

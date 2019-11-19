@@ -120,4 +120,18 @@ dependencies {
 	implementation 'com.jakewharton.rxbinding3:rxbinding-swiperefreshlayout:3.0.0'
 	implementation 'com.jakewharton.rxbinding3:rxbinding-viewpager:3.0.0'
 	implementation 'com.jakewharton.rxbinding3:rxbinding-material:3.0.0'*/
+
+//	implementation 'cglib:cglib-nodep:jar:2.2'
+//	implementation 'junit:junit:jar:4.8.1'
+//	implementation 'org.easymock:easymock:jar:3.0'
+//	implementation 'org.objenesis:objenesis:jar:1.2'
+//	implementation 'org.jmdns:jmdns:3.5.6'
+//	implementation 'org.jmdns:jmdns:3.5.6-SNAPSHOT'
+//	implementation 'org.slf4j:slf4j-api:1.7.25'
+/*	implementation 'org.slf4j:slf4j-api:1.7.28'
+	implementation 'junit:junit:4.12'
+	implementation 'org.easymock:easymock:3.3.1'*/
+
+	implementation 'com.github.andriydruk:dnssd:0.9.13'
+	implementation 'com.github.andriydruk:rx2dnssd:0.9.13'
 }

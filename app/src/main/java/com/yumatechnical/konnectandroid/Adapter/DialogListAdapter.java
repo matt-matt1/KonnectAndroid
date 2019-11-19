@@ -24,7 +24,7 @@ public class DialogListAdapter extends ArrayAdapter<ListItem> implements View.On
 	private ArrayList<ListItem> dataSet;
 	private Context mContext;
 	private int selectedPos = RecyclerView.NO_POSITION;
-	private View lastSelected = null;
+//	private View lastSelected = null;
 	private static final String TAG = DialogListAdapter.class.getSimpleName();
 
 	// View lookup cache
@@ -123,12 +123,12 @@ public class DialogListAdapter extends ArrayAdapter<ListItem> implements View.On
 		convertView.setOnClickListener(v -> {
 			selectedPos = position;
 			v.setSelected(true);
-			if (lastSelected != null) {
-				lastSelected.setSelected(false);
-			}
-			if (position > -1) {
-				lastSelected = v;
-			}
+//			if (lastSelected != null) {
+//				lastSelected.setSelected(false);
+//			}
+//			if (position > -1) {
+//				lastSelected = v;
+//			}
 			ListItem clickedItem = (ListItem) v.getTag();
 			if (!clickedItem.getFaded()) {
 				listener.OnClickItem(clickedItem.getName());

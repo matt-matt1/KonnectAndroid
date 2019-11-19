@@ -9,12 +9,16 @@ import androidx.annotation.RequiresApi;
 
 import com.hierynomus.msfscc.FileAttributes;
 import com.hierynomus.msfscc.fileinformation.FileIdBothDirectoryInformation;
+import com.hierynomus.mssmb2.SMBApiException;
+import com.hierynomus.protocol.commons.buffer.Buffer;
+import com.hierynomus.protocol.transport.TransportException;
 import com.hierynomus.security.SecurityProvider;
 import com.hierynomus.security.bc.BCSecurityProvider;
 import com.hierynomus.smbj.SMBClient;
 import com.hierynomus.smbj.SmbConfig;
 import com.hierynomus.smbj.auth.AuthenticationContext;
 import com.hierynomus.smbj.auth.NtlmAuthenticator;
+import com.hierynomus.smbj.common.SMBException;
 import com.hierynomus.smbj.connection.Connection;
 import com.hierynomus.smbj.session.Session;
 import com.hierynomus.smbj.share.DiskShare;
@@ -24,6 +28,8 @@ import com.rapid7.client.dcerpc.transport.RPCTransport;
 import com.rapid7.client.dcerpc.transport.SMBTransportFactories;
 
 import java.io.IOException;
+import java.net.NoRouteToHostException;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -48,6 +54,7 @@ public class SMBoperation {
 
 	public interface OnSMBinteraction {
 		void OnListFiles(List<String> files);
+		void OnListFilesFull(List<FileIdBothDirectoryInformation> files);
 	}
 	private OnSMBinteraction filesListener;
 
@@ -143,12 +150,22 @@ public class SMBoperation {
 //			client = new SMBClient();
 /*		}*/
 
-		try (Connection connection = client.connect(serverName)) {
+		try {
+			Connection connection = client.connect(serverName);
 			AuthenticationContext ac = new AuthenticationContext(username, password.toCharArray(), domain);
 			Session session = connection.authenticate(ac);
 			this.session = session;
 			return session;
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
+		return null;
+//		try (Connection connection = client.connect(serverName)) {
+//			AuthenticationContext ac = new AuthenticationContext(username, password.toCharArray(), domain);
+//			Session session = connection.authenticate(ac);
+//			this.session = session;
+//			return session;
+//		}
 	}
 
 	@SuppressWarnings("unused")
@@ -200,10 +217,16 @@ public class SMBoperation {
 		if (session == null) {
 			return false;
 		}
-		try (DiskShare share = (DiskShare) session.connectShare(shareName)) {
+		try {
+			DiskShare share = (DiskShare) session.connectShare(shareName);
 			share.rm(filePath);
 			return true;
-		} catch (IOException e) {
+//		try (DiskShare share = (DiskShare) session.connectShare(shareName)) {
+//			share.rm(filePath);
+//			return true;
+//		} catch (IOException e) {
+//			e.printStackTrace();
+		} catch (SMBApiException e) {
 			e.printStackTrace();
 		}
 		return false;
@@ -235,19 +258,24 @@ public class SMBoperation {
 	}
 
 
-
-
-
-	private List<String> doSMBthings(String SERVER, String USERNAME, String PASSWORD, String WORKGROUP,
+	private List<FileIdBothDirectoryInformation> doSMBthings(String SERVER, String USERNAME, String PASSWORD, String WORKGROUP,
 	                         String SHARE, String START_DIR) {
-		try (SMBClient client = new SMBClient()) {
-			try (Connection connection = client.connect(SERVER)) {
-				if (connection != null) {
-					AuthenticationContext ac = new AuthenticationContext(USERNAME, PASSWORD.toCharArray(), WORKGROUP);
-					try (Session session = connection.authenticate(ac)) {
-						try (DiskShare share = (DiskShare) session.connectShare(SHARE)) {
-							List<String> files = new ArrayList<>();
-							listFiles(share, START_DIR, files);
+//		Log.d(TAG, "doSMBthings: (host)"+ SERVER+ ", (user)"+ USERNAME+", (pass)"+ PASSWORD+
+//						", (domain)"+ WORKGROUP+ ", (share)"+ SHARE+ ", (dir)"+ START_DIR);
+		SMBClient client = new SMBClient();
+		try {
+			Connection connection = client.connect(SERVER);
+			if (connection != null) {
+				AuthenticationContext ac = new AuthenticationContext(USERNAME, PASSWORD.toCharArray(), WORKGROUP);
+				try {
+					Session session = connection.authenticate(ac);
+					try {
+						DiskShare share = (DiskShare) session.connectShare(SHARE);
+						List<FileIdBothDirectoryInformation> files = new ArrayList<>();
+						files = share.list(START_DIR);
+/*						List<String> files = new ArrayList<>();
+						listFiles(share, START_DIR == "/" ? "" : START_DIR.replace("/", "\\"),
+								files, false);*/
 //						files.removeIf(name -> !name.toLowerCase().endsWith(".mp4"));
 //						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 //							files.forEach(System.out::println);
@@ -255,15 +283,18 @@ public class SMBoperation {
 //						for (String file : files) {
 //							System.out.println(file);
 //						}
-							return files;
-						}
+						return files;
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
-				} else {
-					Log.d(TAG, "no valid SMB connection! (doSMBthings)");
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
+			} else {
+				Log.d(TAG, "no valid SMB connection! (doSMBthings)");
 			}
 		} catch (IOException e) {
-			e.printStackTrace(System.err);
+			e.printStackTrace();
 		}
 		return null;
 	}
@@ -272,7 +303,7 @@ public class SMBoperation {
 		return fileName.equals(".") || fileName.equals("..");
 	}
 
-	private void listFiles(DiskShare share, String path, Collection<String> files) {
+	private void listFiles(DiskShare share, String path, Collection<String> files, boolean recursive) {
 		List<String> dirs = new ArrayList<>();
 		String extPath = path.isEmpty() ? path : path + "\\";
 		for (FileIdBothDirectoryInformation f : share.list(path)) {
@@ -285,8 +316,12 @@ public class SMBoperation {
 			}
 		}
 //		dirs.forEach(dir -> listFiles(share, extPath + dir, files));
-		for (String dir : dirs) {
-			listFiles(share, extPath+ dir, files);
+		if (!recursive) {
+			files = dirs;
+		} else {
+			for (String dir : dirs) {
+				listFiles(share, extPath + dir, files, false);
+			}
 		}
 	}
 
@@ -299,12 +334,12 @@ public class SMBoperation {
 
 
 	@SuppressLint("StaticFieldLeak")
-	public class AsyncSMBlistFiles extends AsyncTask<String, Void, List<String>> {
+	public class AsyncSMBlistFiles extends AsyncTask<String, Void, List<FileIdBothDirectoryInformation>> {
 
 		private final String TAG = AsyncSMBlistFiles.class.getSimpleName();
 
 		@Override
-		protected List<String> doInBackground(String... strings) {
+		protected List<FileIdBothDirectoryInformation> doInBackground(String... strings) {
 //			if (session == null) {
 //				Log.d(TAG, "SMB list files ERROR - no SMB session");
 //				return null;
@@ -312,14 +347,19 @@ public class SMBoperation {
 			return doSMBthings(strings[0], strings[1], strings[2], strings[3], strings[4], strings[5]);
 		}
 
-		protected void onPostExecute(List<String> files) {
+		protected void onPostExecute(List<FileIdBothDirectoryInformation> files) {
 //			Log.v("FTPTask","FTP connection complete");
 			if (files == null) {
 				Log.d(TAG, "SMB error: files list is null");
+				filesListener.OnListFiles(null);
 			} else if (filesListener == null) {
 				Log.d(TAG, "SMB error: list files listener is null");
 			} else {
-				filesListener.OnListFiles(files);
+				List<String> filenames = new ArrayList<>();
+				for (int i = 0; i < files.size(); i++) {
+					filenames.add(files.get(i).getShortName());
+				}
+				filesListener.OnListFilesFull(files);
 			}
 		}
 	}
@@ -328,6 +368,22 @@ public class SMBoperation {
 	@RequiresApi(api = Build.VERSION_CODES.KITKAT)
 	private List<NetShareInfo0> listSharesMSSRVS(String SERVER, String USERNAME, String PASSWORD, String DOMAIN) {
 		final SMBClient smbClient = new SMBClient();
+		ArrayList<NetShareInfo0> shares = new ArrayList<>();
+		try {
+			final Connection smbConnection = smbClient.connect(SERVER);
+			final AuthenticationContext smbAuthenticationContext = new AuthenticationContext(USERNAME,
+					PASSWORD.toCharArray(), DOMAIN);
+			final Session session = smbConnection.authenticate(smbAuthenticationContext);
+
+			final RPCTransport transport = SMBTransportFactories.SRVSVC.getTransport(session);
+			final ServerService serverService = new ServerService(transport);
+			shares = (ArrayList<NetShareInfo0>) serverService.getShares0();//.getShares();
+//			final List<NetShareInfo0> shares = serverService.getShares0();//.getShares();
+			return shares;
+//			for (final NetShareInfo0 share : shares) {
+//				System.out.println(share);
+//			}
+/*
 		try (final Connection smbConnection = smbClient.connect(SERVER)) {
 			final AuthenticationContext smbAuthenticationContext = new AuthenticationContext(USERNAME,
 					PASSWORD.toCharArray(), DOMAIN);
@@ -335,11 +391,27 @@ public class SMBoperation {
 
 			final RPCTransport transport = SMBTransportFactories.SRVSVC.getTransport(session);
 			final ServerService serverService = new ServerService(transport);
-			final List<NetShareInfo0> shares = serverService.getShares0();//.getShares();
+			shares = (ArrayList<NetShareInfo0>) serverService.getShares0();//.getShares();
+//			final List<NetShareInfo0> shares = serverService.getShares0();//.getShares();
 			return shares;
 //			for (final NetShareInfo0 share : shares) {
 //				System.out.println(share);
 //			}
+*/
+		} catch (SocketTimeoutException e) {
+//			Log.d(TAG, "ERROR: connect timed out");
+			shares.add(new NetShareInfo0("ERROR: Connection Timed-out"));
+			return shares;
+		} catch (NoRouteToHostException e) {
+//			Log.d(TAG, "ERROR: connect timed out");
+			shares.add(new NetShareInfo0("ERROR: Cannot locate device"));
+			return shares;
+		} catch (TransportException e) {
+			shares.add(new NetShareInfo0("ERROR: Cannot communicate with device"));
+			return shares;
+//		} catch (Buffer.BufferException e) {
+//			shares.add(new NetShareInfo0("ERROR: Communication Buffer"));
+//			return shares;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

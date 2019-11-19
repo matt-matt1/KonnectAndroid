@@ -58,6 +58,7 @@
 						style="@style/FormFieldLabel"
 						android:id="@+id/tv_ftp_host" />
 
+<!--					android:text="192.168.1.222"-->
 					<EditText
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
@@ -141,7 +142,6 @@
 				style="@style/FormFieldLabel"
 				android:visibility="gone"
 				android:id="@+id/tv_ftp_domain" />
-
 			<EditText
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
@@ -152,6 +152,24 @@
 				android:hint=""
 				android:visibility="gone"
 				android:id="@+id/et_ftp_domain" />
+<!--			anonymous user-->
+			<LinearLayout
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:orientation="horizontal">
+				<CheckBox
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginRight="8dp"
+					android:layout_marginLeft="16dp"
+					android:id="@+id/cb_ftp_anon"
+					tools:ignore="RtlHardcoded" />
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					style="@style/FormFieldLabel"
+					android:id="@+id/tv_ftp_anon" />
+			</LinearLayout>
 			<!--	username-->
 			<TextView
 				android:layout_width="match_parent"
@@ -159,6 +177,7 @@
 				style="@style/FormFieldLabel"
 				android:id="@+id/tv_ftp_username" />
 
+<!--			android:text="yumausa"-->
 			<EditText
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
@@ -166,7 +185,6 @@
 				android:autofillHints="@string/username"
 				tools:ignore="LabelFor,UnusedAttribute"
 				android:inputType="text"
-				android:hint=""
 				android:id="@+id/et_ftp_username" />
 			<!--password-->
 			<TextView
@@ -175,6 +193,7 @@
 				style="@style/FormFieldLabel"
 				android:id="@+id/tv_ftp_password" />
 
+<!--			android:text="yuma"-->
 			<EditText
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
@@ -182,7 +201,6 @@
 				android:autofillHints="@string/password"
 				tools:ignore="LabelFor,UnusedAttribute"
 				android:inputType="textPassword"
-				android:hint=""
 				android:id="@+id/et_ftp_password" />
 			<!--share_name-->
 			<TextView
@@ -239,22 +257,22 @@
 		</LinearLayout>
 	</ScrollView>
 
+<!--	android:layout_gravity="center"-->
 	<LinearLayout
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		android:gravity="center"
-		android:layout_gravity="center"
 		android:orientation="vertical"
 		android:visibility="invisible"
 		android:id="@+id/ll_ftp_scrolloverlay">
-		<ImageView
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:id="@+id/iv_ftp_scroll" />
-		<ImageView
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:id="@+id/iv_ftp_scroll2" />
+<!--		<ImageView-->
+<!--			android:layout_width="wrap_content"-->
+<!--			android:layout_height="wrap_content"-->
+<!--			android:id="@+id/iv_ftp_scroll" />-->
+<!--		<ImageView-->
+<!--			android:layout_width="wrap_content"-->
+<!--			android:layout_height="wrap_content"-->
+<!--			android:id="@+id/iv_ftp_scroll2" />-->
 	</LinearLayout>
 
 	<LinearLayout
