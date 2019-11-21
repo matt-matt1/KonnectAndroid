@@ -1,6 +1,7 @@
 <application>
   <component name="FileTypeManager" version="17">
     <extensionMap>
+      <mapping pattern="auth_config" type="PLAIN_TEXT" />
       <mapping pattern="list_alphabet" type="XML" />
     </extensionMap>
   </component>
