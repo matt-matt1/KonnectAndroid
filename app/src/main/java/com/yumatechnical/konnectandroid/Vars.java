@@ -79,6 +79,12 @@ public class Vars extends Application {
 	public boolean WifiConn = false;
 	public boolean MobileConn = false;
 	public boolean networkConnected = false;
+	/* MSAL */
+//	final static String SCOPES [] = {"https://graph.microsoft.com/User.Read"};
+//	final static String MSGRAPH_URL = "https://graph.microsoft.com/v1.0/me";
+	/* Azure AD Variables */
+//	private static PublicClientApplication myPCA;
+//	private static IAuthenticationResult authResult;
 
 	private static Vars instance = null;
 
@@ -171,7 +177,7 @@ public class Vars extends Application {
 	 */
 	public ListItem getSourceItemById(int id) {
 		for (ListItem item : sourceList) {
-			if (item.getID() == id)
+			if (item.getType() == id)
 				return item;
 		}
 		return null;
@@ -294,7 +300,7 @@ public class Vars extends Application {
 
 	public ListItem getLeftListItemByID(int id) {
 		for (ListItem item : leftList) {
-			if (item.getID() == id) {
+			if (item.getType() == id) {
 				return item;
 			}
 		}
@@ -304,8 +310,8 @@ public class Vars extends Application {
 	public int getLeftListItemNextID() {
 		int id = 0;
 		for (ListItem item : leftList) {
-			if (item.getID() > id) {
-				id = item.getID();
+			if (item.getType() > id) {
+				id = item.getType();
 			}
 		}
 		return id+1;
@@ -316,6 +322,7 @@ public class Vars extends Application {
 	 * ip address
 	 */
 	private int[] myIP = new int[4];
+	private String prefixIP = "";
 
 	@SuppressWarnings("unused")
 	public int[] getMyIP() {
@@ -340,6 +347,13 @@ public class Vars extends Application {
 		this.myIP = myIP;
 	}
 
+	public String getPrefixIP() {
+		return prefixIP;
+	}
+
+	public void setPrefixIP(String prefixIP) {
+		this.prefixIP = prefixIP;
+	}
 
 	/**
 	 * iconSize
@@ -670,6 +684,10 @@ public class Vars extends Application {
 		return new IconicsDrawable(context, FontAwesome.Icon.faw_times)
 				.color(IconicsColor.colorRes(R.color.springGreen)).size(IconicsSize.TOOLBAR_ICON_SIZE);
 	}
+	public static Drawable cancel_icon(Context context) {
+		return new IconicsDrawable(context, FontAwesome.Icon.faw_times)
+				.color(IconicsColor.colorRes(R.color.gray_gray)).size(IconicsSize.TOOLBAR_ICON_SIZE);
+	}
 
 	/**
 	 * List of connections to add
@@ -689,7 +707,20 @@ public class Vars extends Application {
 		return items;
 	}
 
-//	protected Vars(){}
+
+	/**
+	 * MSAL
+	 */
+/*	public static PublicClientApplication getMyPCA() {
+		return myPCA;
+	}
+
+	public static void setMyPCA(PublicClientApplication myPCA) {
+		Vars.myPCA = myPCA;
+	}
+*/
+
+	//	protected Vars(){}
 //	private Vars(){}
 	public static synchronized Vars getInstance() {
 		if (null == instance)

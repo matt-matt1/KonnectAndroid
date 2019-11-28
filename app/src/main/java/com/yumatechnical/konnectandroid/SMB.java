@@ -10,7 +10,7 @@ import androidx.annotation.RequiresApi;
 import com.hierynomus.msfscc.fileinformation.FileIdBothDirectoryInformation;
 import com.hierynomus.mssmb2.SMBApiException;
 import com.hierynomus.smbj.SMBClient;
-import com.hierynomus.smbj.SmbConfig;
+//import com.hierynomus.smbj.SmbConfig;
 import com.hierynomus.smbj.auth.AuthenticationContext;
 import com.hierynomus.smbj.session.Session;
 import com.hierynomus.smbj.share.DiskShare;
@@ -26,21 +26,6 @@ import java.util.List;
 
 
 public class SMB {
-
-	/**/
-//	private List<SMBConnection> connections = new ArrayList<>();
-//
-//	public SMBConnection getConnection(int index) {
-//		if (connections.size() > 0 && index > -1 && index < connections.size()) {
-//			return connections.get(index);
-//		}
-//		return null;
-//	}
-//
-//	public void addConnection(SMBConnection connection) {
-//		this.connections.add(connection);
-//	}
-	/**/
 
 	private final static String TAG = SMB.class.getSimpleName();
 	private getListAsyncTask task = null;
@@ -98,6 +83,7 @@ public class SMB {
 //		return (connectionIndex != 0) ? connectionIndex : connections.size();
 		return Math.max(0, connectionIndex);
 	}
+
 	public void cancelGetList() {
 		if (task == null) {
 			if (DEBUG_LEVEL == 1)
@@ -287,7 +273,7 @@ public class SMB {
 			transport = SMBTransportFactories.SRVSVC.getTransport(session);
 			final ServerService serverService = new ServerService(transport);
 			List<Object> objects = new ArrayList<>(serverService.getShares0());
-			objects.addAll(serverService.getShares0());
+//			objects.addAll(serverService.getShares0());
 			listener.listedFiles(objects, connectionIndex);
 		} catch (IOException e) {
 			e.printStackTrace();

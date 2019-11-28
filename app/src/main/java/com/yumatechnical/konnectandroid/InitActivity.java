@@ -93,7 +93,7 @@ public class InitActivity extends AppCompatActivity {
 /*
 	public ListItem getSourceItemById(int id) {
 		for (ListItem item : Vars.sourceList) {
-			if (id == item.getID())
+			if (id == item.getType())
 				return item;
 		}
 		return null;

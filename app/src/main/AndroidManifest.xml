@@ -15,8 +15,6 @@
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 	<uses-permission android:name="android.permission.VIBRATE" />
 	<uses-permission android:name="android.permission.WAKE_LOCK" />
-<!--	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />-->
-<!--	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />-->
 
 	<application
 		android:name=".Vars"
@@ -30,20 +28,50 @@
 		android:roundIcon="@mipmap/ic_launcher_round"
 		android:supportsRtl="true"
 		android:theme="@style/AppTheme"
+		tools:overrideLibrary="com.microsoft.graph.authentication"
+		tools:replace="android:hardwareAccelerated"
 		tools:targetApi="n">
+		<activity android:name=".Helper.MSALActivity"></activity>
+		<!--Intent filter to capture System Browser or Authenticator calling back to our app after sign-in-->
+		<activity
+			android:name="com.microsoft.identity.client.BrowserTabActivity">
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<category android:name="android.intent.category.BROWSABLE" />
+				<data android:scheme="msauth"
+					android:host="com.yumatechnical.konnectandroid"
+					android:path="/2jmj7l5rSw0yVb/vlWAYkK/YBwk=" />
+			</intent-filter>
+		</activity>
+<!--		<activity android:name=".BrowserTabActivity">-->
+<!--			<intent-filter>-->
+<!--				<action android:name="android.intent.action.VIEW" />-->
+
+<!--				<category android:name="android.intent.category.DEFAULT" />-->
+<!--				<category android:name="android.intent.category.BROWSABLE" />-->
+<!--				&lt;!&ndash; <data android:scheme="msal8cd4df27-a31a-4ede-a3b0-f1f7408ac8f5" &ndash;&gt;-->
+<!--				&lt;!&ndash; android:host="auth" /> &ndash;&gt;-->
+<!--				<data-->
+<!--					android:host="com.yumatechnical.konnectandroid"-->
+<!--					android:path="/2jmj7l5rSw0yVb/vlWAYkK/YBwk="-->
+<!--					android:scheme="msauth" />-->
+<!--			</intent-filter>-->
+<!--		</activity>-->
 		<activity android:name=".InitActivity">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
+
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
-		</activity>
-		<!-- android:label="MainActivity" -->
+		</activity> <!-- android:label="MainActivity" -->
 		<!-- android:theme="@style/Theme.AppCompat" -->
 		<activity
 			android:name=".MainActivity"
 			android:launchMode="singleTop">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
+
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 
@@ -68,8 +96,7 @@
 				android:name="android.support.PARENT_ACTIVITY"
 				android:value=".MainActivity" />
 		</activity>
-		<activity android:name=".Helper.showFTPsettingsActivity" />
-		<!--			android:theme="@style/PreferencesTheme"-->
+		<activity android:name=".Helper.showFTPsettingsActivity" /> <!-- android:theme="@style/PreferencesTheme" -->
 		<activity
 			android:name=".Settings.SettingsActivity"
 			android:label="@string/settings"
@@ -78,8 +105,10 @@
 			tools:targetApi="jelly_bean">
 			<intent-filter>
 				<action android:name="android.intent.action.MANAGE_NETWORK_USAGE" />
+
 				<category android:name="android.intent.category.DEFAULT" />
 			</intent-filter>
+
 			<meta-data
 				android:name="android.support.PARENT_ACTIVITY"
 				android:value=".MainActivity" />
@@ -90,7 +119,9 @@
 			android:launchMode="singleTask">
 			<intent-filter>
 				<data android:scheme="db-0qb7zuth7zcx40s" />
+
 				<action android:name="android.intent.action.VIEW" />
+
 				<category android:name="android.intent.category.BROWSABLE" />
 				<category android:name="android.intent.category.DEFAULT" />
 			</intent-filter>

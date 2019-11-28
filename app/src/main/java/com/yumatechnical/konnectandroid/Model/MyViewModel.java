@@ -96,7 +96,7 @@ public class MyViewModel extends ViewModel {
 		if (arrayList == null)
 			return null;
 		for (ListItem item : arrayList) {
-			if (item.getID() == id) {
+			if (item.getType() == id) {
 				return item;
 			}
 		}
@@ -109,8 +109,8 @@ public class MyViewModel extends ViewModel {
 		if (arrayList == null)
 			return 0;
 		for (ListItem item : arrayList) {
-			if (item.getID() > id) {
-				id = item.getID();
+			if (item.getType() > id) {
+				id = item.getType();
 			}
 		}
 		return id+1;

@@ -7,13 +7,11 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import org.parceler.ParcelConstructor;
-
 //@Parcel
 public class ListItem implements Cloneable, Parcelable {
 
 	Integer priority;
-	Integer ID;
+	Integer type;
 	String name;
 	String iconAsString;
 	Drawable drawable;
@@ -29,7 +27,7 @@ public class ListItem implements Cloneable, Parcelable {
 /*
 	protected ListItem(Parcel in) {
 		priority = in.readInt();
-		ID = in.readInt();
+		type = in.readInt();
 		name = in.readString();
 		iconAsString = in.readString();
 		leftPadding = in.readInt();
@@ -48,7 +46,7 @@ public class ListItem implements Cloneable, Parcelable {
 	                int topPadding, int botPadding, Boolean iconBeforeText, int iconTextPadding, Boolean faded,
 	                String accessToken, String connectionStr) {
 		this.priority = priority;
-		this.ID = ID;
+		this.type = ID;
 		this.name = name;
 		this.iconAsString = iconAsString;
 		this.drawable = drawable;
@@ -69,9 +67,9 @@ public class ListItem implements Cloneable, Parcelable {
 			priority = in.readInt();
 		}
 		if (in.readByte() == 0) {
-			ID = null;
+			type = null;
 		} else {
-			ID = in.readInt();
+			type = in.readInt();
 		}
 		name = in.readString();
 		iconAsString = in.readString();
@@ -129,9 +127,9 @@ public class ListItem implements Cloneable, Parcelable {
 				priority = in.readInt();
 			}
 			if (in.readByte() == 0) {
-				ID = null;
+				type = null;
 			} else {
-				ID = in.readInt();
+				type = in.readInt();
 			}
 			name = in.readString();
 			iconAsString = in.readString();
@@ -179,8 +177,8 @@ public class ListItem implements Cloneable, Parcelable {
 		return priority;
 	}
 
-	public int getID() {
-		return ID;
+	public int getType() {
+		return type;
 	}
 
 	public String getName() {
@@ -231,8 +229,8 @@ public class ListItem implements Cloneable, Parcelable {
 		this.priority = priority;
 	}
 
-	public void setID(int ID) {
-		this.ID = ID;
+	public void setType(int type) {
+		this.type = type;
 	}
 
 	public void setName(String name) {
@@ -287,7 +285,7 @@ public class ListItem implements Cloneable, Parcelable {
 	@NonNull
 	@Override
 	public String toString() {
-		return "ListItem: NAME="+ getName()+ ", PRIORITY="+ getPriority()+ ", ID="+ getID()+
+		return "ListItem: NAME="+ getName()+ ", PRIORITY="+ getPriority()+ ", type="+ getType()+
 				", ICON_AS_STRING="+ getIconAsString()+ ", DRAWABLE="+ getDrawable()+
 				", PADDING_LEFT="+ getLeftPadding()+ ", PADDING_TOP="+ getTopPadding()+
 				", PADDING_BOTTOM="+ getBotPadding()+ ", IS_ICON_BEFORE_TEXT="+ getIconBeforeText()+
@@ -327,11 +325,11 @@ public class ListItem implements Cloneable, Parcelable {
 			dest.writeByte((byte) 1);
 			dest.writeInt(priority);
 		}
-		if (ID == null) {
+		if (type == null) {
 			dest.writeByte((byte) 0);
 		} else {
 			dest.writeByte((byte) 1);
-			dest.writeInt(ID);
+			dest.writeInt(type);
 		}
 		dest.writeString(name);
 		dest.writeString(iconAsString);

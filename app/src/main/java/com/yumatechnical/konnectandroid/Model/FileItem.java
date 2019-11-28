@@ -58,7 +58,7 @@ public class FileItem /*implements Parcelable*/ {
 /*	protected FileItem(Parcel in) {
 		this.name = in.readString();
 		this.fullPath = in.readParcelable(Uri.class.getClassLoader());
-		this.ID = in.readInt();
+		this.type = in.readInt();
 		this.bitmap = in.readParcelable(Bitmap.class.getClassLoader());
 		this.MIME = in.readString();
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -171,7 +171,7 @@ public class FileItem /*implements Parcelable*/ {
 	@NonNull
 	@Override
 	public String toString() {
-		String rtn = "ID="+ getID()+ ", ";
+		String rtn = "type="+ getID()+ ", ";
 		if (getName() != null) { rtn += "NAME="+ getName()+ ", "; }
 		if (getBitmap() != null) { rtn += "BITMAP="+ getBitmap()+ ", "; }
 		if (getMIME() != null) { rtn += "MIME="+ getMIME()+ ", "; }
@@ -199,7 +199,7 @@ public class FileItem /*implements Parcelable*/ {
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeString(name);
 		dest.writeParcelable(fullPath, flags);
-		dest.writeInt(ID);
+		dest.writeInt(type);
 //		dest.writeValue(drawable);
 		dest.writeParcelable(bitmap, flags);
 		dest.writeString(MIME);

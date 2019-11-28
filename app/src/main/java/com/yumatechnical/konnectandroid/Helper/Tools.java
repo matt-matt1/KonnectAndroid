@@ -27,8 +27,15 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.android.volley.VolleyError;
+import com.yumatechnical.konnectandroid.MainActivity;
 import com.yumatechnical.konnectandroid.Model.ConnectionItem;
+import com.yumatechnical.konnectandroid.Model.MicrosoftGraph.Error;
+import com.yumatechnical.konnectandroid.Model.MicrosoftGraph.JsonError;
 import com.yumatechnical.konnectandroid.Vars;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -47,6 +54,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.InvalidParameterSpecException;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -54,6 +62,8 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+
+import static com.yumatechnical.konnectandroid.MainActivity.jsonObject;
 
 //import okhttp3.HttpUrl;
 
@@ -292,83 +302,85 @@ public class Tools extends AppCompatActivity {
 	 * @return ConnectionItem
 	 */
 	public static ConnectionItem decryptConnString(String connStr) {
-		if (connStr.length() < 2)
-			return null;
+//		if (connStr.length() < 2)
+//			return null;
 		ConnectionItem connectionItem = new ConnectionItem(0, 0, "", "",
 				"", "", "", "", 0, "", "");
-		String scheme = "";
-		String[] parts = connStr.split("/");
-		if (!connStr.startsWith("/") && connStr.contains("://")) {
-			//is URL structure?
-			connectionItem.setScheme(parts[0].substring(0, connStr.indexOf(":")));
-			scheme = connectionItem.getScheme().toLowerCase();
-		}
-		String[] auth = parts[2].split("@");
-		//divide [domain][:username[:password]] & host[:port]
-		if (auth.length == 0 || auth.length > 2)
-			Log.d(TAG, "Error: improper connection string - cannot determine host /& domain /& username");
-		else {
-			if (auth.length > 1) {
-				if (!auth[1].contains(":"))
+		if (connStr.length() > 1) {
+			String scheme = "";
+			String[] parts = connStr.split("/");
+			if (!connStr.startsWith("/") && connStr.contains("://")) {
+				//is URL structure?
+				connectionItem.setScheme(parts[0].substring(0, connStr.indexOf(":")));
+				scheme = connectionItem.getScheme().toLowerCase();
+			}
+			String[] auth = parts[2].split("@");
+			//divide [domain][:username[:password]] & host[:port]
+			if (auth.length == 0 || auth.length > 2)
+				Log.d(TAG, "Error: improper connection string - cannot determine host /& domain /& username");
+			else {
+				if (auth.length > 1) {
+					if (!auth[1].contains(":"))
 						connectionItem.setHost(auth[1].trim());
-				//host only (no port)
-				else {  //contains host : port
-					String[] host_port = auth[1].split(":");
-					//divide host[:port]
-					connectionItem.setHost(host_port[0].trim());
-					connectionItem.setPort(Integer.parseInt(host_port[1].trim()));
-				}
-				if (!auth[0].contains(":")) {
-					connectionItem.setAccessToken(auth[0]);
-				} else {
-					String[] auths = auth[0].split(":");
-					//divide [domain][:username[:password]]
-					if (auths.length == 0 || auths.length > 3)
-						Log.d(TAG, "Error: improper connection string - cannot determine domain &/ username");
-					else {
-						if (auths.length != 2) {
-							connectionItem.setAccessToken(auths[0].trim());
-							if (auths.length == 3) {
-								connectionItem.setUsername(auths[1].trim());
-								connectionItem.setPassword(auths[2].trim());
+						//host only (no port)
+					else {  //contains host : port
+						String[] host_port = auth[1].split(":");
+						//divide host[:port]
+						connectionItem.setHost(host_port[0].trim());
+						connectionItem.setPort(Integer.parseInt(host_port[1].trim()));
+					}
+					if (!auth[0].contains(":")) {
+						connectionItem.setAccessToken(auth[0]);
+					} else {
+						String[] auths = auth[0].split(":");
+						//divide [domain][:username[:password]]
+						if (auths.length == 0 || auths.length > 3)
+							Log.d(TAG, "Error: improper connection string - cannot determine domain &/ username");
+						else {
+							if (auths.length != 2) {
+								connectionItem.setAccessToken(auths[0].trim());
+								if (auths.length == 3) {
+									connectionItem.setUsername(auths[1].trim());
+									connectionItem.setPassword(auths[2].trim());
+								}
+							} else {
+								connectionItem.setUsername(auths[0].trim());
+								connectionItem.setPassword(auths[1].trim());
 							}
-						} else {
-							connectionItem.setUsername(auths[0].trim());
-							connectionItem.setPassword(auths[1].trim());
 						}
 					}
+				} else {
+					if (!auth[0].contains(":"))
+						connectionItem.setHost(auth[0].trim());
+						//host only (no port)
+					else {
+						//contains host : port
+						String[] host_port = auth[0].split(":");
+						//divide host[:port]
+						connectionItem.setHost(host_port[0].trim());
+						connectionItem.setPort(Integer.parseInt(host_port[1].trim()));
+					}
 				}
-			} else {
-				if (!auth[0].contains(":"))
-					connectionItem.setHost(auth[0].trim());
-				//host only (no port)
-				else {
-					//contains host : port
-					String[] host_port = auth[0].split(":");
-					//divide host[:port]
-					connectionItem.setHost(host_port[0].trim());
-					connectionItem.setPort(Integer.parseInt(host_port[1].trim()));
-				}
+				if (parts.length > 3) {
+					if (!parts[3].contains(("/")))
+						if (scheme.equals("smb")) {
+							connectionItem.setShareName(parts[3]);
+							connectionItem.setPath("/");
+						} else
+							connectionItem.setPath(parts[3]);
+					else if (scheme.equals("smb")) {
+						String[] paths = getShareNameFromPath(parts[3]);
+						connectionItem.setShareName(paths[0]);
+						connectionItem.setPath(paths[1]);
+					}
+				} else connectionItem.setPath("/");
 			}
-			if (parts.length > 3) {
-				if (!parts[3].contains(("/")))
-					if (scheme.equals("smb")) {
-						connectionItem.setShareName(parts[3]);
-						connectionItem.setPath("/");
-					} else
-						connectionItem.setPath(parts[3]);
-				else if (scheme.equals("smb")) {
-					String[] paths = getShareNameFromPath(parts[3]);
-					connectionItem.setShareName(paths[0]);
-					connectionItem.setPath(paths[1]);
-				}
-			} else connectionItem.setPath("/");
+			//set type for smb & ftp
+			if (scheme.equals("smb"))
+				connectionItem.setType(Vars.SMB_CONN);
+			else if (scheme.equals("ftp") || scheme.equals("ftps") || scheme.equals("sfpt"))
+				connectionItem.setType(Vars.FTP_COMM);
 		}
-		//set type for smb & ftp
-		if (scheme.equals("smb"))
-			connectionItem.setType(Vars.SMB_CONN);
-		else if (scheme.equals("ftp") || scheme.equals("ftps") || scheme.equals("sfpt"))
-			connectionItem.setType(Vars.FTP_COMM);
 		return connectionItem;
 	}
 
@@ -642,6 +654,58 @@ public class Tools extends AppCompatActivity {
 			return filename;
 
 		return filename.substring(0, extensionIndex);
+	}
+
+	public static String convertStreamToString(InputStream is) {
+		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+		StringBuilder sb = new StringBuilder();
+
+		String line = null;
+		try {
+			while ((line = reader.readLine()) != null) {
+				sb.append((line + "\n"));
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				is.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return sb.toString();
+	}
+
+
+	public static String displayVolleyError(VolleyError error) {
+		String my = "error", result;
+		if (error.networkResponse != null) {
+			result = new String(error.networkResponse.data);
+//		Log.d(TAG, "displayVolleyError() Error result: "+ result);
+			try {
+				jsonObject = new JSONObject(result);
+//			Error err = gson.fromJson(jsonObject.toString(), Error.class);
+				Error err = MainActivity.gson.fromJson(jsonObject.getJSONObject("error").toString(), Error.class);
+				my = String.format(Locale.CANADA, "%d: %s (%s)",
+						error.networkResponse.statusCode,
+						err.getMessage(), err.getCode());
+			} catch (JSONException e) {
+				try {
+					jsonObject = new JSONObject(result);
+					JsonError jsonError = MainActivity.gson.fromJson(jsonObject.getJSONObject("error").toString(), JsonError.class);
+					my = String.format(Locale.CANADA, "%d: %s (%s)",
+							error.networkResponse.statusCode,
+							jsonError.getMessage(), jsonError.getCode());
+				} catch (JSONException e1) {
+					e1.printStackTrace();
+				}
+			}
+		} else my = error.getLocalizedMessage();
+//		Toast.makeText(MainActivity.this,
+//				my, Toast.LENGTH_LONG).show();
+//		Log.d(TAG, "displayVolleyError() Error computed: "+ my);
+		return my;
 	}
 
 }

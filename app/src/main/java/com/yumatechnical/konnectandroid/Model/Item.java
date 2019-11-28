@@ -65,9 +65,9 @@ public class Item implements Parcelable {
 				priority = in.readInt();
 			}
 			if (in.readByte() == 0) {
-				ID = null;
+				type = null;
 			} else {
-				ID = in.readInt();
+				type = in.readInt();
 			}
 			name = in.readString();
 			iconAsString = in.readString();
@@ -207,7 +207,7 @@ public class Item implements Parcelable {
 	@NonNull
 	@Override
 	public String toString() {
-		return "ListItem{ "+ "NAME="+ getName()+ /*", PRIORITY="+ getPriority()+*/ ", ID="+ getID()+ /*", ICON_AS_STRING="+ getIconAsString()+*/
+		return "ListItem{ "+ "NAME="+ getName()+ /*", PRIORITY="+ getPriority()+*/ ", type="+ getID()+ /*", ICON_AS_STRING="+ getIconAsString()+*/
 				/*", DRAWABLE="+ getDrawable()+*/ /*", PADDING_LEFT="+ getLeftPadding()+ ", PADDING_TOP="+ getTopPadding()+
 				", PADDING_BOTTOM="+ getBotPadding()+ ", IS_ICON_BEFORE_TEXT="+ getIconBeforeText()+
 				", PADDING_BETEEN_ICON_AND_TEXT="+ getIconTextPadding()+ ", IS_FADED="+ getFaded()+*/ "}\n";
@@ -242,7 +242,7 @@ public class Item implements Parcelable {
 			dest.writeByte((byte) 1);* /
 		dest.writeInt(priority);/ *
 		}
-		if (ID == null) {
+		if (type == null) {
 			dest.writeByte((byte) 0);
 		} else {
 			dest.writeByte((byte) 1);*/
@@ -290,11 +290,11 @@ public class Item implements Parcelable {
 			dest.writeByte((byte) 1);
 			dest.writeInt(priority);
 		}
-		if (ID == null) {
+		if (type == null) {
 			dest.writeByte((byte) 0);
 		} else {
 			dest.writeByte((byte) 1);
-			dest.writeInt(ID);
+			dest.writeInt(type);
 		}
 		dest.writeString(name);
 		dest.writeString(iconAsString);

@@ -66,7 +66,7 @@ public class MyPhone {
 	@NonNull
 	@Override
 	public String toString() {
-		return "MyPhone: ID="+ getId() +", PHONE_STRING="+ getPhoneString() +", TYPE="+ getType()
+		return "MyPhone: type="+ getId() +", PHONE_STRING="+ getPhoneString() +", TYPE="+ getType()
 				+", NUMBER="+ getNumber() +"\n";
 	}
 

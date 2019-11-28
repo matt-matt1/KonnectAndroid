@@ -106,21 +106,34 @@
 	<string name="smb_share">Local Network Share</string>
 	<string name="cannot_conn">Unable to Retrieve list from server</string>
 	<string name="find_share">Find Share name</string>
-	<string name="num_conn">number of connections</string>
+	<string name="num_conn">number_of_connections</string>
 	<string name="display_name">display_name</string>
 	<string name="conn">connection</string>
 	<string name="token">token</string>
-	<string name="conn_str">connection string</string>
-	<string name="conn_id">connection_id</string>
+	<string name="conn_str">connection_string</string>
+	<string name="conn_type">connection_type</string>
 	<string name="icloud">iCloud</string>
 	<string name="remove_all">Remove all Custom Connections</string>
-<!--	<string name="remove_settings">remove all settings</string>-->
+	<!--	<string name="remove_settings">remove all settings</string>-->
 	<string name="remove_settings">Remove all Customisations and all Settings</string>
 	<string name="PREFS_TITLE_network_transfers">Transfer only over Wifi</string>
 	<string name="Display">Display</string>
 	<string name="Transfers">Transfers</string>
 	<string name="type_remove_settings">Type \'remove\' to Remove all Customisations and Setting</string>
 	<string name="blank_string" />
+	<string name="msa_client_id" translatable="false">8cd4df27-a31a-4ede-a3b0-f1f7408ac8f5</string>
+	<string name="directory_tenant_id" translatable="false">e04a8f8b-842f-46d5-a824-ed7902b2cf81</string>
+	<string name="object_id" translatable="false">88c7bf4c-8478-4434-bb00-8fc06eb88d6c</string>
+	<string name="aad_secretKey">]hp_V–31–21@@F=mh@r0NTwQu1mGMJ=C</string>
+	<string name="aad_secret_encrypted" translatable="false">BA2E7462D0A28CF496A6E94E770FC0E7DF65FC258D60E04B7EEB2D2D12795FD20CC8EE72A457C3AAA35F79627FD13728</string>
+	<string name="aad_redirectUriSignin" translatable="false">http://localhost:8080/msal4jsample/secure/aad</string>
+	<string name="aad_redirectUriGraph" translatable="false">http://localhost:8080/msal4jsample/graph/me</string>
+	<string name="auth_ms">Launching web browser to authenticate with Microsoft</string>
+	<string name="conn_again">No valid Access Token. Delete and add this connectionn again</string>
+	<string name="accountsMSAL">Select your Microsoft account</string>
+	<string name="useGoogleAcc">Using Google account</string>
+	<string name="proceed">proceed</string>
+	<string name="another">another account</string>
 
 	<string-array name="contactShare">
 		<item>Email</item>

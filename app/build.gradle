@@ -5,16 +5,37 @@ android {
 	buildToolsVersion "29.0.2"
 	defaultConfig {
 		applicationId "com.yumatechnical.konnectandroid"
-		minSdkVersion 15
+		minSdkVersion 21
+//		minSdkVersion 15
 		targetSdkVersion 29
 		versionCode 1
 		versionName "1.0"
 		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 		multiDexEnabled true
+//		javaCompileOptions {
+//			annotationProcessorOptions {
+//				includeCompileClasspath true
+//			}
+//		}
+		packagingOptions {
+			pickFirst 'lib/armeabi-v7a/libassmidi.so'
+			pickFirst 'lib/x86/libassmidi.so'
+			exclude 'META-INF/DEPENDENCIES'
+			exclude 'META-INF/LICENSE'
+			exclude 'META-INF/LICENSE.txt'
+			exclude 'META-INF/license.txt'
+			exclude 'META-INF/NOTICE'
+			exclude 'META-INF/NOTICE.txt'
+			exclude 'META-INF/notice.txt'
+			exclude 'META-INF/ASL2.0'
+		}
 	}
 	buildTypes {
 		release {
-			minifyEnabled false
+//			minifyEnabled false
+			minifyEnabled true
+			shrinkResources true
+//			proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 			proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 		}
 	}
@@ -27,10 +48,20 @@ android {
 		exclude 'META-INF/LICENSE.txt'
 		exclude 'META-INF/NOTICE'
 		exclude 'META-INF/NOTICE.txt'
+		exclude 'META-INF/jersey-module-version'
+		exclude 'META-INF/MANIFEST.MF'
 	}
 	aaptOptions {
 		cruncherEnabled = false
 	}
+}
+
+ext {
+	// App dependencies
+	junitVersion = '4.12'
+	mockitoVersion = '1.10.19'
+//	powerMockito = '1.6.2'
+	hamcrestVersion = '1.3'
 }
 
 dependencies {
@@ -38,7 +69,14 @@ dependencies {
 	implementation 'androidx.appcompat:appcompat:1.1.0'
 	implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
 	implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-	testImplementation 'junit:junit:4.12'
+//	testImplementation 'junit:junit:4.12'
+	// Dependencies for local unit tests
+	testImplementation "junit:junit:$junitVersion"
+	testImplementation "org.mockito:mockito-all:$mockitoVersion"
+	testImplementation "org.hamcrest:hamcrest-all:$hamcrestVersion"
+//	testImplementation "org.powermock:powermock-module-junit4:$powerMockito"
+//	testImplementation "org.powermock:powermock-api-mockito:$ext.powerMockito"
+
 	androidTestImplementation 'androidx.test:runner:1.2.0'
 	androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 	implementation 'com.android.support:preference-v7:29.0.0'
@@ -134,4 +172,58 @@ dependencies {
 
 	implementation 'com.github.andriydruk:dnssd:0.9.13'
 	implementation 'com.github.andriydruk:rx2dnssd:0.9.13'
+
+//	implementation 'net.danlew:android.joda:2.10.3'
+//	implementation 'com.google.guava:guava:24.1-jre'
+//	implementation 'com.microsoft.graph:microsoft-graph-android-auth:0.1.0-SNAPSHOT'
+//	implementation 'com.microsoft.azure:msal4j:0.5.0-preview'
+	//^Annotation processors must be explicitly declared now...
+	/*
+	    dependency {
+        // Include the sdk as a dependency
+        compile ('com.onedrive.sdk:onedrive-sdk-android:1.3') {
+            transitive = false
+        }
+
+        // Include the gson dependency
+        compile ('com.google.code.gson:gson:2.3.1')
+
+        // Include supported authentication methods for your application
+        compile ('com.microsoft.services.msa:msa-auth:0.8.+')
+        compile ('com.microsoft.aad:adal:1.1.+')
+    }
+	*/
+//	implementation 'com.onedrive.sdk:onedrive-sdk-android:1.3'
+	//^ERROR: Unable to resolve dependency for ':app@debugAndroidTest/compileClasspath': Could not resolve com.onedrive.sdk:onedrive-sdk-android:1.3.
+//	implementation 'com.google.code.gson:gson:2.8.5'
+//	implementation 'com.microsoft.services.msa:msa-auth:0.8.0'
+//	implementation 'com.microsoft.aad:adal:1.1.0'
+
+//	implementation 'org.projectlombok:lombok:1.18.6'
+//	annotationProcessor 'com.google.auto.value:auto-value:1.5.2'
+
+//	Google Drive
+	implementation 'com.android.volley:volley:1.1.1'
+	implementation 'com.microsoft.identity.client:msal:0.3+'
+	implementation 'com.google.code.gson:gson:2.8.5'
+
+//	implementation 'com.google.android.gms:play-services-auth:16.0.1'
+	implementation 'com.google.android.gms:play-services-auth:17.0.0'
+	implementation 'com.google.http-client:google-http-client-gson:1.26.0'
+	implementation('com.google.api-client:google-api-client-android:1.26.0') {
+		exclude group: 'org.apache.httpcomponents'
+	}
+	implementation('com.google.apis:google-api-services-drive:v3-rev136-1.25.0') {
+		exclude group: 'org.apache.httpcomponents'
+	}
+	// Ammarptn file explorer for GDrive
+	implementation 'com.github.ammarptn:GDriveDebugViewer:0.1.1'
+
+//	The BOX
+//	implementation 'com.box:box-android-preview-sdk:3.0.3'
+	implementation 'com.box:box-java-sdk:2.32.0'
+	implementation 'com.eclipsesource.minimal-json:minimal-json:0.9.1'
+	implementation 'org.bitbucket.b_c:jose4j:0.5.5'
+	implementation 'org.bouncycastle:bcprov-jdk15on:1.60'
+	implementation 'org.bouncycastle:bcpkix-jdk15on:1.60'
 }

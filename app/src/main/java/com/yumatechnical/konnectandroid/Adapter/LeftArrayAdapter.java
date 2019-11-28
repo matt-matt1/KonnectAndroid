@@ -22,7 +22,6 @@ import com.yumatechnical.konnectandroid.Model.ListItem;
 import com.yumatechnical.konnectandroid.R;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 
 public class LeftArrayAdapter extends ArrayAdapter<ListItem> /*implements ActionMode.Callback*/ {
@@ -123,7 +122,7 @@ public class LeftArrayAdapter extends ArrayAdapter<ListItem> /*implements Action
 			}
 			lastSelected = v;
 //			mActionMode = view.startActionMode(LeftArrayAdapter.this);
-			listener.LongPressedLeftItemId(clickedItem.getID());
+			listener.LongPressedLeftItemId(clickedItem.getType());
 			listener.LongPressedLeftItemIndex(position);
 			return true;
 		});
@@ -180,7 +179,7 @@ public class LeftArrayAdapter extends ArrayAdapter<ListItem> /*implements Action
 				lastSelected.setSelected(false);
 			}
 			lastSelected = v;
-			listener.SelectedLeftItemId(clickedItem.getID());
+			listener.SelectedLeftItemId(clickedItem.getType());
 			listener.SelectedLeftItemIndex(position);
 		});
 		return view;

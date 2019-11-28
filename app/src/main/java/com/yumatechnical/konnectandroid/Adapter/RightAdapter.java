@@ -15,7 +15,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.github.chrisbanes.photoview.PhotoView;
 import com.yumatechnical.konnectandroid.Model.FileItem;
 import com.yumatechnical.konnectandroid.R;
 
@@ -43,6 +42,7 @@ public class RightAdapter extends RecyclerView.Adapter<RightAdapter.RightAdapter
     	this.defaultImage = defaultImage;
     }
 
+	@SuppressWarnings("unused")
 	public RightAdapter() {
 	}
 
@@ -145,6 +145,11 @@ public class RightAdapter extends RecyclerView.Adapter<RightAdapter.RightAdapter
 	public void clear() {
 		my_data.clear();
 		notifyDataSetChanged();
+	}
+
+	public void addAll(ArrayList<FileItem> items) {
+    	my_data.addAll(items);
+    	notifyDataSetChanged();
 	}
 
 	public void setListener(OnListItemClickListener listener) {
