@@ -1,10 +1,10 @@
 {
   "boxAppSettings": {
 	"clientID": "s3al43fdi2g5yda105kj8it91buta9ys",
-	"clientSecret": "********************************",
+	"clientSecret": "UKLM13j4haw1PQAzG6MwvtsF3qIZszre",
 	"appAuth": {
-	  "publicKeyID": "public.pem",
-	  "privateKey": "private.pem",
+	  "publicKeyID": "fc6o6e72",
+	  "privateKey": "-----BEGIN RSA PRIVATE KEY-----\nProc-Type: 4,ENCRYPTED\nDEK-Info: DES-EDE3-CBC,FDAB198A0DBBEE46\n\nQNrkiXbMmHTyyQqUt0th22uRi0ngzKx3AEwWJiB9fY5pqG76NKlu3gpDXoJQF0le\nP6wPjx2PtUczBt3O04BgtqALsFUA51QapJRgsdY0pEKtLQdF0tSSwA6lD88osenl\niQiroNYj9LsPI+++k1mz7EMNaVRXKQ+futpY+R0qCArYLw39HxXv5cZXQeo2szqD\nsmI+iGIpb3Tk4Al6b11prGfVlV0O+Jdor7BmFi26c9JfaEq9cv95OWvQ+QFzZ6Ci\nRlXb6Y+0hALPg3cBZpbBck3n/IttlzVN/aOCAyEx9kF8cDVXSzFSIjOLMjkuHiLH\nDn5KJx6m6annXHqIkRQkIhUW4Mve6h2qpAYr0QZwbxneHr0k7wHmfEqTSFFhxy96\np96zQXHeTRafvdSkONiRKu7BZ0Vn3bHY0mgctdtVc+DZ1xhjoCGYtG58wgKCLoKW\nmdi4DaR1YYc8YDaXQ/ylH+YsMhOZ1Z6m6xYQG44EDh9GE8FHVRcZPF4PVh45M36p\n+VHqG/4x5obsMQlgKbDDM5BO8BUvndpBJtQ1qQtPLmj4GZJJmFYnRaS7eHBj7RNe\noZxAhxH+mY6P4lhdws0pZgmBeeA3ClMxGBhl97Dco5pk9nqGkLTSOLf6+J7XLLgW\nEB7MT7gT20vUgjptPbvfiwP7GgkvCn0fomqbHlZx9ynI7SfpQtRnzAmrD8EAr99l\nID50O4mWkLuGenM8q3c9AKd2lyCAK3M1teq/LaI1p9tq4jz8OBmczv3ZdvpOzoch\nkES/CqLEmV+YjWDGX404ex+2kpanARkaM0U8Hadzxg0+OPKJdELSa6+zWMo1hPna\n97k/kPY6H+dgQts8CwtMQ8d8c7TkxeZFppXkCzcKupnw3WXIyP6ifJ83EWgUWWzn\neDBKHjQ1T0UQRFrVYYmIRDfMxyjx5Y1nUzX44PGE4+FNR9ddhDGIfMXc4PZtznYV\npV4tC+nvb6pYb8iZf7VjqlfYymVelrClQp4E9uzeJMseeZ5MNpCvk/LN+dk4XP3M\nWWc6+0E+ObEBT9EvJEj3Tccog3fOQZQBlXLucFtZb7TFNd7cfyR4a1Z1lu/L2V2q\nhsbR5BYNGFKOKLMaGGjxUPhdMHxwHQhqnDfEG0kLHTqu+5uVO12vqUdglTfbRhfH\nNKzFLaBM/qPp1ofq0ctDprdoScOkValLqk3eqV8Myz0zj1BYCYhIr+dD1iNtc3Wc\nJtde+kqhOQJmctev7cVu8dGd7/KvElQi48XoTVDGvPZJxl+Vy1U6DJYjgMPKjrJL\np3qFpjSgV4/wZcbV6X2VS2nC45AI1s4tQBBwdIkD1XdA5ZLcf/RBBNuwRiOoN7m0\nQ8NFR/trvH23DI43nPguuBVxy3CcX2LDk4mDqUboPDmXLkRkE79EPxIE5xe1LA8t\nFKvC/uzB8DDmWwL5J5NWhITXETZ34fA7E3Zm3Lj+IUgUHjf7n39kcki7dUrvgjMw\nmQBS56r7QMqxtJzPM4+xilGVb26p2hjzD5AhoGbN8+srAb3ThbFlgRomCcTbaLN1\nCFdqT8tCDKC3iUBXWZE0YV0hvJ6Ir9IiutCYDhqHBCvebZhuG06knUomFjfFBL1P\n-----END RSA PRIVATE KEY-----\n",
 	  "passphrase": "android"
 	}
   },

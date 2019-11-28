@@ -219,6 +219,28 @@ dependencies {
 	// Ammarptn file explorer for GDrive
 	implementation 'com.github.ammarptn:GDriveDebugViewer:0.1.1'
 
+	implementation 'com.google.api-client:google-api-client:1.26.0'
+//	implementation 'com.google.api-client:google-api-client:1.23.0'
+	implementation 'com.google.oauth-client:google-oauth-client-jetty:1.23.0'
+	implementation 'com.google.apis:google-api-services-drive:v3-rev110-1.23.0'
+	// Google Drive
+/*	implementation "com.google.android.gms:play-services-auth:17.0.0"
+	implementation "com.google.android.gms:play-services-drive:17.0.0"
+	implementation 'com.squareup.okio:okio:2.2.2'
+//	implementation 'com.squareup.okio:okio:1.14.0'
+*/
+	implementation 'com.google.android.gms:play-services-auth:17.0.0'
+//	implementation 'com.google.android.gms:play-services-auth:16.0.1'
+	implementation('com.google.api-client:google-api-client-android:1.23.0') {
+		exclude group: 'org.apache.httpcomponents'
+		exclude module: 'guava-jdk5'
+	}
+	// https://mvnrepository.com/artifact/com.google.apis/google-api-services-drive
+	implementation('com.google.apis:google-api-services-drive:v3-rev136-1.25.0') {
+		exclude group: 'org.apache.httpcomponents'
+		exclude module: 'guava-jdk5'
+	}
+
 //	The BOX
 //	implementation 'com.box:box-android-preview-sdk:3.0.3'
 	implementation 'com.box:box-java-sdk:2.32.0'
@@ -226,4 +248,6 @@ dependencies {
 	implementation 'org.bitbucket.b_c:jose4j:0.5.5'
 	implementation 'org.bouncycastle:bcprov-jdk15on:1.60'
 	implementation 'org.bouncycastle:bcpkix-jdk15on:1.60'
+
+
 }

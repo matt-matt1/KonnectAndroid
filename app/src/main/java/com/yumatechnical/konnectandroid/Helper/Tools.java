@@ -11,6 +11,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Process;
 import android.text.TextPaint;
@@ -34,6 +35,7 @@ import com.yumatechnical.konnectandroid.Model.MicrosoftGraph.Error;
 import com.yumatechnical.konnectandroid.Model.MicrosoftGraph.JsonError;
 import com.yumatechnical.konnectandroid.Vars;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -71,6 +73,7 @@ import static com.yumatechnical.konnectandroid.MainActivity.jsonObject;
 public class Tools extends AppCompatActivity {
 
 	private static final String TAG = Tools.class.getSimpleName();
+	private WifiManager.WifiLock mWifiLock = null;
 
 
 	/**
@@ -706,6 +709,95 @@ public class Tools extends AppCompatActivity {
 //				my, Toast.LENGTH_LONG).show();
 //		Log.d(TAG, "displayVolleyError() Error computed: "+ my);
 		return my;
+	}
+/*
+	public ArrayList processFile(Context context, int resourceId) {
+		ArrayList contentList = new ArrayList();
+		String jsonStr = readRawTextFile(context, resourceId);
+		try {
+			contentList = this.parseJsonFromString(jsonStr);
+		} catch(Exception e){
+			e.printStackTrace();
+		}
+		return contentList;
+	}
+	private static String readRawTextFile(Context context, int resourceId)
+	{
+		InputStream inputStream = context.getResources().openRawResource(resourceId);
+		InputStreamReader inputreader = new InputStreamReader(inputStream);
+		BufferedReader buffreader = new BufferedReader(inputreader);
+		String line;
+		StringBuilder text = new StringBuilder();
+		try {
+			while (( line = buffreader.readLine()) != null) {
+				text.append(line);
+			}
+		} catch (IOException e) {
+			return null;
+		}
+		return text.toString();
+	}
+	private ArrayList parseJsonFromString(String jsonString)
+			throws JSONException {
+		ArrayList contentList = new ArrayList();
+		try {
+			JSONObject contentJson = new JSONObject(jsonString);
+			JSONArray itemArray = contentJson.getJSONArray("items");
+			for(int i = 0; i < itemArray.length(); i++) {
+				String title="", details="", thumbnail="", link="";
+				JSONObject itemDetails = itemArray.getJSONObject(i);
+				if (!itemDetails.isNull("title")) { title = itemDetails.getString("title"); }
+				if (!itemDetails.isNull("details")) { details = itemDetails.getString("details"); }
+				if (!itemDetails.isNull("thumbnail")) { thumbnail = itemDetails.getString("thumbnail"); }
+				if (!itemDetails.isNull("link")) { link = itemDetails.getString("link"); }
+				ContentBlock newContent = new ContentBlock(mContext, title, details, thumbnail, link);
+				contentList.add(newContent);
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return contentList;
+	}
+	*/
+/*
+	public void readJSON() {
+		// config Map is created for pretty printing.
+		Map<String, Boolean> config = new HashMap<>();
+		// Pretty printing feature is added.
+		config.put(JsonGenerator.PRETTY_PRINTING, true);
+		// PrintWriter and JsonWriter is being created
+// in try-with-resources
+		try (PrintWriter pw = new PrintWriter("./src/main/resources/jsonObject.json")
+		     ;JsonWriter jsonWriter = Json.createWriterFactory(config).createWriter(pw)) {
+			// Json object is being sent into file system
+			jsonWriter.writeObject(jsonObject);
+		}
+	}
+*/
+	/***
+	 * Calling this method will aquire the lock on wifi. This is avoid wifi
+	 * from going to sleep as long as <code>releaseWifiLock</code> method is called.
+	 **/
+	private void holdWifiLock(Context context) {
+		WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+		if (mWifiLock == null)
+			mWifiLock = wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL, TAG);
+		mWifiLock.setReferenceCounted(false);
+		if (!mWifiLock.isHeld())
+			mWifiLock.acquire();
+	}
+
+	/***
+	 * Calling this method will release if the lock is already help. After this method is called,
+	 * the Wifi on the device can goto sleep.
+	 **/
+	private void releaseWifiLock() {
+		if (mWifiLock == null)
+			Log.w(TAG, "#releaseWifiLock mWifiLock was not created previously");
+		if (mWifiLock != null && mWifiLock.isHeld()) {
+			mWifiLock.release();
+			//mWifiLock = null;
+		}
 	}
 
 }

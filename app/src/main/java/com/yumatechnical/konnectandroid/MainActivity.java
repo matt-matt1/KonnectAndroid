@@ -28,6 +28,7 @@ import android.os.Bundle;
 import android.os.Process;
 import android.provider.ContactsContract;
 import android.util.DisplayMetrics;
+import android.util.JsonReader;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -58,6 +59,8 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.box.sdk.BoxConfig;
+import com.box.sdk.BoxDeveloperEditionAPIConnection;
 import com.dropbox.core.DbxAppInfo;
 import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.DbxWebAuth;
@@ -71,10 +74,17 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+//import com.google.api.client.json.Json;
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.Json;
 import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
+import com.google.api.services.drive.model.FileList;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.hierynomus.msfscc.fileinformation.FileIdBothDirectoryInformation;
 import com.hierynomus.smbj.SMBClient;
 import com.hierynomus.smbj.auth.AuthenticationContext;
@@ -100,6 +110,7 @@ import com.yumatechnical.konnectandroid.Fragment.MyDialogFragment;
 import com.yumatechnical.konnectandroid.Fragment.RightFragment;
 import com.yumatechnical.konnectandroid.Helper.AESUtils;
 import com.yumatechnical.konnectandroid.Helper.BoxSDK;
+import com.yumatechnical.konnectandroid.Helper.DriveQuickstart;
 import com.yumatechnical.konnectandroid.Helper.DriveServiceHelper;
 import com.yumatechnical.konnectandroid.Helper.Dropbox.DropboxInstance;
 import com.yumatechnical.konnectandroid.Helper.Dropbox.UploadTask;
@@ -126,8 +137,11 @@ import org.json.JSONObject;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -230,7 +244,75 @@ public class MainActivity extends AppCompatActivity
 //		gson = gsonBuilder.create();
 		gson = gsonBuilder.serializeNulls().create();
 		accountGoogle = GoogleSignIn.getLastSignedInAccount(this);
+//		Log.d(TAG, "box config is "+ getResources().getResourceName(R.raw.box_config)+ ".");
+		BoxSDK boxSDK = new BoxSDK();
+		String configFilename = "./src/main/res/raw/box_config.json";
+//		String configFilename = "/Volumes/Mac27ShareHFS/yuma/AndroidStudioProjects/KonnectAndroid2/app/src/main/res/raw/box_config.json";
+		BoxConfig config = boxSDK.loadConfig(configFilename);
+		try {
+			BoxDeveloperEditionAPIConnection api =
+					BoxDeveloperEditionAPIConnection.getAppEnterpriseConnection(config);
+			Log.d(TAG, "box config ID is " + api.getClientID());
+		} catch (Exception e) {
+			try {
+				BoxConfig config1 = new BoxConfig(BoxSDK.CLIENT_ID, BoxSDK.CLIENT_SECRET,
+						BoxSDK.ENTERPRISE_ID, BoxSDK.PUBLIC_KEY_ID, BoxSDK.PRIVATE_KEY,
+						BoxSDK.PRIVATE_KEY_PASSPH);//, BoxSDK.ENCRYPTION_ALGORITHM
+				BoxDeveloperEditionAPIConnection api =
+						BoxDeveloperEditionAPIConnection.getAppEnterpriseConnection(config1);
+				Log.d(TAG, "box config(2) ID is "+ api.toString());
+			} catch (Exception ex) {
+				Log.d(TAG, "box config ID is invalid");
+			}
+		}
+/*		JsonReader reader;
+		try {
+			reader = Json.createReader(new FileReader(new FileReader(configFilename));
+			JsonObject obj = reader.readObject();
+			System.out.println("Content: " + obj.toString());
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}*/
 		BoxSDK.listDevFiles(BoxSDK.DEVELOPER_TOKEN);
+
+		// Build a new authorized API client service.
+/*		NetHttpTransport HTTP_TRANSPORT = new NetHttpTransport();
+		try {
+			HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+		} catch (GeneralSecurityException | IOException e) {
+			e.printStackTrace();
+		}*/
+		NetHttpTransport HTTP_TRANSPORT = new com.google.api.client.http.javanet.NetHttpTransport();
+		Drive service = null;
+		try {
+			service = new Drive.Builder(HTTP_TRANSPORT,
+					DriveQuickstart.JSON_FACTORY,
+					DriveQuickstart.getCredentials(HTTP_TRANSPORT))
+					.setApplicationName(DriveQuickstart.APPLICATION_NAME)
+					.build();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		// Print the names and IDs for up to 10 files.
+		FileList result = null;
+		try {
+			result = service.files().list()
+					.setPageSize(10)
+					.setFields("nextPageToken, files(id, name)")
+					.execute();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		List<com.google.api.services.drive.model.File> files = result.getFiles();
+		if (files == null || files.isEmpty()) {
+			System.out.println("No files found.");
+		} else {
+			System.out.println("Files:");
+			for (com.google.api.services.drive.model.File file : files) {
+				System.out.printf("%s (%s)\n", file.getName(), file.getId());
+			}
+		}
+
 	}
 
 

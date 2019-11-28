@@ -15,6 +15,8 @@
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 	<uses-permission android:name="android.permission.VIBRATE" />
 	<uses-permission android:name="android.permission.WAKE_LOCK" />
+<!--	<uses-permission android:name="android.permission.WRITE_SETTINGS" />-->
+<!--	<uses-permission android:name="com.google.android.c2dm.permission.RECIEVE" />-->
 
 	<application
 		android:name=".Vars"
@@ -31,6 +33,19 @@
 		tools:overrideLibrary="com.microsoft.graph.authentication"
 		tools:replace="android:hardwareAccelerated"
 		tools:targetApi="n">
+		<meta-data
+			android:name="com.google.android.gms.version"
+			android:value="@integer/google_play_services_version" />
+<!--		android:name="android.support.v4.content.FileProvider"-->
+		<provider
+			android:name="android.support.v4."
+			android:authorities="${applicationId}.provider"
+			android:exported="false"
+			android:grantUriPermissions="true">
+			<meta-data
+				android:name="android.support.FILE_PROVIDER_PATHS"
+				android:resource="@xml/provider_paths"/>
+		</provider>
 		<activity android:name=".Helper.MSALActivity"></activity>
 		<!--Intent filter to capture System Browser or Authenticator calling back to our app after sign-in-->
 		<activity
@@ -61,7 +76,6 @@
 		<activity android:name=".InitActivity">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
-
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity> <!-- android:label="MainActivity" -->
@@ -71,10 +85,8 @@
 			android:launchMode="singleTop">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
-
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
-
 			<meta-data
 				android:name="android.app.searchable"
 				android:resource="@xml/searchable_sharename" />
@@ -83,7 +95,6 @@
 			<intent-filter>
 				<action android:name="android.intent.action.SEARCH" />
 			</intent-filter>
-
 			<meta-data
 				android:name="android.app.searchable"
 				android:resource="@xml/searchable_sharename" />
@@ -105,10 +116,8 @@
 			tools:targetApi="jelly_bean">
 			<intent-filter>
 				<action android:name="android.intent.action.MANAGE_NETWORK_USAGE" />
-
 				<category android:name="android.intent.category.DEFAULT" />
 			</intent-filter>
-
 			<meta-data
 				android:name="android.support.PARENT_ACTIVITY"
 				android:value=".MainActivity" />
@@ -119,9 +128,7 @@
 			android:launchMode="singleTask">
 			<intent-filter>
 				<data android:scheme="db-0qb7zuth7zcx40s" />
-
 				<action android:name="android.intent.action.VIEW" />
-
 				<category android:name="android.intent.category.BROWSABLE" />
 				<category android:name="android.intent.category.DEFAULT" />
 			</intent-filter>

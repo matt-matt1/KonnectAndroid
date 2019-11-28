@@ -33,3 +33,24 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+/*
+//gdive
+apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = 'DriveQuickstart'
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+version = '1.0'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implentation 'com.google.api-client:google-api-client:1.26.0'
+//	implentation 'com.google.api-client:google-api-client:1.23.0'
+	implentation 'com.google.oauth-client:google-oauth-client-jetty:1.23.0'
+	implentation 'com.google.apis:google-api-services-drive:v3-rev110-1.23.0'
+}
+*/
