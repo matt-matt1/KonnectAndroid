@@ -4,6 +4,7 @@
       <mapping pattern="msal_mulitple_personal" type="JSON" />
       <mapping pattern="msal_mulitple" type="JSON" />
       <mapping pattern="msal_mulitple_work" type="JSON" />
+      <mapping pattern="microsoft_onedrive.jpg" type="JavaFX" />
       <mapping pattern="auth_config" type="PLAIN_TEXT" />
       <mapping pattern="list_alphabet" type="XML" />
       <mapping pattern="provider_paths" type="XML" />
